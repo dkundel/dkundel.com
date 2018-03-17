@@ -46,11 +46,12 @@ const Talk = ({ info }) => {
   );
 };
 
-const TalkList = ({ talks }) => (
-  <TalkListContainer>
-    {talks.sort(sortByEventDate).map(talkInfo => <Talk info={talkInfo} />)}
-  </TalkListContainer>
-);
+const TalkList = ({ talks, collapsed = false }) => {
+  const list = collapsed
+    ? ''
+    : talks.sort(sortByEventDate).map(talkInfo => <Talk info={talkInfo} />);
+  return <TalkListContainer>{list}</TalkListContainer>;
+};
 
 function sortByEventDate(talkA, talkB) {
   const format = 'MMMM D, YYYY';
