@@ -1,26 +1,53 @@
-import React from 'react'
-import Link from 'gatsby-link'
+import React, { Fragment } from 'react';
+import Link from 'gatsby-link';
 
-const IndexPage = ({ data }) => (
+const Paragraphs = ({ list }) => (
   <div>
-    <h1>Hi people</h1>
-    <pre>{JSON.stringify(data, null, 4)}</pre>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <Link to="/page-2/">Go to page 2</Link>
+    {list.map(content => <p dangerouslySetInnerHTML={{ __html: content }} />)}
   </div>
-)
+);
+const IndexPage = ({ data }) => {
+  const bio = data.aboutJson.biography._paragraphs;
+  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs;
+  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list;
+  const social = data.aboutJson.socialChannels._list;
+  return (
+    <div>
+      <h2>{data.aboutJson.biography._heading}</h2>
+      <Paragraphs list={bio} />
+      <h3>{data.aboutJson.biography.examplesOfPreviousTalks._heading}</h3>
+      <Paragraphs list={talkText} />
+      <ul>
+        {talks.map(talk => <li dangerouslySetInnerHTML={{ __html: talk }} />)}
+      </ul>
+      <h2>{data.aboutJson.socialChannels._heading}</h2>
+      <ul>
+        {social.map(channel => (
+          <li dangerouslySetInnerHTML={{ __html: channel }} />
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 export const query = graphql`
   query AboutMe {
-    allAboutJson {
-      edges {
-        node {
-          header: _raw
+    aboutJson {
+      biography {
+        _paragraphs
+        examplesOfPreviousTalks {
+          _paragraphs
+          _heading
+          _list
         }
+        _heading
+      }
+      socialChannels {
+        _heading
+        _list
       }
     }
   }
-`
+`;
 
-export default IndexPage
+export default IndexPage;

@@ -12,5 +12,11 @@ module.exports = {
         path: `${__dirname}/data/about`,
       },
     },
+    {
+      resolve: `gatsby-plugin-typography`,
+      options: {
+        pathToConfigModule: `src/utils/typography.js`,
+      },
+    },
   ],
 }
