@@ -33,11 +33,14 @@ const Article = ({ language, link, date, url, onWebsite }) => {
   );
 };
 
-const ArticleList = ({ list }) => (
-  <ArticleListContainer>
-    {list
-      .map(parseListEntry)
-      .map(({ language, link, date, url, onWebsite }) => (
+const ArticleList = ({ list, reverseOrder = false }) => {
+  let entries = list.map(parseListEntry);
+  if (reverseOrder) {
+    entries = entries.reverse();
+  }
+  return (
+    <ArticleListContainer>
+      {entries.map(({ language, link, date, url, onWebsite }) => (
         <Article
           language={language}
           link={link}
@@ -46,8 +49,9 @@ const ArticleList = ({ list }) => (
           onWebsite={onWebsite}
         />
       ))}
-  </ArticleListContainer>
-);
+    </ArticleListContainer>
+  );
+};
 
 function parseListEntry(entry) {
   const regExp = /(.*?)\s+(.*)\s+\|\s+(.*?)$/;

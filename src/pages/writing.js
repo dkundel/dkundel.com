@@ -9,7 +9,7 @@ const Writing = ({ data }) => {
     <div>
       <h1>{_heading}</h1>
       <h2>{online._heading}</h2>
-      <ArticleList list={online._list} />
+      <ArticleList list={online._list} reverseOrder={true} />
       <h2>{print._heading}</h2>
       <ArticleList list={print._list} />
     </div>
