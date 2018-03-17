@@ -1,5 +1,12 @@
 import React, { Fragment } from 'react';
-import Link from 'gatsby-link';
+import styled from 'styled-components';
+
+import InfoHeader from '../components/InfoHeader';
+
+const SocialList = styled.ul`
+  list-style: none;
+  margin-left: 0;
+`;
 
 const Paragraphs = ({ list }) => (
   <div>
@@ -13,6 +20,7 @@ const IndexPage = ({ data }) => {
   const social = data.aboutJson.socialChannels._list;
   return (
     <div>
+      <InfoHeader headerInfo={data.aboutJson.header} />
       <h2>{data.aboutJson.biography._heading}</h2>
       <Paragraphs list={bio} />
       <h3>{data.aboutJson.biography.examplesOfPreviousTalks._heading}</h3>
@@ -21,18 +29,19 @@ const IndexPage = ({ data }) => {
         {talks.map(talk => <li dangerouslySetInnerHTML={{ __html: talk }} />)}
       </ul>
       <h2>{data.aboutJson.socialChannels._heading}</h2>
-      <ul>
+      <SocialList>
         {social.map(channel => (
           <li dangerouslySetInnerHTML={{ __html: channel }} />
         ))}
-      </ul>
+      </SocialList>
     </div>
   );
 };
 
 export const query = graphql`
-  query AboutMe {
+  query IndexData {
     aboutJson {
+      header: _raw
       biography {
         _paragraphs
         examplesOfPreviousTalks {

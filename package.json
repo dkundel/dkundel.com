@@ -6,13 +6,17 @@
   "author": "Dominik Kundel <dominik.kundel@gmail.com>",
   "dependencies": {
     "about-json": "^1.0.1",
+    "anker-colors": "^1.4.0",
     "gatsby": "^1.9.236",
     "gatsby-link": "^1.6.39",
     "gatsby-plugin-react-helmet": "^2.0.8",
+    "gatsby-plugin-styled-components": "^2.0.9",
     "gatsby-plugin-typography": "^1.7.18",
     "gatsby-source-filesystem": "^1.5.27",
     "gatsby-transformer-json": "^1.0.16",
+    "moment": "^2.21.0",
     "react-helmet": "^5.2.0",
+    "styled-components": "^3.2.3",
     "typography-theme-noriega": "^0.15.10"
   },
   "keywords": [
