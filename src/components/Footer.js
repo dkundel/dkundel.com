@@ -1,8 +1,29 @@
 import React from 'react';
 import Link from 'gatsby-link';
+import styled from 'styled-components';
+import { purple } from 'anker-colors';
+
+import Anchor from './Anchor';
+
+const Container = styled.footer`
+  font-size: 0.8em;
+  text-align: center;
+  margin-top: 10px;
+  svg {
+    height: 2em;
+    width: auto;
+  }
+`;
+
+const AnchorContainer = styled.p`
+  margin-bottom: 0;
+`;
 
 const Footer = () => (
-  <footer>
+  <Container>
+    <AnchorContainer>
+      <Anchor color={purple} />
+    </AnchorContainer>
     <p>
       Made by{' '}
       <a
@@ -17,7 +38,7 @@ const Footer = () => (
         Gatsby
       </a>
     </p>
-  </footer>
+  </Container>
 );
 
 export default Footer;
