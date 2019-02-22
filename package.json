@@ -26,6 +26,7 @@
   "scripts": {
     "prebuild": "npm run fetch:data",
     "build": "gatsby build",
+    "postbuild": "ncp data/about/dkundel.json public/dkundel.json",
     "develop": "gatsby develop",
     "format": "prettier --write 'src/**/*.js'",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "gatsby-cli": "^1.1.46",
+    "ncp": "^2.0.0",
     "prettier": "^1.11.1"
   }
 }
