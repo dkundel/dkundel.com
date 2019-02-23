@@ -14,6 +14,7 @@ const RAW_GITHUB = `https://raw.githubusercontent.com/dkundel/about-me`;
 const PAGE_GITHUB = `https://github.com/dkundel/about-me/blob`;
 const DATA_URL = `${RAW_GITHUB}/master/README.md`;
 const OUTPUT = resolve(process.cwd(), 'data/about/dkundel.json');
+const OUTPUT_MD = resolve(process.cwd(), 'data/dkundel-md.json');
 
 async function run() {
   const resp = await got(DATA_URL);
@@ -26,8 +27,15 @@ async function run() {
     asHtml: true,
     updateRelativeLinks: linkMarkdownToGitHub,
   });
+  const mdData = parse(resp.body, {
+    asHtml: false,
+    updateRelativeLinks: linkMarkdownToGitHub,
+  });
 
-  writeFile(OUTPUT, JSON.stringify(data), 'utf8');
+  return Promise.all([
+    writeFile(OUTPUT, JSON.stringify(data), 'utf8'),
+    writeFile(OUTPUT_MD, JSON.stringify(data), 'utf8'),
+  ]);
 }
 
 function linkMarkdownToGitHub(url) {

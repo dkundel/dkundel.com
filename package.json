@@ -26,7 +26,8 @@
   "scripts": {
     "prebuild": "npm run fetch:data",
     "build": "gatsby build",
-    "postbuild": "ncp data/about/dkundel.json public/dkundel.json",
+    "postbuild":
+      "ncp data/about/dkundel.json public/dkundel.json && ncp data/dkundel-md.json public/dkundel-md.json",
     "develop": "gatsby develop",
     "format": "prettier --write 'src/**/*.js'",
     "test": "echo \"Error: no test specified\" && exit 1",
