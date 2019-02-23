@@ -34,7 +34,7 @@ async function run() {
 
   return Promise.all([
     writeFile(OUTPUT, JSON.stringify(data), 'utf8'),
-    writeFile(OUTPUT_MD, JSON.stringify(data), 'utf8'),
+    writeFile(OUTPUT_MD, JSON.stringify(mdData), 'utf8'),
   ]);
 }
 
