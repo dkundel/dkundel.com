@@ -1,4 +1,4 @@
-import { purpleShades } from 'anker-colors';
+import { secondaryGreenShades } from 'anker-colors';
 import moment from 'moment';
 import React from 'react';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ const TalkListContainer = styled.div``;
 
 const TalkContainer = styled.section`
   padding: 10px 20px;
-  border-left: 5px solid ${purpleShades['500']};
+  border-left: 5px solid ${secondaryGreenShades['500']};
   margin-bottom: 20px;
 `;
 const TalkDate = styled.p`

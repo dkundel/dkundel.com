@@ -27,7 +27,7 @@ const IndexPage = ({ data }) => {
   const social = data.aboutJson.socialChannels._list;
   return (
     <Layout>
-      <SEO title="Home" keywords={[`dkundel`, `javascript`, `speaker`]} />
+      <SEO title="About Me" keywords={[`dkundel`, `javascript`, `speaker`]} />
       <InfoHeader headerInfo={data.aboutJson.header} />
       <h2>{data.aboutJson.biography._heading}</h2>
       <Paragraphs list={bio} />

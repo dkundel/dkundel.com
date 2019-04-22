@@ -2,11 +2,13 @@ import { graphql } from 'gatsby';
 import React from 'react';
 import ArticleList from '../components/ArticleList';
 import Layout from '../components/layout';
+import SEO from '../components/seo';
 
 const Writing = ({ data }) => {
   const { _heading, online, print } = data.aboutJson.technicalWriting;
   return (
     <Layout>
+      <SEO title="Technical Writing" />
       <h1>{_heading}</h1>
       <h2>{online._heading}</h2>
       <ArticleList list={online._list} reverseOrder={true} />

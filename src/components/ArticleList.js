@@ -1,11 +1,10 @@
-import { purpleShades } from 'anker-colors';
+import { secondaryGreenShades } from 'anker-colors';
 import React from 'react';
 import styled from 'styled-components';
 import Html from './Html';
-
 const ArticleWrapper = styled.section`
   padding: 10px 20px;
-  border-left: 5px solid ${purpleShades['500']};
+  border-left: 5px solid ${secondaryGreenShades['500']};
   margin-bottom: 20px;
 `;
 const ArticleLanguage = styled.span``;

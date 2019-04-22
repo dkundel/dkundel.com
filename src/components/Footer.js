@@ -1,4 +1,4 @@
-import { purple } from 'anker-colors';
+import { secondaryGreen } from 'anker-colors';
 import React from 'react';
 import styled from 'styled-components';
 import Anchor from './Anchor';
@@ -20,7 +20,7 @@ const AnchorContainer = styled.p`
 const Footer = () => (
   <Container>
     <AnchorContainer>
-      <Anchor color={purple} />
+      <Anchor color={secondaryGreen} />
     </AnchorContainer>
     <p>
       Made by{' '}

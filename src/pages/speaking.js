@@ -1,8 +1,9 @@
-import { secondaryGreenShades } from 'anker-colors';
+import { purpleShades } from 'anker-colors';
 import { graphql } from 'gatsby';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import Layout from '../components/layout';
+import SEO from '../components/seo';
 import TalkList from '../components/TalkList';
 
 const ListContainer = styled.div``;
@@ -15,7 +16,7 @@ const TalkYear = styled.h2`
 const ToggleButton = styled.button`
   font-size: 0.8em;
   background: transparent;
-  color: ${secondaryGreenShades['500']};
+  color: ${purpleShades['300']};
   cursor: pointer;
   border: 0;
   padding: 0;
@@ -24,7 +25,7 @@ const ToggleButton = styled.button`
   &:hover,
   &:focus {
     text-decoration: underline;
-    color: ${secondaryGreenShades['900']};
+    color: ${purpleShades['700']};
   }
 `;
 
@@ -80,6 +81,7 @@ class Writing extends Component {
     return (
       <Layout>
         <h1>{this.props.data.aboutJson.pastPresentations._heading}</h1>
+        <SEO title="Speaking" />
         {talkOverview}
       </Layout>
     );
