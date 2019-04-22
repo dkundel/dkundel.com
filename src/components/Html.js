@@ -19,7 +19,7 @@ const Html = ({ children, as = "div", sanitizeOptions }) => {
 }
 
 export const allowImages = {
-  allowedTags: extendedTags.concat(["img", ]),
+  allowedTags: extendedTags.concat(["img"]),
   allowedAttributes: {
     ...sanitize.defaults.allowedAttributes,
     "*": ["class"],

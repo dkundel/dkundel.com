@@ -14,7 +14,9 @@ const SocialList = styled.ul`
 const Paragraphs = ({ list }) => (
   <div>
     {list.map(content => (
-      <Html as="p">{content}</Html>
+      <Html as="p" key={content.substr(6)}>
+        {content}
+      </Html>
     ))}
   </div>
 )
@@ -33,13 +35,17 @@ const IndexPage = ({ data }) => {
       <Paragraphs list={talkText} />
       <ul>
         {talks.map(talk => (
-          <Html as="li">{talk}</Html>
+          <Html as="li" key={talk.substr(4)}>
+            {talk}
+          </Html>
         ))}
       </ul>
       <h2>{data.aboutJson.socialChannels._heading}</h2>
       <SocialList>
         {social.map(channel => (
-          <Html as="li">{channel}</Html>
+          <Html as="li" key={channel.substr(4)}>
+            {channel}
+          </Html>
         ))}
       </SocialList>
     </Layout>
