@@ -4,7 +4,7 @@ import styled from "styled-components"
 import Html from "../components/Html"
 import InfoHeader from "../components/InfoHeader"
 import Layout from "../components/layout"
-import SEO from "../components/Seo"
+import SEO from "../components/seo"
 
 const SocialList = styled.ul`
   list-style: none;
