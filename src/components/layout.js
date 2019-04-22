@@ -11,7 +11,7 @@ import React from "react"
 import styled from "styled-components"
 import GlobalStyles from "../utils/globalStyles"
 import Footer from "./Footer"
-import Header from "./header"
+import Header from "./Header"
 
 const Container = styled.div`
   display: flex;
