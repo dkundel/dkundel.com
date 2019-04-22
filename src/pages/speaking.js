@@ -2,34 +2,43 @@ import { purpleShades } from 'anker-colors';
 import { graphql } from 'gatsby';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import tw from 'tailwind.macro';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
 import TalkList from '../components/TalkList';
+import SpeakingIcon from '../icons/Speaking';
 
 const ListContainer = styled.div``;
 const TalkYear = styled.h2`
-  margin-bottom: 10px;
-  display: inline-block;
-  margin-right: 10px;
+  ${tw`mb-4 inline-block mr-2 text-base font-bold text-grey-darkest tracking-wide`}
 `;
 
+const TalkYearContainer = styled.div``;
+
 const ToggleButton = styled.button`
-  font-size: 0.8em;
-  background: transparent;
+  ${tw`text-xs bg-transparent cursor-pointer border-0 p-0 mb-4 hover:underline focus:underline`}
   color: ${purpleShades['300']};
-  cursor: pointer;
-  border: 0;
-  padding: 0;
-  margin-bottom: 1.6em;
 
   &:hover,
   &:focus {
-    text-decoration: underline;
     color: ${purpleShades['700']};
   }
 `;
 
-class Writing extends Component {
+const SectionHeader = styled.header`
+  ${tw`flex justify-between items-end flex-wrap flex-row-reverse content-end`}
+`;
+
+const Heading = styled.h1`
+  ${tw`flex-no-shrink flex-grow`}
+`;
+
+const StyledSpeakingIcon = styled(SpeakingIcon)`
+  ${tw`flex-grow center w-12`}
+  min-width: 3rem;
+`;
+
+class Speaking extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = { openedSections: {} };
@@ -68,11 +77,11 @@ class Writing extends Component {
       );
       const collapsed = !this.state.openedSections[year];
       return (
-        <ListContainer>
-          <div>
+        <ListContainer key={year}>
+          <TalkYearContainer>
             <TalkYear>{year}</TalkYear>
             {!collapsed && hideButton}
-          </div>
+          </TalkYearContainer>
           <TalkList talks={this.talks[year]} collapsed={collapsed} />
           {collapsed && showButton}
         </ListContainer>
@@ -80,7 +89,12 @@ class Writing extends Component {
     });
     return (
       <Layout>
-        <h1>{this.props.data.aboutJson.pastPresentations._heading}</h1>
+        <SectionHeader>
+          <StyledSpeakingIcon width="200" />
+          <Heading>
+            {this.props.data.aboutJson.pastPresentations._heading}
+          </Heading>
+        </SectionHeader>
         <SEO title="Speaking" />
         {talkOverview}
       </Layout>
@@ -117,4 +131,4 @@ export const query = graphql`
   }
 `;
 
-export default Writing;
+export default Speaking;
