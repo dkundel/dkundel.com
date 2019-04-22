@@ -1,15 +1,15 @@
-import { graphql } from "gatsby"
-import React from "react"
-import styled from "styled-components"
-import Html from "../components/Html"
-import InfoHeader from "../components/InfoHeader"
-import Layout from "../components/layout"
-import SEO from "../components/seo"
+import { graphql } from 'gatsby';
+import React from 'react';
+import styled from 'styled-components';
+import Html from '../components/Html';
+import InfoHeader from '../components/InfoHeader';
+import Layout from '../components/layout';
+import SEO from '../components/seo';
 
 const SocialList = styled.ul`
   list-style: none;
   margin-left: 0;
-`
+`;
 
 const Paragraphs = ({ list }) => (
   <div>
@@ -19,12 +19,12 @@ const Paragraphs = ({ list }) => (
       </Html>
     ))}
   </div>
-)
+);
 const IndexPage = ({ data }) => {
-  const bio = data.aboutJson.biography._paragraphs
-  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs
-  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list
-  const social = data.aboutJson.socialChannels._list
+  const bio = data.aboutJson.biography._paragraphs;
+  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs;
+  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list;
+  const social = data.aboutJson.socialChannels._list;
   return (
     <Layout>
       <SEO title="Home" keywords={[`dkundel`, `javascript`, `speaker`]} />
@@ -49,8 +49,8 @@ const IndexPage = ({ data }) => {
         ))}
       </SocialList>
     </Layout>
-  )
-}
+  );
+};
 
 export const query = graphql`
   query IndexData {
@@ -71,6 +71,6 @@ export const query = graphql`
       }
     }
   }
-`
+`;
 
-export default IndexPage
+export default IndexPage;

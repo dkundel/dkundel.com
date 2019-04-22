@@ -1,10 +1,10 @@
 import { graphql } from 'gatsby';
-import React from "react";
-import ArticleList from "../components/ArticleList";
-import Layout from "../components/layout";
+import React from 'react';
+import ArticleList from '../components/ArticleList';
+import Layout from '../components/layout';
 
 const Writing = ({ data }) => {
-  const { _heading, online, print } = data.aboutJson.technicalWriting
+  const { _heading, online, print } = data.aboutJson.technicalWriting;
   return (
     <Layout>
       <h1>{_heading}</h1>
@@ -13,8 +13,8 @@ const Writing = ({ data }) => {
       <h2>{print._heading}</h2>
       <ArticleList list={print._list} />
     </Layout>
-  )
-}
+  );
+};
 
 export const query = graphql`
   query WritingData {
@@ -32,6 +32,6 @@ export const query = graphql`
       }
     }
   }
-`
+`;
 
-export default Writing
+export default Writing;

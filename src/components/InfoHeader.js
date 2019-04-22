@@ -1,7 +1,7 @@
-import { darkBlue, secondaryGreen } from "anker-colors"
-import React from "react"
-import styled from "styled-components"
-import Html, { allowImages } from "./Html"
+import { darkBlue, secondaryGreen } from 'anker-colors';
+import React from 'react';
+import styled from 'styled-components';
+import Html, { allowImages } from './Html';
 
 const Container = styled.div`
   text-align: center;
@@ -26,15 +26,15 @@ const Container = styled.div`
     font-size: 1.5em;
     margin-bottom: 0;
   }
-`
+`;
 
 const InfoHeader = ({ headerInfo }) => {
-  headerInfo = headerInfo.replace(/align="center"/g, "")
+  headerInfo = headerInfo.replace(/align="center"/g, '');
   return (
     <Html as={Container} sanitizeOptions={allowImages}>
       {headerInfo}
     </Html>
-  )
-}
+  );
+};
 
-export default InfoHeader
+export default InfoHeader;

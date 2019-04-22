@@ -1,14 +1,15 @@
 module.exports = {
   siteMetadata: {
-    title: "Dominik Kundel | Programmer, Developer Evangelist, Public Speaker",
+    title: 'Dominik Kundel | Programmer, Developer Evangelist, Public Speaker',
     description:
-      "Dominik Kundel is a Web Developer, Developer Evangelist and Public Speaker. ",
-    name: "Dominik Kundel",
+      'Dominik Kundel is a Web Developer, Developer Evangelist and Public Speaker. ',
+    name: 'Dominik Kundel',
     author: `@dkundel`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
     `gatsby-transformer-json`,
+    `gatsby-plugin-styled-components`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -47,4 +48,4 @@ module.exports = {
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
   ],
-}
+};

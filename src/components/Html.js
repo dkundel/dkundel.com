@@ -1,36 +1,36 @@
-import PropTypes from "prop-types"
-import React from "react"
-import sanitize from "sanitize-html"
+import PropTypes from 'prop-types';
+import React from 'react';
+import sanitize from 'sanitize-html';
 
-const extendedTags = sanitize.defaults.allowedTags.concat(["h1", "h2", "span"])
+const extendedTags = sanitize.defaults.allowedTags.concat(['h1', 'h2', 'span']);
 
-const Html = ({ children, as = "div", sanitizeOptions }) => {
+const Html = ({ children, as = 'div', sanitizeOptions }) => {
   const config = {
     allowedTags: extendedTags,
     allowedAttributes: {
-      "*": ["class"],
+      '*': ['class'],
     },
     ...sanitizeOptions,
-  }
-  const sanitizedHtml = sanitize(children, config)
+  };
+  const sanitizedHtml = sanitize(children, config);
   return React.createElement(as, {
     dangerouslySetInnerHTML: { __html: sanitizedHtml },
-  })
-}
+  });
+};
 
 export const allowImages = {
-  allowedTags: extendedTags.concat(["img"]),
+  allowedTags: extendedTags.concat(['img']),
   allowedAttributes: {
     ...sanitize.defaults.allowedAttributes,
-    "*": ["class"],
-    img: ["src", "width", "height"],
+    '*': ['class'],
+    img: ['src', 'width', 'height'],
   },
-}
+};
 
 Html.propTypes = {
   children: PropTypes.string.isRequired,
   as: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
   sanitizeOptions: PropTypes.object,
-}
+};
 
-export default Html
+export default Html;

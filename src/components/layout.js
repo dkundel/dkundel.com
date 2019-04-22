@@ -5,13 +5,13 @@
  * See: https://www.gatsbyjs.org/docs/static-query/
  */
 
-import { graphql, StaticQuery } from "gatsby"
-import PropTypes from "prop-types"
-import React from "react"
-import styled from "styled-components"
-import GlobalStyles from "../utils/globalStyles"
-import Footer from "./Footer"
-import Header from "./Header"
+import { graphql, StaticQuery } from 'gatsby';
+import PropTypes from 'prop-types';
+import React from 'react';
+import styled from 'styled-components';
+import GlobalStyles from '../utils/globalStyles';
+import Footer from './Footer';
+import Header from './Header';
 
 const Container = styled.div`
   display: flex;
@@ -19,13 +19,13 @@ const Container = styled.div`
   height: 100%;
   flex-direction: column;
   align-items: center;
-`
+`;
 const Main = styled.div`
   flex: 1;
   max-width: 800px;
   width: 100%;
   padding: 20px;
-`
+`;
 
 const Layout = ({ children }) => (
   <StaticQuery
@@ -48,10 +48,10 @@ const Layout = ({ children }) => (
       </Container>
     )}
   />
-)
+);
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};
 
-export default Layout
+export default Layout;
