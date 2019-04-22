@@ -3,10 +3,13 @@ import { graphql } from 'gatsby';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import tw from 'tailwind.macro';
+import md5 from 'tiny-hashes/md5';
+import Html from '../components/Html';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
 import TalkList from '../components/TalkList';
 import SpeakingIcon from '../icons/Speaking';
+import { smallAllCaps } from '../utils/tailwind-helpers';
 
 const ListContainer = styled.div``;
 const TalkYear = styled.h2`
@@ -26,16 +29,55 @@ const ToggleButton = styled.button`
 `;
 
 const SectionHeader = styled.header`
-  ${tw`flex justify-between items-end flex-wrap flex-row-reverse content-end`}
+  ${tw`flex justify-between items-start flex-wrap flex-row-reverse content-end`}
 `;
 
-const Heading = styled.h1`
-  ${tw`flex-no-shrink flex-grow`}
+const Heading = styled.hgroup`
+  min-width: 19rem;
+  ${tw`flex-1 text-sm`}
+
+  h1 {
+    ${tw`text-xl mb-2`}
+  }
+
+  p {
+    ${tw`mb-2`}
+  }
+`;
+
+const TopicList = styled.ul`
+  ${tw`mb-3 ml-2`}
+
+  li {
+    ${tw`p-0 my-2 mx-0 text-xs`}
+    list-style: none;
+    ${smallAllCaps}
+
+    a {
+      ${tw`text-sm normal-case`}
+    }
+
+    &::before {
+      ${tw`pl-5 pt-1`}
+      content: '';
+      display: inline-block;
+      height: 1em;
+      width: 1em;
+      background-image: url('/icons/arrow-outline.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  }
+`;
+
+const ZeroMarginP = styled.p`
+  ${tw`m-0`}
 `;
 
 const StyledSpeakingIcon = styled(SpeakingIcon)`
-  ${tw`flex-grow center w-12`}
-  min-width: 3rem;
+  ${tw`flex-grow center w-12 mx-auto`}
+  min-width: 10rem;
+  max-width: 25%;
 `;
 
 class Speaking extends Component {
@@ -87,12 +129,35 @@ class Speaking extends Component {
         </ListContainer>
       );
     });
+    console.log(this.props.data);
     return (
       <Layout>
         <SectionHeader>
           <StyledSpeakingIcon width="200" />
           <Heading>
-            {this.props.data.aboutJson.pastPresentations._heading}
+            <h1>Past Presentations</h1>
+            <p>
+              During my time as a developer, I learned a lot from my peers and
+              as a result I try to give back whenever possible. One way for me
+              to do this is by giving presentations about a variety of topics.
+            </p>
+            <ZeroMarginP>Among others these topics include:</ZeroMarginP>
+            <TopicList>
+              {this.props.data.aboutJson.currentTalkTopics._list.map(topic => {
+                return (
+                  <Html as="li" key={md5(topic)}>
+                    {topic}
+                  </Html>
+                );
+              })}
+            </TopicList>
+            <ZeroMarginP>
+              You can find a comprehensive{' '}
+              <a href="https://github.com/dkundel/about-me/tree/master/abstracts">
+                list on my GitHub
+              </a>
+              .
+            </ZeroMarginP>
           </Heading>
         </SectionHeader>
         <SEO title="Speaking" />
@@ -126,6 +191,9 @@ export const query = graphql`
           topic
           other
         }
+      }
+      currentTalkTopics {
+        _list
       }
     }
   }
