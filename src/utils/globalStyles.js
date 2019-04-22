@@ -1,8 +1,7 @@
-import { injectGlobal } from 'styled-components';
+import { secondaryGreenShades } from "anker-colors"
+import { createGlobalStyle } from "styled-components"
 
-import { lightGray, secondaryGreenShades } from 'anker-colors';
-
-injectGlobal`
+export default createGlobalStyle`
   html {
     height: 100%;
     width: 100%;
@@ -15,11 +14,11 @@ injectGlobal`
   }
 
   a {
-    color: ${secondaryGreenShades['500']};
+    color: ${secondaryGreenShades["500"]};
     text-decoration: none;
     &:hover, &:focus {
-      color: ${secondaryGreenShades['900']};
+      color: ${secondaryGreenShades["900"]};
       text-decoration: underline;
     }
   }
-`;
+`

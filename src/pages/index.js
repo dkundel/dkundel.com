@@ -1,21 +1,70 @@
+import { graphql } from "gatsby"
 import React from "react"
-import { Link } from "gatsby"
-
+import styled from "styled-components"
+import Html from "../components/Html"
+import InfoHeader from "../components/InfoHeader"
 import Layout from "../components/layout"
-import Image from "../components/image"
-import SEO from "../components/seo"
+import SEO from "../components/Seo"
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" keywords={[`gatsby`, `application`, `react`]} />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link>
-  </Layout>
+const SocialList = styled.ul`
+  list-style: none;
+  margin-left: 0;
+`
+
+const Paragraphs = ({ list }) => (
+  <div>
+    {list.map(content => (
+      <Html as="p">{content}</Html>
+    ))}
+  </div>
 )
+const IndexPage = ({ data }) => {
+  const bio = data.aboutJson.biography._paragraphs
+  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs
+  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list
+  const social = data.aboutJson.socialChannels._list
+  return (
+    <Layout>
+      <SEO title="Home" keywords={[`dkundel`, `javascript`, `speaker`]} />
+      <InfoHeader headerInfo={data.aboutJson.header} />
+      <h2>{data.aboutJson.biography._heading}</h2>
+      <Paragraphs list={bio} />
+      <h3>{data.aboutJson.biography.examplesOfPreviousTalks._heading}</h3>
+      <Paragraphs list={talkText} />
+      <ul>
+        {talks.map(talk => (
+          <Html as="li">{talk}</Html>
+        ))}
+      </ul>
+      <h2>{data.aboutJson.socialChannels._heading}</h2>
+      <SocialList>
+        {social.map(channel => (
+          <Html as="li">{channel}</Html>
+        ))}
+      </SocialList>
+    </Layout>
+  )
+}
+
+export const query = graphql`
+  query IndexData {
+    aboutJson {
+      header: _raw
+      biography {
+        _paragraphs
+        examplesOfPreviousTalks {
+          _paragraphs
+          _heading
+          _list
+        }
+        _heading
+      }
+      socialChannels {
+        _heading
+        _list
+      }
+    }
+  }
+`
 
 export default IndexPage
