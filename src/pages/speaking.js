@@ -1,22 +1,21 @@
-import React, { Component } from 'react';
-import Link from 'gatsby-link';
-import styled from 'styled-components';
+import { secondaryGreenShades } from "anker-colors"
+import { graphql } from "gatsby"
+import React, { Component } from "react"
+import styled from "styled-components"
+import Layout from "../components/layout"
+import TalkList from "../components/TalkList"
 
-import { secondaryGreenShades } from 'anker-colors';
-
-import TalkList from '../components/TalkList';
-
-const ListContainer = styled.div``;
+const ListContainer = styled.div``
 const TalkYear = styled.h2`
   margin-bottom: 10px;
   display: inline-block;
   margin-right: 10px;
-`;
+`
 
 const ToggleButton = styled.button`
   font-size: 0.8em;
   background: transparent;
-  color: ${secondaryGreenShades['500']};
+  color: ${secondaryGreenShades["500"]};
   cursor: pointer;
   border: 0;
   padding: 0;
@@ -25,48 +24,48 @@ const ToggleButton = styled.button`
   &:hover,
   &:focus {
     text-decoration: underline;
-    color: ${secondaryGreenShades['900']};
+    color: ${secondaryGreenShades["900"]};
   }
-`;
+`
 
 class Writing extends Component {
   constructor(props, context) {
-    super(props, context);
-    this.state = { openedSections: {} };
+    super(props, context)
+    this.state = { openedSections: {} }
   }
   componentWillMount() {
     this.talks = groupPresentationsByYear(
       this.props.data.aboutJson.pastPresentations._entries
-    );
+    )
     const openedSections = Object.keys(this.talks)
       .sort((a, b) => +b - +a)
       .reduce((obj, key, idx) => {
-        obj[key] = idx === 0;
-        return obj;
-      }, {});
-    this.setState({ openedSections });
+        obj[key] = idx === 0
+        return obj
+      }, {})
+    this.setState({ openedSections })
   }
 
   toggleSection(year) {
-    const openedSections = { ...this.state.openedSections };
-    openedSections[year] = !openedSections[year];
-    this.setState({ openedSections });
+    const openedSections = { ...this.state.openedSections }
+    openedSections[year] = !openedSections[year]
+    this.setState({ openedSections })
   }
 
   render() {
-    const years = Object.keys(this.talks).sort((a, b) => +b - +a);
+    const years = Object.keys(this.talks).sort((a, b) => +b - +a)
     const talkOverview = years.map((year, idx) => {
       const showButton = (
         <ToggleButton onClick={() => this.toggleSection(year)}>
           Show {this.talks[year].length} talks
         </ToggleButton>
-      );
+      )
       const hideButton = (
         <ToggleButton onClick={() => this.toggleSection(year)}>
           Hide talks
         </ToggleButton>
-      );
-      const collapsed = !this.state.openedSections[year];
+      )
+      const collapsed = !this.state.openedSections[year]
       return (
         <ListContainer>
           <div>
@@ -76,27 +75,27 @@ class Writing extends Component {
           <TalkList talks={this.talks[year]} collapsed={collapsed} />
           {collapsed && showButton}
         </ListContainer>
-      );
-    });
+      )
+    })
     return (
-      <div>
+      <Layout>
         <h1>{this.props.data.aboutJson.pastPresentations._heading}</h1>
         {talkOverview}
-      </div>
-    );
+      </Layout>
+    )
   }
 }
 
 function groupPresentationsByYear(list) {
   return list.reduce((byYear, talk) => {
-    const [, year] = talk.date.match(/,\s*(\d{4})$/);
+    const [, year] = talk.date.match(/,\s*(\d{4})$/)
     if (byYear[year]) {
-      byYear[year].push(talk);
+      byYear[year].push(talk)
     } else {
-      byYear[year] = [talk];
+      byYear[year] = [talk]
     }
-    return byYear;
-  }, {});
+    return byYear
+  }, {})
 }
 
 export const query = graphql`
@@ -114,6 +113,6 @@ export const query = graphql`
       }
     }
   }
-`;
+`
 
-export default Writing;
+export default Writing

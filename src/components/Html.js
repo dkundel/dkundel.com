@@ -1,7 +1,36 @@
-import React, { Fragment } from 'react';
+import PropTypes from "prop-types"
+import React from "react"
+import sanitize from "sanitize-html"
 
-const Html = ({ children }) => (
-  <div dangerouslySetInnerHTML={{ __html: children }} />
-);
+const extendedTags = sanitize.defaults.allowedTags.concat(["h1", "h2", "span"])
 
-export default Html;
+const Html = ({ children, as = "div", sanitizeOptions }) => {
+  const config = {
+    allowedTags: extendedTags,
+    allowedAttributes: {
+      "*": ["class"],
+    },
+    ...sanitizeOptions,
+  }
+  const sanitizedHtml = sanitize(children, config)
+  return React.createElement(as, {
+    dangerouslySetInnerHTML: { __html: sanitizedHtml },
+  })
+}
+
+export const allowImages = {
+  allowedTags: extendedTags.concat(["img"]),
+  allowedAttributes: {
+    ...sanitize.defaults.allowedAttributes,
+    "*": ["class"],
+    img: ["src", "width", "height"],
+  },
+}
+
+Html.propTypes = {
+  children: PropTypes.string.isRequired,
+  as: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
+  sanitizeOptions: PropTypes.object,
+}
+
+export default Html

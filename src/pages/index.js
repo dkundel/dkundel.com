@@ -1,42 +1,56 @@
-import React, { Fragment } from 'react';
-import styled from 'styled-components';
-
-import InfoHeader from '../components/InfoHeader';
+import { graphql } from "gatsby"
+import React from "react"
+import styled from "styled-components"
+import Html from "../components/Html"
+import InfoHeader from "../components/InfoHeader"
+import Layout from "../components/layout"
+import SEO from "../components/Seo"
 
 const SocialList = styled.ul`
   list-style: none;
   margin-left: 0;
-`;
+`
 
 const Paragraphs = ({ list }) => (
   <div>
-    {list.map(content => <p dangerouslySetInnerHTML={{ __html: content }} />)}
+    {list.map(content => (
+      <Html as="p" key={content.substr(6)}>
+        {content}
+      </Html>
+    ))}
   </div>
-);
+)
 const IndexPage = ({ data }) => {
-  const bio = data.aboutJson.biography._paragraphs;
-  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs;
-  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list;
-  const social = data.aboutJson.socialChannels._list;
+  const bio = data.aboutJson.biography._paragraphs
+  const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs
+  const talks = data.aboutJson.biography.examplesOfPreviousTalks._list
+  const social = data.aboutJson.socialChannels._list
   return (
-    <div>
+    <Layout>
+      <SEO title="Home" keywords={[`dkundel`, `javascript`, `speaker`]} />
       <InfoHeader headerInfo={data.aboutJson.header} />
       <h2>{data.aboutJson.biography._heading}</h2>
       <Paragraphs list={bio} />
       <h3>{data.aboutJson.biography.examplesOfPreviousTalks._heading}</h3>
       <Paragraphs list={talkText} />
       <ul>
-        {talks.map(talk => <li dangerouslySetInnerHTML={{ __html: talk }} />)}
+        {talks.map(talk => (
+          <Html as="li" key={talk.substr(4)}>
+            {talk}
+          </Html>
+        ))}
       </ul>
       <h2>{data.aboutJson.socialChannels._heading}</h2>
       <SocialList>
         {social.map(channel => (
-          <li dangerouslySetInnerHTML={{ __html: channel }} />
+          <Html as="li" key={channel.substr(4)}>
+            {channel}
+          </Html>
         ))}
       </SocialList>
-    </div>
-  );
-};
+    </Layout>
+  )
+}
 
 export const query = graphql`
   query IndexData {
@@ -57,6 +71,6 @@ export const query = graphql`
       }
     }
   }
-`;
+`
 
-export default IndexPage;
+export default IndexPage

@@ -1,41 +1,60 @@
 {
   "name": "dkundel.com",
   "private": true,
-  "description":
-    "👨‍💻 My personal website. Basically a mirror of dkundel/about-me ",
+  "description": "👨‍💻 My personal website. Basically a mirror of dkundel/about-me ",
   "version": "1.0.0",
   "author": "Dominik Kundel <dominik.kundel@gmail.com>",
   "dependencies": {
-    "about-json": "^1.0.1",
+    "about-json": "^1.0.2",
     "anker-colors": "^1.4.0",
-    "gatsby": "^1.9.236",
-    "gatsby-link": "^1.6.39",
-    "gatsby-plugin-react-helmet": "^2.0.8",
-    "gatsby-plugin-styled-components": "^2.0.9",
-    "gatsby-plugin-typography": "^1.7.18",
-    "gatsby-source-filesystem": "^1.5.27",
-    "gatsby-transformer-json": "^1.0.16",
-    "got": "^8.3.0",
-    "moment": "^2.21.0",
+    "gatsby": "^2.3.25",
+    "gatsby-image": "^2.0.39",
+    "gatsby-plugin-manifest": "^2.0.29",
+    "gatsby-plugin-offline": "^2.0.25",
+    "gatsby-plugin-react-helmet": "^3.0.12",
+    "gatsby-plugin-sharp": "^2.0.35",
+    "gatsby-plugin-styled-components": "^3.0.7",
+    "gatsby-plugin-typography": "^2.2.13",
+    "gatsby-source-filesystem": "^2.0.29",
+    "gatsby-transformer-json": "^2.1.11",
+    "gatsby-transformer-sharp": "^2.1.18",
+    "got": "^9.6.0",
+    "moment": "^2.24.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-helmet": "^5.2.0",
-    "styled-components": "^3.2.3",
-    "typography-theme-noriega": "^0.15.10"
+    "react-typography": "^0.16.19",
+    "sanitize-html": "^1.20.0",
+    "styled-components": "^4.2.0",
+    "typography": "^0.16.19",
+    "typography-theme-noriega": "^0.16.19"
   },
-  "keywords": ["gatsby"],
+  "devDependencies": {
+    "gatsby-cli": "^2.5.9",
+    "ncp": "^2.0.0",
+    "prettier": "^1.17.0"
+  },
+  "keywords": [
+    "dkundel",
+    "gatsby"
+  ],
   "license": "MIT",
   "scripts": {
+    "start": "npm run dev",
     "prebuild": "npm run fetch:data",
     "build": "gatsby build",
-    "postbuild":
-      "ncp data/about/dkundel.json public/dkundel.json && ncp data/dkundel-md.json public/dkundel-md.json",
-    "develop": "gatsby develop",
+    "postbuild": "ncp data/about/dkundel.json public/dkundel.json && ncp data/dkundel-md.json public/dkundel-md.json",
+    "dev": "gatsby develop",
     "format": "prettier --write 'src/**/*.js'",
     "test": "echo \"Error: no test specified\" && exit 1",
     "fetch:data": "node scripts/fetchData.js"
   },
-  "devDependencies": {
-    "gatsby-cli": "^1.1.46",
-    "ncp": "^2.0.0",
-    "prettier": "^1.11.1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkundel/dkundel.com"
+  },
+  "bugs": {
+    "url": "https://github.com/dkundel/dkundel.com/issues"
   }
 }
