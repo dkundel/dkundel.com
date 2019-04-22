@@ -24,7 +24,7 @@ const Article = ({ language, link, date, url, onWebsite }) => {
       <ArticleMeta>
         <ArticleLanguage>{language}</ArticleLanguage>{' '}
         <ArticleDate>{date}</ArticleDate> on{' '}
-        <ArticlePlatform href={onWebsite} target="_blank">
+        <ArticlePlatform href={`https://${onWebsite}`} target="_blank">
           {onWebsite}
         </ArticlePlatform>
       </ArticleMeta>
@@ -41,6 +41,7 @@ const ArticleList = ({ list, reverseOrder = false }) => {
     <ArticleListContainer>
       {entries.map(({ language, link, date, url, onWebsite }) => (
         <Article
+          key={url}
           language={language}
           link={link}
           date={date}

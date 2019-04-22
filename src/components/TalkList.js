@@ -1,46 +1,54 @@
-import { secondaryGreenShades } from 'anker-colors';
 import moment from 'moment';
 import React from 'react';
 import styled from 'styled-components';
+import tw from 'tailwind.macro';
+import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
 
 const TalkListContainer = styled.div``;
 
 const TalkContainer = styled.section`
-  padding: 10px 20px;
-  border-left: 5px solid ${secondaryGreenShades['500']};
-  margin-bottom: 20px;
+  ${tw`bg-white mx-auto max-w-lg shadow-lg rounded-lg overflow-hidden mb-6 p-3`}
+`;
+const TalkEvent = styled.h3`
+  ${tw`text-sm font-semibold my-2 pb-2 mx-0 border-0 border-b-2 border-solid border-green`}
+`;
+const TalkTopic = styled.p`
+  ${tw`text-sm mx-0 my-2`}
 `;
 const TalkDate = styled.p`
-  font-size: 0.8em;
-  margin-bottom: 0;
+  ${smallAllCaps}
+  ${tw`flex-shrink mr-3`}
 `;
-const TalkEvent = styled.h3``;
-const TalkTopic = styled.p``;
 const TalkInfo = styled.p`
-  font-size: 0.8em;
-  margin: 0;
+  ${tw`flex-shrink`}
+  ${smallAllCaps}
   a {
     margin-left: 5px;
   }
+`;
+const TalkMetaContainer = styled.div`
+  ${tw`w-auto flex justify-between flex-wrap`}
 `;
 
 const Talk = ({ info }) => {
   const { event, location, date, topic, other } = info;
   return (
     <TalkContainer>
-      <TalkDate>
-        {date} in {location}
-      </TalkDate>
       <TalkEvent>
         <Html as="span">{event}</Html>
       </TalkEvent>
       <TalkTopic>
-        Topic: <Html as="span">{topic}</Html>
+        <Html as="span">{topic}</Html>
       </TalkTopic>
-      <TalkInfo>
-        Additional Material: <Html as="span">{other}</Html>
-      </TalkInfo>
+      <TalkMetaContainer>
+        <TalkDate>
+          {date} @ {location}
+        </TalkDate>
+        <TalkInfo>
+          Additional Material: <Html as="span">{other}</Html>
+        </TalkInfo>
+      </TalkMetaContainer>
     </TalkContainer>
   );
 };
@@ -48,7 +56,9 @@ const Talk = ({ info }) => {
 const TalkList = ({ talks, collapsed = false }) => {
   const list = collapsed
     ? ''
-    : talks.sort(sortByEventDate).map(talkInfo => <Talk info={talkInfo} />);
+    : talks
+        .sort(sortByEventDate)
+        .map(talkInfo => <Talk info={talkInfo} key={talkInfo.date} />);
   return <TalkListContainer>{list}</TalkListContainer>;
 };
 

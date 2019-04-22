@@ -10,6 +10,7 @@ module.exports = {
     `gatsby-plugin-react-helmet`,
     `gatsby-transformer-json`,
     `gatsby-plugin-styled-components`,
+    `gatsby-plugin-tailwindcss`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {

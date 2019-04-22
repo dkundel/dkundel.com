@@ -1,8 +1,7 @@
-import React from 'react';
-import Link from 'gatsby-link';
-import styled from 'styled-components';
 import { lightGray, secondaryGreen } from 'anker-colors';
-
+import Link from 'gatsby-link';
+import React from 'react';
+import styled from 'styled-components';
 import Anchor from './Anchor';
 
 const headerBreakpoints = {
