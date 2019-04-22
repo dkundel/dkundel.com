@@ -1,4 +1,4 @@
-import { secondaryGreenShades } from 'anker-colors';
+import { purpleShades } from 'anker-colors';
 import { createGlobalStyle } from 'styled-components';
 
 export default createGlobalStyle`
@@ -14,10 +14,10 @@ export default createGlobalStyle`
   }
 
   a {
-    color: ${secondaryGreenShades['500']};
+    color: ${purpleShades['300']};
     text-decoration: none;
     &:hover, &:focus {
-      color: ${secondaryGreenShades['900']};
+      color: ${purpleShades['700']};
       text-decoration: underline;
     }
   }

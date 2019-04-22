@@ -8,7 +8,7 @@ const Html = ({ children, as = 'div', sanitizeOptions }) => {
   const config = {
     allowedTags: extendedTags,
     allowedAttributes: {
-      '*': ['class'],
+      '*': ['class', 'alt'],
     },
     ...sanitizeOptions,
   };
