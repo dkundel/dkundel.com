@@ -31,6 +31,8 @@ const ArticleDate = styled.span`
 const ArticlePlatform = styled.a``;
 const ArticleImage = styled.img`
   ${tw`mb-1`}
+  min-width: 360px;
+  min-height: 135px;
 `;
 
 const Article = ({ language, link, date, url, onWebsite, image }) => {
