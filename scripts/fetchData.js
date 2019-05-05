@@ -7,6 +7,7 @@ const got = require('got');
 const { resolve } = require('path');
 const { writeFile: fsWriteFile } = require('fs');
 const { promisify } = require('util');
+const cheerio = require('cheerio');
 
 const writeFile = promisify(fsWriteFile);
 
@@ -31,6 +32,21 @@ async function run() {
     asHtml: false,
     updateRelativeLinks: linkMarkdownToGitHub,
   });
+
+  data.technicalWriting.online._listExtended = await Promise.all(
+    data.technicalWriting.online._list.map(async entry => {
+      const out = {
+        html: entry,
+      };
+      const url = entry.match(/href="(.+)"/)[1];
+      out.url = url;
+      const resp = await got(url);
+      const $ = cheerio.load(resp.body);
+      const image = $('meta[property="og:image"]').attr('content');
+      out.image = image;
+      return out;
+    })
+  );
 
   return Promise.all([
     writeFile(OUTPUT, JSON.stringify(data), 'utf8'),

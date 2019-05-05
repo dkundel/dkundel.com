@@ -5,7 +5,6 @@
   "version": "1.0.0",
   "author": "Dominik Kundel <dominik.kundel@gmail.com>",
   "dependencies": {
-    "about-json": "^1.0.2",
     "anker-colors": "^1.4.0",
     "emoji-regex": "^8.0.0",
     "gatsby": "^2.3.25",
@@ -36,6 +35,8 @@
     "typography-theme-noriega": "^0.16.19"
   },
   "devDependencies": {
+    "about-json": "^1.0.2",
+    "cheerio": "^1.0.0-rc.3",
     "gatsby-cli": "^2.5.9",
     "ncp": "^2.0.0",
     "prettier": "^1.17.0"

@@ -9,6 +9,7 @@ import { graphql, StaticQuery } from 'gatsby';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
+import tw from 'tailwind.macro';
 import GlobalStyles from '../utils/globalStyles';
 import Footer from './Footer';
 import Header from './Header';
@@ -19,6 +20,7 @@ const Container = styled.div`
   height: 100%;
   flex-direction: column;
   align-items: center;
+  ${tw`bg-grey-lightest`}
 `;
 const Main = styled.div`
   flex: 1;

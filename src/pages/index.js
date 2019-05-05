@@ -1,25 +1,71 @@
 import { graphql } from 'gatsby';
 import React from 'react';
 import styled from 'styled-components';
+import tw from 'tailwind.macro';
 import Html from '../components/Html';
 import InfoHeader from '../components/InfoHeader';
 import Layout from '../components/layout';
 import SEO from '../components/seo';
+import { smallAllCaps } from '../utils/tailwind-helpers';
 
 const SocialList = styled.ul`
   list-style: none;
   margin-left: 0;
+  ${tw`flex flex-wrap`}
+
+  li {
+    ${tw`w-auto flex-1 flex-no-shrink text-sm mx-2`}
+    min-width: 40%;
+  }
+`;
+
+const StyledParagraphs = styled.div`
+  ${tw`text-base mb-2`}
+
+  p:last-of-type {
+    ${tw`mb-0`}
+  }
 `;
 
 const Paragraphs = ({ list }) => (
-  <div>
+  <StyledParagraphs>
     {list.map(content => (
       <Html as="p" key={content.substr(6)}>
         {content}
       </Html>
     ))}
-  </div>
+  </StyledParagraphs>
 );
+
+const TopicList = styled.ul`
+  ${tw`mb-3 ml-2`}
+
+  li {
+    list-style: none;
+    ${smallAllCaps}
+    ${tw`p-0 mb-2 mx-0 text-xs`}
+
+    a {
+      ${tw`text-sm normal-case`}
+    }
+
+    &::before {
+      ${tw`pl-5 pt-1`}
+      content: '';
+      display: inline-block;
+      height: 1em;
+      width: 1em;
+      background-image: url('/icons/arrow-outline.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  }
+`;
+
+const SubsectionHeader = styled.h2`
+  ${tw`text-sm mb-2 mt-8 font-bold uppercase text-grey-darker`}
+`;
+
 const IndexPage = ({ data }) => {
   const bio = data.aboutJson.biography._paragraphs;
   const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs;
@@ -29,18 +75,18 @@ const IndexPage = ({ data }) => {
     <Layout>
       <SEO title="About Me" keywords={[`dkundel`, `javascript`, `speaker`]} />
       <InfoHeader headerInfo={data.aboutJson.header} />
-      <h2>{data.aboutJson.biography._heading}</h2>
+      <SubsectionHeader>Biography</SubsectionHeader>
       <Paragraphs list={bio} />
-      <h3>{data.aboutJson.biography.examplesOfPreviousTalks._heading}</h3>
+      <SubsectionHeader>Examples of previous talks</SubsectionHeader>
       <Paragraphs list={talkText} />
-      <ul>
+      <TopicList>
         {talks.map(talk => (
           <Html as="li" key={talk.substr(4)}>
             {talk}
           </Html>
         ))}
-      </ul>
-      <h2>{data.aboutJson.socialChannels._heading}</h2>
+      </TopicList>
+      <SubsectionHeader>Reach me on:</SubsectionHeader>
       <SocialList>
         {social.map(channel => (
           <Html as="li" key={channel.substr(4)}>
