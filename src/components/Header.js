@@ -1,4 +1,4 @@
-import { lightGray, secondaryGreen } from 'anker-colors';
+import { secondaryGreen, secondaryGreenShades } from 'anker-colors';
 import Link from 'gatsby-link';
 import React from 'react';
 import styled from 'styled-components';
@@ -12,7 +12,8 @@ const headerBreakpoints = {
 const HeaderContainer = styled.header`
   display: flex;
   justify-content: space-between;
-  background: ${lightGray};
+  background: white;
+  border-bottom: 2px solid ${secondaryGreenShades['500']};
   padding: 20px 20px;
   width: 100%;
   min-height: fit-content;

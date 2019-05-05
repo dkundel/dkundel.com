@@ -8,7 +8,8 @@ import Html from './Html';
 const TalkListContainer = styled.div``;
 
 const TalkContainer = styled.section`
-  ${tw`bg-white mx-auto max-w-lg shadow-lg rounded-lg overflow-hidden mb-6 p-3`}
+  ${tw`bg-white mx-auto max-w-lg shadow-md rounded-lg overflow-hidden mb-6 p-3`}
+  ${tw`hover:shadow-lg focus:shadow-lg focus-within:shadow-lg`}
 `;
 const TalkEvent = styled.h3`
   ${tw`text-sm font-semibold my-2 pb-2 mx-0 border-0 border-b-2 border-solid border-green`}

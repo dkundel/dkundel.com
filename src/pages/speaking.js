@@ -49,9 +49,9 @@ const TopicList = styled.ul`
   ${tw`mb-3 ml-2`}
 
   li {
-    ${tw`p-0 my-2 mx-0 text-xs`}
     list-style: none;
     ${smallAllCaps}
+    ${tw`p-0 mb-2 mx-0 text-xs`}
 
     a {
       ${tw`text-sm normal-case`}
@@ -129,9 +129,9 @@ class Speaking extends Component {
         </ListContainer>
       );
     });
-    console.log(this.props.data);
     return (
       <Layout>
+        <SEO title="Speaking" />
         <SectionHeader>
           <StyledSpeakingIcon width="200" />
           <Heading>
@@ -146,7 +146,7 @@ class Speaking extends Component {
               {this.props.data.aboutJson.currentTalkTopics._list.map(topic => {
                 return (
                   <Html as="li" key={md5(topic)}>
-                    {topic}
+                    {topic.replace('|', '<br>')}
                   </Html>
                 );
               })}
@@ -160,7 +160,6 @@ class Speaking extends Component {
             </ZeroMarginP>
           </Heading>
         </SectionHeader>
-        <SEO title="Speaking" />
         {talkOverview}
       </Layout>
     );

@@ -1,33 +1,59 @@
-import { secondaryGreenShades } from 'anker-colors';
 import React from 'react';
 import styled from 'styled-components';
+import tw from 'tailwind.macro';
+import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
-const ArticleWrapper = styled.section`
-  padding: 10px 20px;
-  border-left: 5px solid ${secondaryGreenShades['500']};
-  margin-bottom: 20px;
+
+const ArticleListContainer = styled.div`
+  ${tw`flex flex-wrap items-center`}
+`;
+const ArticleWrapper = styled.a`
+  ${tw`bg-white w-auto mx-auto max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0`}
+  ${tw`flex flex-col`}
+  ${tw`hover:no-underline hover:shadow-lg focus:shadow-lg focus-within:shadow-lg`}
+  min-height: ${props => (props.hasImage ? '14rem' : '0')};
+  ${props => (!props.hasImage ? tw`max-w-full` : '')}
+`;
+const ArticleInfo = styled.div`
+  ${tw`flex flex-col flex-1 px-3 py-2 justify-between`}
 `;
 const ArticleLanguage = styled.span``;
-const ArticleTitle = styled.h3``;
-const ArticleMeta = styled.p`
-  font-size: 0.8em;
-  margin-bottom: 0;
+const ArticleTitle = styled.h3`
+  ${tw`text-base`}
 `;
-const ArticleDate = styled.span``;
-const ArticleListContainer = styled.div``;
+const ArticleMeta = styled.p`
+  ${smallAllCaps}
+  ${tw`normal-case`}
+`;
+const ArticleDate = styled.span`
+  ${tw`uppercase`}
+`;
 const ArticlePlatform = styled.a``;
+const ArticleImage = styled.img`
+  ${tw`mb-1`}
+`;
 
-const Article = ({ language, link, date, url, onWebsite }) => {
+const Article = ({ language, link, date, url, onWebsite, image }) => {
   return (
-    <ArticleWrapper>
-      <Html as={ArticleTitle}>{link}</Html>
-      <ArticleMeta>
-        <ArticleLanguage>{language}</ArticleLanguage>{' '}
-        <ArticleDate>{date}</ArticleDate> on{' '}
-        <ArticlePlatform href={`https://${onWebsite}`} target="_blank">
-          {onWebsite}
-        </ArticlePlatform>
-      </ArticleMeta>
+    <ArticleWrapper
+      href={url}
+      hasImage={!!image}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {image ? (
+        <ArticleImage src={image} alt="decorative header image of blog post" />
+      ) : null}
+      <ArticleInfo>
+        <Html as={ArticleTitle}>{link}</Html>
+        <ArticleMeta>
+          <ArticleLanguage>{language}</ArticleLanguage>{' '}
+          <ArticleDate>{date}</ArticleDate> on{' '}
+          <ArticlePlatform href={`https://${onWebsite}`} target="_blank">
+            {onWebsite}
+          </ArticlePlatform>
+        </ArticleMeta>
+      </ArticleInfo>
     </ArticleWrapper>
   );
 };
@@ -39,7 +65,7 @@ const ArticleList = ({ list, reverseOrder = false }) => {
   }
   return (
     <ArticleListContainer>
-      {entries.map(({ language, link, date, url, onWebsite }) => (
+      {entries.map(({ language, link, date, url, onWebsite, image }) => (
         <Article
           key={url}
           language={language}
@@ -47,6 +73,7 @@ const ArticleList = ({ list, reverseOrder = false }) => {
           date={date}
           url={url}
           onWebsite={onWebsite}
+          image={image}
         />
       ))}
     </ArticleListContainer>
@@ -54,10 +81,15 @@ const ArticleList = ({ list, reverseOrder = false }) => {
 };
 
 function parseListEntry(entry) {
+  let info = entry;
+  if (typeof info !== 'string') {
+    info = entry.html;
+  }
   const regExp = /(.*?)\s+(.*)\s+\|\s+(.*?)$/;
   const linkRegExp = /href="(.*?)"/;
-  const [, language, link, date] = entry.match(regExp);
-  const result = { language, link, date };
+  const [, language, link, date] = info.match(regExp);
+  const image = entry.image || undefined;
+  const result = { language, link, date, image };
   const match = link.match(linkRegExp);
   if (match) {
     result.url = match[1];
