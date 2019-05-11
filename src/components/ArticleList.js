@@ -5,11 +5,12 @@ import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
 
 const ArticleListContainer = styled.div`
-  ${tw`flex flex-wrap items-center`}
+  ${tw`flex flex-wrap justify-around lg:justify-start`}
 `;
-const ArticleWrapper = styled.a`
-  ${tw`bg-white w-auto mx-auto max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0`}
+const ArticleWrapper = styled.div`
+  ${tw`bg-white w-auto mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0`}
   ${tw`flex flex-col`}
+  ${tw`cursor-pointer`}
   ${tw`hover:no-underline hover:shadow-lg focus:shadow-lg focus-within:shadow-lg`}
   min-height: ${props => (props.hasImage ? '14rem' : '0')};
   ${props => (!props.hasImage ? tw`max-w-full` : '')}
@@ -38,9 +39,8 @@ const ArticleImage = styled.img`
 const Article = ({ language, link, date, url, onWebsite, image }) => {
   return (
     <ArticleWrapper
-      href={url}
+      onClick={() => window.open(url, '_blank')}
       hasImage={!!image}
-      target="_blank"
       rel="noopener noreferrer"
     >
       {image ? (
