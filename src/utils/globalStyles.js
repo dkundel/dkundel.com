@@ -7,6 +7,7 @@ export default createGlobalStyle`
     height: 100%;
     width: 100%;
     min-height: 100vh;
+    min-width: 250px;
     ${tw`font-sans`}
   }
 

@@ -1,3 +1,4 @@
+import emojiRegex from 'emoji-regex';
 import { graphql } from 'gatsby';
 import React from 'react';
 import styled from 'styled-components';
@@ -14,8 +15,11 @@ const SocialList = styled.ul`
   ${tw`flex flex-wrap`}
 
   li {
-    ${tw`w-auto flex-1 flex-no-shrink text-sm mx-2`}
-    min-width: 40%;
+    ${tw`w-auto flex-1 flex-no-shrink text-sm mx-2 text-center`}
+    a {
+      ${tw`bg-white shadow px-2 py-1 text-center inline-block`}
+      width: 200px;
+    }
   }
 `;
 
@@ -66,11 +70,27 @@ const SubsectionHeader = styled.h2`
   ${tw`text-sm mb-2 mt-8 font-bold uppercase text-grey-darker`}
 `;
 
+const globalEmojiRegex = new RegExp(emojiRegex(), 'g');
+const removeEmoji = str =>
+  str.replace(globalEmojiRegex, '').replace(globalEmojiRegex, '');
+
+const linkRegEx = /<a .*<\/a>/;
+function parseSocialChannels(channel) {
+  const link = channel.match(linkRegEx)[0];
+  const emoji = channel.replace(link, '').trim();
+  const linkWithEmoji = link.replace('>', `> ${emoji} `);
+  return {
+    link,
+    emoji,
+    linkWithEmoji,
+  };
+}
+
 const IndexPage = ({ data }) => {
   const bio = data.aboutJson.biography._paragraphs;
   const talkText = data.aboutJson.biography.examplesOfPreviousTalks._paragraphs;
   const talks = data.aboutJson.biography.examplesOfPreviousTalks._list;
-  const social = data.aboutJson.socialChannels._list;
+  const social = data.aboutJson.socialChannels._list.map(parseSocialChannels);
   return (
     <Layout>
       <SEO title="About Me" keywords={[`dkundel`, `javascript`, `speaker`]} />
@@ -89,8 +109,8 @@ const IndexPage = ({ data }) => {
       <SubsectionHeader>Reach me on:</SubsectionHeader>
       <SocialList>
         {social.map(channel => (
-          <Html as="li" key={channel.substr(4)}>
-            {channel}
+          <Html as="li" key={channel.link.substr(8)}>
+            {channel.linkWithEmoji}
           </Html>
         ))}
       </SocialList>
