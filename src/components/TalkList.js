@@ -47,7 +47,12 @@ const Talk = ({ info }) => {
           {date} @ {location}
         </TalkDate>
         <TalkInfo>
-          Additional Material: <Html as="span">{other}</Html>
+          Additional Material:{' '}
+          <Html as="span">
+            {other
+              .replace(' Slides', '&nbsp;Slides')
+              .replace(' Video', '&nbsp;Video')}
+          </Html>
         </TalkInfo>
       </TalkMetaContainer>
     </TalkContainer>
