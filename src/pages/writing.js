@@ -12,7 +12,7 @@ const SectionHeader = styled.header`
 `;
 
 const Heading = styled.hgroup`
-  min-width: 19rem;
+  min-width: 7rem;
   ${tw`flex-1 text-sm`}
 
   h1 {

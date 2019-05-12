@@ -17,7 +17,7 @@ const SocialList = styled.ul`
   li {
     ${tw`w-auto flex-1 flex-no-shrink text-sm mx-2 text-center`}
     a {
-      ${tw`bg-white shadow px-2 py-1 text-center inline-block`}
+      ${tw`bg-white shadow px-2 py-1 text-center inline-block rounded hover:shadow-lg`}
       width: 200px;
     }
   }
