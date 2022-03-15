@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/default.astro';
+import TopicList from '../components/main/TopicList.jsx';
+import TalksByYear from '../components/speaking/TalksByYear.jsx';
+import SectionHeader from '../components/SectionHeader.jsx';
+import PageIcon from '../icons/PageIcon.jsx';
+import Speaking from '../icons/Speaking.jsx';
+import Heading from '../components/Heading.jsx';
+import data from '../../data/about/dkundel.json';
+
+function groupPresentationsByYear(list) {
+  return list.reduce((byYear, talk) => {
+    const [, year] = talk.date.match(/,\s*(\d{4})$/);
+    if (byYear[year]) {
+      byYear[year].push(talk);
+    } else {
+      byYear[year] = [talk];
+    }
+    return byYear;
+  }, {});
+}
+
+const talksByYears = groupPresentationsByYear(data.pastPresentations._entries);
+const years = Object.keys(talksByYears).sort((a, b) => +b - +a);
+---
+<!-- Below is your "component template." It's just HTML, but with
+     some magic sprinkled in to help you build great templates. -->
+  <Layout title="Speaking">
+  <SectionHeader>
+  <PageIcon Icon={Speaking} />
+  <Heading>
+    <Heading.h1>Past Presentations</Heading.h1>
+    <Heading.p>
+      During my time as a developer, I learned a lot from my peers and
+      as a result I try to give back whenever possible. One way for me
+      to do this is by giving presentations about a variety of topics.
+    </Heading.p>
+    <Heading.p className="m-0 mb-2">
+      Among others these topics include:
+    </Heading.p>
+    <TopicList talks={data.currentTalkTopics._list.map(x => x.replace('|', '<br>'))} />
+    <Heading.p className="m-0">
+      You can find a comprehensive{' '}
+      <a href="https://github.com/dkundel/about-me/tree/master/abstracts">
+        list on my GitHub
+      </a>
+      .
+    </Heading.p>
+  </Heading>
+  </SectionHeader>
+  {years.map((year, idx) => {
+    return <TalksByYear list={talksByYears[year]} year={year} showDefault={idx!==0} client:load />
+  })}
+  </Layout>

@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/default.astro';
+import SubsectionHeader from '../components/SubsectionHeader.jsx';
+import SectionHeader from '../components/SectionHeader.jsx';
+import PageIcon from '../icons/PageIcon.jsx';
+import Speaking from '../icons/Speaking.jsx';
+import Heading from '../components/Heading.jsx';
+import data from '../../data/about/dkundel.json';
+---
+<Layout title="Work">
+  <SectionHeader>
+    <PageIcon Icon={Speaking} />
+    <Heading>
+      <Heading.h1>Current & Past Projects</Heading.h1>
+      <Heading.p>
+        Something about developer experience and tools.
+      </Heading.p>
+    </Heading>
+  </SectionHeader>
+  <SubsectionHeader>Developer Tools</SubsectionHeader>
+</Layout>

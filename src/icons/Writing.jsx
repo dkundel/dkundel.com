@@ -1,32 +1,10 @@
 import { lightGray, secondaryGreenShades } from 'anker-colors';
 import React from 'react';
-import styled from 'styled-components';
+import styled from '../utils/styled.js';
 
-const StyledSvg = styled.svg`
-  .cls-1 {
-    fill: ${() => lightGray}; /* lightest */
-  }
-  .cls-2,
-  .cls-3 {
-    fill: ${() => secondaryGreenShades['100']};
-  }
-  .cls-3,
-  .cls-5,
-  .cls-6 {
-    stroke: ${secondaryGreenShades['500']}; /* full */
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .cls-4,
-  .cls-6 {
-    fill: #fff;
-  }
-  .cls-5 {
-    fill: none;
-  }
-`;
+const StyledSvg = styled('svg', 'writing-icon')
 
-const SpeakingIcon = props => {
+const WritingIcon = props => {
   return (
     <StyledSvg
       id="Duotone"
@@ -125,4 +103,4 @@ const SpeakingIcon = props => {
   );
 };
 
-export default SpeakingIcon;
+export default WritingIcon;

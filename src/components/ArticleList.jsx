@@ -1,39 +1,22 @@
 import React from 'react';
-import styled from 'styled-components';
-import tw from 'tailwind.macro';
+import styled from '../utils/styled';
 import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
 
-const ArticleListContainer = styled.div`
-  ${tw`flex flex-wrap justify-around lg:justify-start`}
-`;
-const ArticleWrapper = styled.div`
-  ${tw`bg-white w-auto mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0`}
-  ${tw`flex flex-col`}
-  ${tw`cursor-pointer`}
-  ${tw`hover:no-underline hover:shadow-lg focus:shadow-lg focus-within:shadow-lg`}
-  min-height: ${props => (props.hasImage ? '14rem' : '0')};
-  ${props => (!props.hasImage ? tw`max-w-full` : '')}
-`;
-const ArticleInfo = styled.div`
-  ${tw`flex flex-col flex-1 px-3 py-2 justify-between`}
-`;
-const ArticleLanguage = styled.span``;
-const ArticleTitle = styled.h3`
-  ${tw`text-base`}
-`;
-const ArticleMeta = styled.p`
-  ${smallAllCaps}
-  ${tw`normal-case`}
-`;
-const ArticleDate = styled.span`
-  ${tw`uppercase`}
-`;
-const ArticlePlatform = styled.a``;
-const ArticleImage = styled.img`
-  ${tw`mb-1`} /* min-width: 360px;
-  min-height: 135px; */
-`;
+const ArticleListContainer = styled('div', 'flex flex-wrap justify-around lg:justify-start');
+
+function ArticleWrapper({ hasImage, children, ...props }) {
+  const imageClasses = hasImage ? 'min-h-[14rem] max-w-full' : 'min-h-0';
+  return <div className={`bg-white w-auto mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0 flex flex-col cursor-pointer hover:no-underline hover:shadow-lg focus:shadow-lg focus-within:shadow-lg ${imageClasses}`} {...props}>{children}</div>
+}
+
+const ArticleInfo = styled('div', 'flex flex-col flex-1 px-3 py-2 justify-between')
+const ArticleLanguage = styled('span', '');
+const ArticleTitle = styled('h3', "text-base")
+const ArticleMeta = styled('p', `normal-case ${smallAllCaps}`)
+const ArticleDate = styled('span', 'uppercase')
+const ArticlePlatform = styled('a', '');
+const ArticleImage = styled('img', 'mb-1');
 
 const Article = ({ language, link, date, url, onWebsite, image }) => {
   return (

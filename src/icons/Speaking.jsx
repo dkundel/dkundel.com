@@ -1,33 +1,8 @@
 import { lightGray, secondaryGreenShades } from 'anker-colors';
 import React from 'react';
-import styled from 'styled-components';
+import styled from '../utils/styled';
 
-const StyledSvg = styled.svg`
-  .cls-1 {
-    fill: ${() => lightGray}; /* lightest */
-  }
-  .cls-2 {
-    fill: none;
-  }
-  .cls-2,
-  .cls-4,
-  .cls-7 {
-    stroke: ${secondaryGreenShades['500']}; /* full */
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .cls-3,
-  .cls-7 {
-    fill: ${() => secondaryGreenShades['100']}; /* lighter */
-  }
-  .cls-4,
-  .cls-5 {
-    fill: #fff;
-  }
-  .cls-6 {
-    fill: ${() => secondaryGreenShades['500']};
-  }
-`;
+const StyledSvg = styled('svg', 'speaking-icon')
 
 const SpeakingIcon = props => {
   return (

@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/default.astro';
+import InfoHeader from '../components/main/InfoHeader.jsx';
+import TopicList from '../components/main/TopicList.jsx';
+import Paragraphs from '../components/main/Paragraphs.jsx';
+import SocialList from '../components/main/SocialList.jsx';
+import SubsectionHeader from '../components/SubsectionHeader.jsx';
+import data from '../../data/about/dkundel.json';
+---
+<!-- Below is your "component template." It's just HTML, but with
+     some magic sprinkled in to help you build great templates. -->
+  <Layout>
+  <InfoHeader headerInfo={data._raw} />
+  <SubsectionHeader>Biography</SubsectionHeader>
+  <Paragraphs list={data.biography._paragraphs} />
+  <SubsectionHeader>Examples of previous talks</SubsectionHeader>
+  <Paragraphs list={data.biography.examplesOfPreviousTalks._paragraphs}/>
+  <TopicList talks={data.biography.examplesOfPreviousTalks._list} />
+  <SubsectionHeader>Reach me on:</SubsectionHeader>
+  <SocialList channels={data.socialChannels._list} />
+  </Layout>
