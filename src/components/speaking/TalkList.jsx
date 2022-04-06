@@ -1,4 +1,4 @@
-import parse from 'date-fns/parse';
+import parse from 'date-fns/parse/index.js';
 import React from 'react';
 import { uid} from 'react-uid';
 import styled from '../../utils/styled';

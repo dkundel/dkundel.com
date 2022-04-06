@@ -1,6 +1,6 @@
 ---
 import React from 'react';
-import { TypographyStyle, GoogleFont } from 'react-typography'
+import typographyPkg from 'react-typography'
 import styled from '../utils/styled.js';
 // import GlobalStyles from '../utils/globalStyles.js';
 import Footer from '../components/Footer.jsx';
@@ -8,6 +8,8 @@ import Header from '../components/Header.jsx';
 // import SEO from '../components/seo.jsx';
 import siteMetaData from '../../data/siteMetadata.json';
 import typography from '../utils/typography.js';
+
+const { TypographyStyle } = typographyPkg;
 
 const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-center min-h-[100vh]');
 
@@ -44,5 +46,6 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <Main role="main"><slot/></Main>
   <Footer />
 </Container>
+  <script src={Astro.resolve('../index.js')} type="module" hoist></script>
 </body>
 </html>
