@@ -3,10 +3,10 @@ import { graphql } from 'gatsby';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import tw from 'tailwind.macro';
-import md5 from 'tiny-hashes/md5';
+import { uid } from 'react-uid';
 import Html from '../components/Html';
 import Layout from '../components/layout';
-import SEO from '../components/seo';
+import SEO from '../../src/components/seo';
 import TalkList from '../components/TalkList';
 import SpeakingIcon from '../icons/Speaking';
 import { smallAllCaps } from '../utils/tailwind-helpers';
@@ -145,7 +145,7 @@ class Speaking extends Component {
             <TopicList>
               {this.props.data.aboutJson.currentTalkTopics._list.map(topic => {
                 return (
-                  <Html as="li" key={md5(topic)}>
+                  <Html as="li" key={uid(topic)}>
                     {topic.replace('|', '<br>')}
                   </Html>
                 );

@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@astrojs/react": "^0.1.0",
+    "@astrojs/tailwind": "^0.1.0",
     "about-json": "^1.0.2",
     "cheerio": "^1.0.0-rc.3",
     "ncp": "^2.0.0",

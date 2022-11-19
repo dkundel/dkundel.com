@@ -32,12 +32,13 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <meta name="twitter:title" content={siteTitle}>
   <meta name="twitter:description" content={siteMetaData.description}>
   <title>{siteTitle}</title>
-	<style global>
-      /* @import "../styles/typography.css"; */
-			@import "../styles/global.css";
-	</style>
 </head>
 <body>
+<style is:global>
+      /* @import "../styles/typography.css"; */
+			@import "../styles/global.css";
+      @tailwind base;
+	</style>
 <Container>
   <TypographyStyle typography={typography} />
   <!-- <SEO title="About Me" keywords={[`dkundel`, `javascript`, `speaker`]} /> -->
@@ -46,6 +47,6 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <Main role="main"><slot/></Main>
   <Footer />
 </Container>
-  <script src={Astro.resolve('../index.js')} type="module" hoist></script>
+  <!-- <script src={(await import('../index.js?url').default} type="module" hoist></script> -->
 </body>
 </html>
