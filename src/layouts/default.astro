@@ -1,13 +1,8 @@
 ---
-import React from 'react';
-import typographyPkg from 'react-typography'
 import styled from '../utils/styled.js';
 import Footer from '../components/Footer.jsx';
 import Header from '../components/Header.jsx';
 import siteMetaData from '../../data/siteMetadata.json';
-import typography from '../utils/typography.js';
-
-const { TypographyStyle } = typographyPkg;
 
 const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-center min-h-[100vh]');
 
@@ -39,7 +34,7 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
       @tailwind base;
 	</style>
 <Container>
-  <TypographyStyle typography={typography} />
+  <!-- <TypographyStyle typography={typography} /> -->
   <Header name={siteMetaData.name} />
   <Main role="main"><slot/></Main>
   <Footer />

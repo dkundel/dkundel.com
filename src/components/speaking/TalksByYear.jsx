@@ -10,7 +10,7 @@ function ToggleButton({children, onClick}) {
 
 const TalkYearContainer = styled('div', '');
 const ListContainer = styled('div', '');
-const TalkYear = styled('h2', 'mb-4 inline-block mr-2 text-base font-bold text-gray-900 tracking-wide');
+const TalkYear = styled('h2', 'mb-2 inline-block mr-2 text-base font-bold text-gray-900 tracking-wide');
 
 function TalksByYear({year, list, showDefault}) {
   const [collapsed, setCollapsed] = React.useState(typeof showDefault === 'undefined' ? true : showDefault);

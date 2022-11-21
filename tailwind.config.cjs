@@ -8,6 +8,9 @@ module.exports = {
     './src/**/*.{astro,js,jsx,svelte,ts,tsx,vue}',
   ],
   theme: {
+    fontFamily: {
+      sans: 'Lato, sans-serif',
+    },
     extend: {
       colors: {
         ...shades,

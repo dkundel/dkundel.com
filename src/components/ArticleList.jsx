@@ -7,15 +7,15 @@ const ArticleListContainer = styled('div', 'flex flex-wrap justify-around lg:jus
 
 function ArticleWrapper({ hasImage, children, ...props }) {
   const imageClasses = hasImage ? 'min-h-[14rem] max-w-full' : 'min-h-0';
-  return <div className={`bg-white w-auto mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0 flex flex-col cursor-pointer hover:no-underline hover:shadow-lg focus:shadow-lg focus-within:shadow-lg ${imageClasses}`} {...props}>{children}</div>
+  return <div className={`bg-white w-auto mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0 flex flex-col cursor-pointer hover:no-underline hover:shadow-xl focus:shadow-xl focus-within:shadow-xl ${imageClasses}`} {...props}>{children}</div>
 }
 
 const ArticleInfo = styled('div', 'flex flex-col flex-1 px-3 py-2 justify-between')
 const ArticleLanguage = styled('span', '');
-const ArticleTitle = styled('h3', "text-base")
-const ArticleMeta = styled('p', `normal-case ${smallAllCaps}`)
+const ArticleTitle = styled('h3', "text-base font-bold pb-4 text-purple-300")
+const ArticleMeta = styled('p', `normal-case ${smallAllCaps} text-gray-500 `)
 const ArticleDate = styled('span', 'uppercase')
-const ArticlePlatform = styled('a', '');
+const ArticlePlatform = styled('a', 'text-purple-300');
 const ArticleImage = styled('img', 'mb-1');
 
 const Article = ({ language, link, date, url, onWebsite, image }) => {
