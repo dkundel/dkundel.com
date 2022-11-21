@@ -18,7 +18,7 @@ const Header = ({ name }) => (
       <a href="/">About Me</a>
       <a href="/writing">Writing</a>
       <a href="/speaking">Speaking</a>
-      <a href="/work">Projects</a>
+      {/* <a href="/work">Projects</a> */}
     </Navigation>
   </HeaderContainer>
 );

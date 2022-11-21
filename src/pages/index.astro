@@ -6,10 +6,11 @@ import Paragraphs from '../components/main/Paragraphs.jsx';
 import SocialList from '../components/main/SocialList.jsx';
 import SubsectionHeader from '../components/SubsectionHeader.jsx';
 import data from '../../data/about/dkundel.json';
+
 ---
 <!-- Below is your "component template." It's just HTML, but with
      some magic sprinkled in to help you build great templates. -->
-  <Layout>
+  <Layout title="About Me">
   <InfoHeader headerInfo={data._raw} />
   <SubsectionHeader>Biography</SubsectionHeader>
   <Paragraphs list={data.biography._paragraphs} />

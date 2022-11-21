@@ -2,10 +2,8 @@
 import React from 'react';
 import typographyPkg from 'react-typography'
 import styled from '../utils/styled.js';
-// import GlobalStyles from '../utils/globalStyles.js';
 import Footer from '../components/Footer.jsx';
 import Header from '../components/Header.jsx';
-// import SEO from '../components/seo.jsx';
 import siteMetaData from '../../data/siteMetadata.json';
 import typography from '../utils/typography.js';
 
@@ -20,6 +18,7 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
 ---
 <html>
 <head>
+  <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -41,12 +40,10 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
 	</style>
 <Container>
   <TypographyStyle typography={typography} />
-  <!-- <SEO title="About Me" keywords={[`dkundel`, `javascript`, `speaker`]} /> -->
-  <!-- <GlobalStyles /> -->
   <Header name={siteMetaData.name} />
   <Main role="main"><slot/></Main>
   <Footer />
 </Container>
-  <!-- <script src={(await import('../index.js?url').default} type="module" hoist></script> -->
+  <script src={(await import('../index.js?url')).default} type="module" hoist></script>
 </body>
 </html>

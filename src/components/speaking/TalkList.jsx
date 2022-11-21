@@ -1,6 +1,5 @@
 import parse from 'date-fns/parse/index.js';
 import React from 'react';
-import { uid} from 'react-uid';
 import styled from '../../utils/styled';
 import Html from '../Html';
 
@@ -45,7 +44,7 @@ const TalkList = ({ talks, collapsed = false }) => {
     ? ''
     : talks
         .sort(sortByEventDate)
-        .map(talkInfo => <Talk info={talkInfo} key={uid(talkInfo)} />);
+        .map(talkInfo => <Talk info={talkInfo} key={talkInfo.date + talkInfo.topic}/>);
   return <TalkListContainer>{list}</TalkListContainer>;
 };
 
