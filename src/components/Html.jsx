@@ -24,7 +24,7 @@ export const allowImages = {
   allowedAttributes: {
     ...sanitize.defaults.allowedAttributes,
     '*': ['class'],
-    img: ['src', 'width', 'height'],
+    img: ['src', 'width', 'height', 'alt'],
   },
 };
 

@@ -11,9 +11,10 @@ const Main = styled('div', 'flex-1 max-w-[800px] w-full p-[20px]');
 const {title} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 ---
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -28,17 +29,14 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <title>{siteTitle}</title>
 </head>
 <body>
-<style is:global>
-      /* @import "../styles/typography.css"; */
-			@import "../styles/global.css";
-      @tailwind base;
+  <style is:global>
+    @import "../styles/global.css";
+    @tailwind base;
 	</style>
-<Container>
-  <!-- <TypographyStyle typography={typography} /> -->
-  <Header name={siteMetaData.name} />
-  <Main role="main"><slot/></Main>
-  <Footer />
-</Container>
-  <script src={(await import('../index.js?url')).default} type="module" hoist></script>
+  <Container>
+    <Header name={siteMetaData.name} />
+    <Main role="main"><slot/></Main>
+    <Footer />
+  </Container>
 </body>
 </html>
