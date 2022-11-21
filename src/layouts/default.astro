@@ -1,0 +1,49 @@
+---
+import styled from '../utils/styled.js';
+import Footer from '../components/Footer.jsx';
+import Header from '../components/Header.jsx';
+import siteMetaData from '../../data/siteMetadata.json';
+
+const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-center min-h-[100vh]');
+
+const Main = styled('div', 'flex-1 max-w-[800px] w-full p-[20px]');
+
+const {title} = Astro.props;
+const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
+---
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <meta name="description" content={siteMetaData.description}>
+  <meta property="og:title" content={siteTitle}>
+  <meta property="og:description" content={siteMetaData.description}>
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content={siteMetaData.author}>
+  <meta name="twitter:title" content={siteTitle}>
+  <meta name="twitter:description" content={siteMetaData.description}>
+  <link rel="shortcut icon" type="image/png" href="/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="/favicon-192.png">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32">
+  <link rel="icon" href="/favicon-128.png" sizes="128x128">
+  <link rel="icon" href="/favicon-180.png" sizes="180x180">
+  <link rel="icon" href="/favicon-192.png" sizes="192x192">
+  <title>{siteTitle}</title>
+</head>
+<body>
+  <style is:global>
+    @import "../styles/global.css";
+    @tailwind base;
+	</style>
+  <Container>
+    <Header name={siteMetaData.name} />
+    <Main role="main"><slot/></Main>
+    <Footer />
+    <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
+  </Container>
+</body>
+</html>

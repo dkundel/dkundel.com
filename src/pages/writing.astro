@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/default.astro';
+import ArticleList from '../components/ArticleList.jsx';
+import TopicList from '../components/main/TopicList.jsx';
+import Paragraphs from '../components/main/Paragraphs.jsx';
+import SocialList from '../components/main/SocialList.jsx';
+import SubsectionHeader from '../components/SubsectionHeader.jsx';
+import SectionHeader from '../components/SectionHeader.jsx';
+import PageIcon from '../icons/PageIcon.jsx';
+import Writing from '../icons/Writing.jsx';
+import Heading from '../components/Heading.jsx';
+import data from '../../data/about/dkundel.json';
+---
+<!-- Below is your "component template." It's just HTML, but with
+     some magic sprinkled in to help you build great templates. -->
+  <Layout title="Writing">
+  <SectionHeader>
+  <PageIcon Icon={Writing} />
+  <Heading>
+    <Heading.h1>Technical Writing</Heading.h1>
+    <Heading.p>
+      I love telling stories through code and explaining technical
+      concepts. As a result you'll find me regularly blogging on various
+      platforms such as{' '}
+      <a href="https://twilio.com/blog/author/dkundel">the Twilio Blog</a>
+      , <a href="https://dev.to/dkundel">dev.to</a>, or{' '}
+      <a href="https://moin.world">my personal blog</a>.
+    </Heading.p>
+    <Heading.p>
+      Here's a list of some of my technical content published online and
+      in print.
+    </Heading.p>
+  </Heading>
+  </SectionHeader>
+  <SubsectionHeader>Online Posts</SubsectionHeader>
+  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} />
+  <SubsectionHeader>Printed Articles</SubsectionHeader>
+  <ArticleList list={data.technicalWriting.print._list} />
+  </Layout>

@@ -1,0 +1,219 @@
+/* src/styles/global.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-width: 250px;
+    line-height: 1.61;
+  }
+  
+  body {
+    /* height: 100%; */
+    width: 100%;
+    color: hsla(0, 0%, 0%, 0.8);
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    word-wrap: break-word;
+    font-kerning: normal;
+    -moz-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+    -ms-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+    -webkit-font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+    font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+  }
+  
+  body h1 {
+    @apply font-light text-2xl;
+  }
+
+  hgroup h2 {
+    @apply text-2xl leading-[1.1] font-bold;
+  }
+  
+  a {
+    @apply text-purple-300;
+    text-decoration: none;
+  }
+  
+  a:hover,
+  a:focus {
+    @apply text-purple-700;
+    text-decoration: underline;
+  }
+
+  h1,h2,h3,h4,h5,h6,p {
+    margin: 0;
+    margin-bottom: 1.61rem;
+  }
+
+  li {
+    margin-bottom: calc(1.61rem / 2)
+  }
+  
+  .small-all-caps {
+    @apply text-gray-500 text-xs m-0 tracking-wide uppercase;
+  }
+  
+  .footer-container {
+    @apply text-xs text-center;
+    margin-top: 10px;
+  }
+  
+  .footer-container svg,
+  .footer-container img.panda {
+    height: 3em;
+    @apply w-auto mb-2;
+  }
+  
+  .info-container {
+    text-align: center;
+    padding: 20px;
+    @apply border-b-[1px] border-secondaryGreen-500 border-solid;
+    margin-bottom: 20px;
+  }
+  
+  .info-container .header-image {
+    @apply flex justify-center;
+  }
+  
+  .info-container h1.name {
+    @apply text-darkBlue-500;
+  }
+  .info-container h1.name span {
+    padding-bottom: 5px;
+    @apply border-b-[1px] border-secondaryGreen-500 border-solid;
+  }
+  
+  .info-container p.meta-data {
+    font-size: 0.8em;
+  }
+  
+  .info-container p:last-of-type {
+    font-size: 1.5em;
+    margin-bottom: 0;
+  }
+  
+  .navigation-container {
+    @apply flex flex-wrap mt-[10px] xs:mt-auto;
+  }
+  
+  .navigation-container a {
+    @apply xs:mr-auto xs:ml-[20px] ml-0 mr-[20px];
+  }
+  
+  .page-title-container {
+    @apply m-0 flex flex-wrap;
+  }
+  
+  .page-title-container:hover svg {
+    transform: rotateZ(0deg);
+  }
+  
+  .page-title-container svg {
+    @apply mr-0 w-auto h-[1.5em] mb-[10px] tiny:mb-auto;
+    transform: rotateZ(22.5deg);
+    transition: transform 0.5s ease;
+  }
+  
+  .social-list {
+    list-style: none;
+    margin-left: 0;
+    @apply flex flex-wrap;
+  }
+  
+  .social-list li {
+    @apply w-auto flex-1 flex-shrink-0 text-sm mx-2 text-center;
+  }
+  
+  .social-list li a {
+    @apply bg-white shadow px-2 py-1 text-center inline-block rounded hover:shadow-lg;
+    width: 210px;
+  }
+  
+  .social-list li a .emoji {
+    @apply mr-3;
+  }
+  
+  .topic-list {
+    @apply mb-3 ml-2;
+  }
+  
+  .topic-list li {
+    list-style: none;
+    @apply small-all-caps p-0 mb-2 mx-0 text-xs;
+  }
+  
+  .topic-list a {
+    @apply text-sm normal-case;
+  }
+  
+  .topic-list li::before {
+    @apply pl-5 pt-1;
+    content: '';
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    background-image: url('/icons/arrow-outline.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  
+  .styled-paragraphs p:last-of-type {
+    @apply mb-0;
+  }
+  
+  .writing-icon .cls-1 {
+    @apply fill-lightGray-500; /* lightest */
+  }
+  .writing-icon .cls-2,
+  .writing-icon .cls-3 {
+    @apply fill-secondaryGreen-100;
+  }
+  .writing-icon .cls-3,
+  .writing-icon .cls-5,
+  .writing-icon .cls-6 {
+    @apply stroke-secondaryGreen-500;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .writing-icon .cls-4,
+  .writing-icon .cls-6 {
+    fill: #fff;
+  }
+  .writing-icon .cls-5 {
+    fill: none;
+  }
+  
+  .speaking-icon .cls-1 {
+    @apply fill-lightGray-500;
+  }
+  .speaking-icon .cls-2 {
+    fill: none;
+  }
+  .speaking-icon .cls-2,
+  .speaking-icon .cls-4,
+  .speaking-icon .cls-7 {
+    @apply stroke-secondaryGreen-500;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .speaking-icon .cls-3,
+  .speaking-icon .cls-7 {
+    @apply fill-secondaryGreen-100;
+  }
+  .speaking-icon .cls-4,
+  .speaking-icon .cls-5 {
+    fill: #fff;
+  }
+  .speaking-icon .cls-6 {
+    @apply fill-secondaryGreen-500;
+  }
+}
+
+@layer components {
+  
+}
