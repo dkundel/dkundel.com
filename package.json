@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "author": "Dominik Kundel <dominik.kundel@gmail.com>",
   "dependencies": {
+    "@astrojs/sitemap": "^1.0.0",
     "anker-colors": "^1.4.0",
     "astro": "^1.6.10",
     "date-fns": "^2.28.0",
