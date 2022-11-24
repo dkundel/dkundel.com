@@ -2,7 +2,7 @@ import { secondaryGreen } from 'anker-colors';
 import React from 'react';
 import styled from '../utils/styled';
 import Anchor from './Anchor';
-import imgUrl from '../images/panda-laptop.png';
+import img from '../images/panda-laptop.png';
 
 const Container = styled('footer', 'footer-container');
 
@@ -11,7 +11,7 @@ const ImageContainer = styled('p', 'mb-0 flex justify-center');
 const Footer = () => (
   <Container>
     <ImageContainer>
-      <img className="panda" src={imgUrl} alt="Panda emoji sitting in front of laptop"/>
+      <img className="panda" alt="Panda emoji sitting in front of laptop" {...img}/>
     </ImageContainer>
     <p>
       Made by{' '}
