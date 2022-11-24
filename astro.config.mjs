@@ -9,12 +9,20 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
+import mdx from '@astrojs/mdx';
+
+// https://astro.build/config
 export default defineConfig(
   /** @type {import('astro').AstroUserConfig} */
   {
     site: 'https://dkundel.com/',
     vite: {
       plugins: [imagetools(), VitePWA()],
+    },
+    markdown: {
+      shikiConfig: {
+        theme: 'rose-pine-moon',
+      },
     },
     integrations: [
       react(),
@@ -27,6 +35,7 @@ export default defineConfig(
       }),
       sitemap(),
       image(),
+      mdx({}),
     ],
   }
 );

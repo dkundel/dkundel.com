@@ -1,0 +1,13 @@
+h3 {
+  @apply text-xl font-bold mb-2;
+}
+
+.astro-code {
+  @apply p-3;
+}
+
+.inline-code-prose *:not(pre) code {
+  @apply text-purple-700 bg-purple-200/40 px-1 py-1 text-[0.70em] rounded-md;
+  /* @apply before:content-none;
+  @apply after:content-none; */
+}

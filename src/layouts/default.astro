@@ -8,8 +8,13 @@ const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-ce
 
 const Main = styled('div', 'flex-1 max-w-[800px] w-full p-[20px]');
 
-const {title} = Astro.props;
+const {title, canonical_url, image} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
+let canonicalURL = new URL(Astro.url.pathname, Astro.site);
+if (canonical_url) {
+  canonicalURL = canonical_url;
+}
+const pageImage = image || '';
 ---
 <html lang="en">
 <head>
@@ -22,6 +27,7 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <meta property="og:title" content={siteTitle}>
   <meta property="og:description" content={siteMetaData.description}>
   <meta property="og:type" content="website">
+  <meta property="og:image" content={pageImage}>
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content={siteMetaData.author}>
   <meta name="twitter:title" content={siteTitle}>
@@ -32,6 +38,7 @@ const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.titl
   <link rel="icon" href="/favicon-128.png" sizes="128x128">
   <link rel="icon" href="/favicon-180.png" sizes="180x180">
   <link rel="icon" href="/favicon-192.png" sizes="192x192">
+  <link rel="canonical" href={canonicalURL} />
   <title>{siteTitle}</title>
 </head>
 <body>
