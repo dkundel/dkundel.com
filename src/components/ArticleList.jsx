@@ -74,13 +74,22 @@ function parseListEntry(entry) {
   const [, language, link, date] = info.match(regExp);
   const image = entry.image || undefined;
   const result = { language, link, date, image };
+  const url = entry.url;
   const match = link.match(linkRegExp);
-  if (match) {
+  if (url) {
+    result.url = url;
+  } else if (match) {
     result.url = match[1];
+  }
+    
+  if (result.url.startsWith('/')) {
+    result.onWebsite = 'dkundel.com'
+  } else if (typeof result.url === 'string' ) {
     result.onWebsite = result.url
       .match(/(.*?\.\w+)\//)[1]
       .replace(/^http(s)?:\/\//, '');
   }
+  
   return result;
 }
 

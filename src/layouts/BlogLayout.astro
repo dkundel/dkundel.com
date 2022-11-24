@@ -1,0 +1,52 @@
+---
+import { getFormattedDate } from "@utils/date";
+import { log } from "astro/dist/core/logger/core";
+import Layout from "./default.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title} canonical_url={frontmatter?.canonical_url}>
+  <style is:global>
+    @import "../styles/blog.css";
+  </style>
+  <!-- <Container> -->
+    <div class="mx-auto max-w-[735px] mt-14">
+      <span class="text-purple-300 uppercase tracking-wider text-sm font-medium">
+        {frontmatter.category || 'Blog'}
+      </span>
+      <h2
+        class="text-4xl lg:text-5xl font-bold lg:tracking-tight mt-1 lg:leading-tight">
+        {frontmatter.title}
+      </h2>
+      <div class="flex gap-2 mt-3 items-center flex-wrap md:flex-nowrap">
+        <span class="text-gray-400">
+          {frontmatter.author}
+        </span>
+        <span class="text-gray-400">•</span>
+        <time class="text-gray-400" datetime={frontmatter.publishDate}>
+          {getFormattedDate(frontmatter.publishDate)}
+        </time>
+        <span class="text-gray-400 hidden md:block">•</span>
+        <div class="w-full md:w-auto flex flex-wrap gap-3">
+          {
+            frontmatter.tags.map((tag) => (
+              <span class="text-sm text-gray-500">#{tag}</span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="mx-auto prose prose-slate prose-base inline-code-prose prose-img:max-h-[500px] prose-img:mx-auto prose-a:text-secondaryGreen-500 mt-6">
+      <slot />
+    </div>
+    <div class="text-center mt-8">
+      <a
+        href="/writing"
+        class="bg-white text-sm shadow-sm hover:shadow-lg transition hover:scale-200 px-5 py-3 rounded-md"
+        >← Back to all articles</a
+      >
+    </div>
+  <!-- </Container> -->
+</Layout>

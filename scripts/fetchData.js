@@ -4,7 +4,7 @@ const {
   updateRelativeLinksFromBase,
 } = require('about-json');
 const got = require('got');
-const { resolve, extname, relative } = require('path');
+const { resolve, extname, relative, basename } = require('path');
 const { writeFile: fsWriteFile, createWriteStream } = require('fs');
 const stream = require('stream');
 const crypto = require('crypto');
@@ -76,6 +76,11 @@ async function run() {
         out.image =
           '/blog-headers/external/' +
           relative(OUTPUT_IMAGES, existingImageResults[0]);
+      }
+
+      if (out.url.startsWith('https://moin.world')) {
+        out.url = '/blog/' + basename(out.url);
+        out.html = out.html.replace(/href="(.*?)"/, `href="${out.url}"`);
       }
 
       return out;

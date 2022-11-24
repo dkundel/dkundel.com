@@ -6,6 +6,7 @@
   "author": "Dominik Kundel <dominik.kundel@gmail.com>",
   "dependencies": {
     "@astrojs/image": "^0.11.6",
+    "@astrojs/mdx": "^0.12.0",
     "@astrojs/sitemap": "^1.0.0",
     "anker-colors": "^1.4.0",
     "astro": "^1.6.10",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@astrojs/react": "^1.2.2",
     "@astrojs/tailwind": "^2.1.2",
+    "@tailwindcss/typography": "^0.5.8",
     "about-json": "^1.0.2",
     "cheerio": "^1.0.0-rc.3",
     "ncp": "^2.0.0",
