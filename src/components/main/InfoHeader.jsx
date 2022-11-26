@@ -15,12 +15,12 @@ const InfoHeader = ({ headerInfo }) => {
       <img className="max-w-[200px] md:max-w-sm mx-auto mb-5 md:m-0" alt="Photo of Dominik in front of purple background" {...headshotImage} />
       <Heading>
         <Heading.h1>
-          <p className='mb-0 font-sans font-thin text-3xl md:text-4xl text-black/80'>
+          <p className='mb-0 mt-10 font-sans font-thin text-3xl md:text-4xl text-black/80'>
             Hi! I'm
           </p>
-          <p className="mb-0 text-highlight-gradient leading-[1.1em] text-5xl md:text-7xl">Dominik <br className="hidden md:block" /> Kundel</p>
+          <p className="mb-0 sm:min-w-[444px] text-highlight-gradient leading-[1.1em] text-6xl md:text-8xl">Dominik <br className="hidden md:block" /> Kundel</p>
         </Heading.h1>
-        <Heading.p>Developer | Product Manager | Public Speaker</Heading.p>
+        <Heading.p><span className="small-all-caps text-base font-light">Developer | Product Manager | Public Speaker</span></Heading.p>
       </Heading>
     </div>
     // <Html as={Container} sanitizeOptions={allowImages}>
