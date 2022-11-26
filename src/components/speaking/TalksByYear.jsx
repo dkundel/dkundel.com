@@ -3,7 +3,7 @@ import styled from '../../utils/styled';
 import TalkList from './TalkList';
 
 function ToggleButton({children, onClick}) {
-  return <button onClick={onClick} className="text-xs bg-transparent cursor-pointer border-0 p-0 mb-4 underline hover:underline focus:underline text-purple-300 hover:text-purple-700 focus:text-purple-700">
+  return <button onClick={onClick} className="text-xs bg-transparent cursor-pointer border-0 p-0 mb-4 underline hover:underline focus:underline text-purple-300 dark:text-purple-100 hover:text-purple-700 focus:text-purple-700 dark:hover:text-purple-200 dark:focus:text-purple-200">
     {children}
   </button>
 }

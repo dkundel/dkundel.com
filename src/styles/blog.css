@@ -7,7 +7,7 @@ h3 {
 }
 
 .inline-code-prose *:not(pre) code {
-  @apply text-purple-700 bg-purple-200/40 px-1 py-1 text-[0.70em] rounded-md;
+  @apply text-purple-700 dark:text-purple-50 bg-purple-200/40 dark:bg-primaryPurple/60 px-1 py-1 text-[0.70em] rounded-md;
   /* @apply before:content-none;
   @apply after:content-none; */
 }

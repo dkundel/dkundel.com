@@ -4,7 +4,7 @@ import Footer from '../components/Footer.jsx';
 import Header from '../components/Header.jsx';
 import siteMetaData from '../../data/siteMetadata.json';
 
-const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-center min-h-[100vh]');
+const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]');
 
 const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
 
@@ -40,6 +40,13 @@ const pageImage = image || '';
   <link rel="icon" href="/favicon-192.png" sizes="192x192">
   <link rel="canonical" href={canonicalURL} />
   <title>{siteTitle}</title>
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
 </head>
 <body>
   <style is:global>
@@ -47,9 +54,9 @@ const pageImage = image || '';
     @tailwind base;
 	</style>
   <Container>
-    <Header name={siteMetaData.name} path={Astro.url.pathname} />
+    <Header name={siteMetaData.name} path={Astro.url.pathname} client:load />
     <Main role="main"><slot/></Main>
-    <Footer />
+    <Footer client:load />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
   </Container>
 </body>

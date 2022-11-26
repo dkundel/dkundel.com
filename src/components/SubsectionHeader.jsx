@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from '../utils/styled';
 
-const SubsectionHeader = styled('h2', 'text-sm mb-2 mt-8 tracking-widest font-bold uppercase text-gray-600');
+const SubsectionHeader = styled('h2', 'text-sm mb-2 mt-8 tracking-widest font-bold uppercase text-gray-600 dark:text-gray-300');
 
 export default SubsectionHeader;
