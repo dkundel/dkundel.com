@@ -141,11 +141,11 @@
   }
   
   .navigation-container {
-    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-4 sm:gap-4 flex-grow sm:flex-grow-0;
+    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-4 md:gap-4 flex-grow md:flex-grow-0;
   }
   
   .navigation-container a {
-    @apply xs:mr-auto ml-0;
+    @apply ml-0;
   }
   
   .page-title-container {

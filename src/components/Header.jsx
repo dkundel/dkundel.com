@@ -4,10 +4,10 @@ import styled from '../utils/styled';
 import Anchor from './Anchor';
 import SocialChannels from './SocialChannels';
 
-const HeaderContainer = styled('div', 'flex justify-between p-[20px] w-full min-h-fit flex-col xs:flex-row')
+const HeaderContainer = styled('div', 'flex flex-wrap justify-between p-[20px] w-full min-h-fit flex-col md:flex-row')
 const Navigation = styled('nav', 'navigation-container leading-8');
-const PageTitleContainer = styled('hgroup', 'page-title-container');
-const PageTitle = styled('h2', 'm-0 p-0 large-headings tracking-wider text-base/80 dark:text-white');
+const PageTitleContainer = styled('hgroup', 'page-title-container items-center');
+const PageTitle = styled('h2', 'm-0 p-0 min-w-[226px] shrink-0 large-headings tracking-wider text-base/80 dark:text-white');
 
 const Header = ({ name, path }) => {
   const normalizedPath = path === '/' ? path : (path.endsWith('/') ? path.substr(0, path.length - 1) : path);
