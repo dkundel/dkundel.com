@@ -2,5 +2,31 @@
   "title": "Dominik Kundel | Programmer, Product Manager, Public Speaker",
   "description": "Dominik Kundel is a Web Developer, Product Manager and Public Speaker.",
   "name": "Dominik Kundel",
-  "author": "@dkundel"
+  "author": "@dkundel",
+  "socials": {
+    "github": "https://github.com/dkundel",
+    "twitter": "https://twitter.com/dkundel",
+    "linkedin": "https://linkedin.com/in/dkundel",
+    "instagram": "https://instagram.com/cocktail.and.code"
+  },
+  "featuredTalks": [
+    {
+      "title": "XSS, CSRF, CSP, JWT, WTF? IDK ¯\\_(ツ)_/¯",
+      "youtubeId": "c6mqdsfWdmE",
+      "location": "Reykjavík, Iceland",
+      "conference": "JSConf Iceland '18"
+    },
+    {
+      "title": "When Porgs Scream at Webpack and Other Stories",
+      "youtubeId": "3wx806HOgnA",
+      "location": "Seattle, WA, US",
+      "conference": "CascadiaJS '19"
+    },
+    {
+      "title": "Make Web, Not War",
+      "youtubeId": "ifcuGQ3cOeY",
+      "location": "Carlsbad, CA, US",
+      "conference": "JSConf US '19"
+    }
+  ]
 }

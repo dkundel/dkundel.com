@@ -29,6 +29,7 @@ module.exports = {
       },
       colors: {
         ...shades,
+        primaryPurple: 'rgb(151,60,105)',
       },
       screens: {
         xs: '515px',

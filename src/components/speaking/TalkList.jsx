@@ -5,9 +5,9 @@ import Html from '../Html';
 
 const TalkListContainer = styled('div', '');
 
-const TalkContainer = styled('section', 'bg-white mx-auto shadow-md rounded-lg overflow-hidden mb-6 p-3 hover:shadow-lg focus:shadow-lg focus-within:shadow-lg');
-const TalkEvent = styled('h3', 'text-sm font-semibold my-2 pb-2 mx-0 border-0 border-b-2 border-solid border-secondaryGreen-500');
-const TalkTopic = styled('p', 'text-sm mx-0 my-2');
+const TalkContainer = styled('section', 'talk-entry bg-white shadow-md rounded-lg overflow-hidden mb-6 p-3 hover:shadow-lg focus:shadow-lg focus-within:shadow-lg max-w-[800px] hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform');
+const TalkEvent = styled('h4', 'text-md font-semibold mx-0');
+const TalkTopic = styled('p', 'text-sm mx-0 my-2 pb-2 border-0 border-b-2 border-solid border-secondaryGreen-500');
 const TalkDate = styled('p', `flex-shrink mr-3 small-all-caps`);
 const TalkInfo = styled('p', `flex-shrink small-all-caps`);
 const TalkMetaContainer = styled('div', 'w-auto flex justify-between flex-wrap');
