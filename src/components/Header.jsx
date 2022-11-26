@@ -11,7 +11,7 @@ const PageTitle = styled('h2', 'm-0 p-0 large-headings tracking-wide text-base/8
 
 const Header = ({ name, path }) => {
   const Link = ({href, ...props}) => {
-    return <a href={href} {...props} className={(path === href ? 'border-b-2' : "no-border") + " text-black/80 box-border no-underline border-solid border-secondaryGreen-500  hover:border-b-2 focus:border-b-2 focus:no-underline hover:no-underline"}/>
+    return <a href={href} {...props} className={"border-b-2 text-black/80 box-border no-underline border-solid border-secondaryGreen-500  hover:border-secondaryGreen-500 focus:border-secondaryGreen-500 focus:no-underline hover:no-underline " + (path === href ? '' : "border-transparent")}/>
   }
   return (
   <HeaderContainer>

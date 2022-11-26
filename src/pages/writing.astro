@@ -1,13 +1,8 @@
 ---
 import Layout from '../layouts/default.astro';
 import ArticleList from '../components/ArticleList.jsx';
-import TopicList from '../components/main/TopicList.jsx';
-import Paragraphs from '../components/main/Paragraphs.jsx';
-import SocialList from '../components/main/SocialList.jsx';
-import SubsectionHeader from '../components/SubsectionHeader.jsx';
 import SectionHeader from '../components/SectionHeader.jsx';
-import PageIcon from '../icons/PageIcon.jsx';
-import Writing from '../icons/Writing.jsx';
+import PageSubheading from '@components/common/PageSubheading';
 import Heading from '../components/Heading.jsx';
 import data from '../../data/about/dkundel.json';
 ---
@@ -32,8 +27,8 @@ import data from '../../data/about/dkundel.json';
     </Heading.p>
   </Heading>
   </SectionHeader>
-  <SubsectionHeader>Online Posts</SubsectionHeader>
+  <PageSubheading.h2>Online Posts</PageSubheading.h2>
   <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} client:load />
-  <SubsectionHeader>Printed Articles</SubsectionHeader>
+  <PageSubheading.h2>Printed Articles</PageSubheading.h2>
   <ArticleList list={data.technicalWriting.print._list} client:load/>
   </Layout>
