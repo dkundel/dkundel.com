@@ -14,6 +14,7 @@
   
   body {
     /* height: 100%; */
+    @apply dark:text-gray-400;
     width: 100%;
     color: hsla(0, 0%, 0%, 0.8);
     font-family: 'Lato', sans-serif;
@@ -35,16 +36,24 @@
   }
   
   a {
-    @apply text-primaryPurple;
+    @apply text-primaryPurple dark:text-gray-300;
     text-decoration: none;
   }
 
   .talk-entry a {
     text-decoration: none;
-    @apply text-purple-300;
+    @apply text-purple-300 dark:text-inherit;
+  }
+
+  .talk-entry a:hover, .talk-entry a:focus {
+    @apply dark:text-inherit;
   }
 
   h3 > a {
+    @apply text-inherit
+  }
+
+  h3 > a:hover, h3 > a:focus {
     @apply text-inherit
   }
 
@@ -55,7 +64,7 @@
   
   a:hover,
   a:focus {
-    @apply text-purple-700;
+    @apply text-purple-700 dark:text-white;
     text-decoration: underline;
   }
 
@@ -73,7 +82,7 @@
   }
 
   .purple-gradient {
-    @apply bg-gradient-to-tr from-[#DF3C83] to-purple-700
+    @apply bg-gradient-to-tr from-[#DF3C83] to-purple-700 dark:to-purple-400
   }
 
   .text-highlight-gradient {
@@ -81,7 +90,7 @@
   }
   
   .small-all-caps {
-    @apply text-gray-500 text-xs m-0 tracking-wider uppercase;
+    @apply text-gray-500 dark:text-gray-400 text-xs m-0 tracking-wider uppercase;
   }
 
   .medium-all-caps {
@@ -132,11 +141,11 @@
   }
   
   .navigation-container {
-    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-3 sm:gap-5 flex-grow sm:flex-grow-0;
+    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-4 sm:gap-4 flex-grow sm:flex-grow-0;
   }
   
   .navigation-container a {
-    @apply xs:mr-auto xs:ml-[20px] ml-0;
+    @apply xs:mr-auto ml-0;
   }
   
   .page-title-container {
@@ -164,7 +173,7 @@
   }
   
   .social-list li a {
-    @apply bg-white shadow px-2 py-1 text-center inline-block rounded hover:shadow-lg;
+    @apply bg-white dark:bg-slate-700 shadow px-2 py-1 text-center inline-block rounded hover:shadow-lg;
     width: 210px;
   }
   

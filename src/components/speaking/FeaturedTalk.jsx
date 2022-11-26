@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from '@utils/styled';
 
-const FeaturedTalkWrapper = styled('div', 'bg-white rounded-lg shadow-md px-3 py-4 sm:pt-1 flex sm:inline-block w-full sm:w-[300px]')
-const TalkTitle = styled('p', 'font-bold mt-2 text-purple-300 truncate text-ellipsis overflow-hidden sm:no-wrap');
+const FeaturedTalkWrapper = styled('div', 'bg-white dark:bg-slate-800 rounded-lg shadow-md px-3 py-4 sm:pt-1 flex sm:inline-block w-full sm:w-[300px]')
+const TalkTitle = styled('p', 'font-bold mt-2 text-purple-300 dark:text-gray-300 truncate text-ellipsis overflow-hidden sm:no-wrap');
 const YoutubeFrame = styled('iframe', 'aspect-video hidden sm:block sm:w-full');
 const YoutubeImage = styled('img', 'sm:hidden')
 const YoutubeContainer = styled('div', 'w-[100px] shrink-0 sm:w-full');

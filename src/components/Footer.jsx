@@ -3,6 +3,7 @@ import React from 'react';
 import styled from '../utils/styled';
 import Anchor from './Anchor';
 import img from '../images/panda-laptop.png';
+import DarkModeToggle from './DarkModeToggle';
 
 const Container = styled('footer', 'footer-container');
 
@@ -12,6 +13,7 @@ const Footer = () => (
   <Container>
     <ImageContainer>
       <img className="panda" alt="Panda emoji sitting in front of laptop" {...img}/>
+      <DarkModeToggle className="sm:hidden" />
     </ImageContainer>
     <p>
       Made by{' '}
