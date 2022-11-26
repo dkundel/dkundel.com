@@ -5,7 +5,7 @@ import siteMetaData from '../../data/siteMetadata.json';
 
 import styled from '@utils/styled';
 
-const SocialChannelsWrapper = styled('div', 'flex gap-3');
+const SocialChannelsWrapper = styled('div', 'flex flex-col -mt-[36px] sm:mt-0 sm:flex-row gap-1 sm:gap-3');
 
 const socialChannels = {
   github: {

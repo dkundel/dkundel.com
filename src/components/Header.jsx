@@ -7,16 +7,17 @@ import SocialChannels from './SocialChannels';
 const HeaderContainer = styled('div', 'flex justify-between p-[20px] w-full min-h-fit flex-col xs:flex-row')
 const Navigation = styled('nav', 'navigation-container leading-8');
 const PageTitleContainer = styled('hgroup', 'page-title-container');
-const PageTitle = styled('h2', 'm-0 p-0 large-headings tracking-wide text-base/80');
+const PageTitle = styled('h2', 'm-0 p-0 large-headings tracking-wider text-base/80');
 
 const Header = ({ name, path }) => {
+  const normalizedPath = path === '/' ? path : (path.endsWith('/') ? path.substr(0, path.length - 1) : path);
   const Link = ({href, ...props}) => {
-    return <a href={href} {...props} className={"border-b-2 text-black/80 box-border no-underline border-solid border-secondaryGreen-500  hover:border-secondaryGreen-500 focus:border-secondaryGreen-500 focus:no-underline hover:no-underline " + (path === href ? '' : "border-transparent")}/>
+    return <a href={href} {...props} className={"border-b-2 text-black/80 box-border no-underline border-solid border-secondaryGreen-500  hover:border-secondaryGreen-500 focus:border-secondaryGreen-500 focus:no-underline hover:no-underline " + (normalizedPath === href ? '' : "border-transparent")}/>
   }
   return (
   <HeaderContainer>
     <PageTitleContainer>
-      <Anchor color={secondaryGreen} />
+      {/* <Anchor color={secondaryGreen} /> */}
       <PageTitle>{name}</PageTitle>
     </PageTitleContainer>
     <div className="flex items-center gap-10">
