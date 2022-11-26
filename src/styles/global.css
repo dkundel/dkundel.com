@@ -81,7 +81,7 @@
   }
   
   .small-all-caps {
-    @apply text-gray-500 text-xs m-0 tracking-wide uppercase;
+    @apply text-gray-500 text-xs m-0 tracking-wider uppercase;
   }
 
   .article-list-container {
