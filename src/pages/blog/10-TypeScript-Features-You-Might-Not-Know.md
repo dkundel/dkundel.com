@@ -5,7 +5,7 @@ image: '/blog/typescript-header.png'
 imageAlt: 'Decorative header image with title of the post.'
 imageWidth: 1200
 imageHeight: 630
-desc: 'TypeScript constantly evolves with monthly updates to the langauge. This is a list of 10 of my favorite recent additions to the language and its tooling that you might have missed.'
+excerpt: 'TypeScript constantly evolves with monthly updates to the language. This is a list of 10 of my favorite recent additions to the language and its tooling that you might have missed.'
 author: 'Dominik Kundel'
 layout: '@layouts/BlogLayout.astro'
 tags: [typescript, tsc]
