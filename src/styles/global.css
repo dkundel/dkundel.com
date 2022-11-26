@@ -173,7 +173,7 @@
   }
   
   .social-list li a {
-    @apply bg-white dark:bg-slate-700 shadow px-2 py-1 text-center inline-block rounded hover:shadow-lg;
+    @apply bg-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:focus:bg-slate-700 dark:focus-within:bg-slate-700 shadow px-2 py-2 text-center inline-block rounded hover:shadow-lg;
     width: 210px;
   }
   
