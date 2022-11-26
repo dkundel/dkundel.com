@@ -15,16 +15,16 @@ import data from '../../data/about/dkundel.json';
      some magic sprinkled in to help you build great templates. -->
   <Layout title="Writing">
   <SectionHeader>
-  <PageIcon Icon={Writing} />
+  <!-- <PageIcon Icon={Writing} /> -->
   <Heading>
-    <Heading.h1>Technical Writing</Heading.h1>
+    <Heading.h1>Writing</Heading.h1>
     <Heading.p>
       I love telling stories through code and explaining technical
       concepts. As a result you'll find me regularly blogging on various
       platforms such as{' '}
       <a href="https://twilio.com/blog/author/dkundel">the Twilio Blog</a>
       , <a href="https://dev.to/dkundel">dev.to</a>, or{' '}
-      <a href="https://moin.world">my personal blog</a>.
+      <a href="/blog">my personal blog</a>.
     </Heading.p>
     <Heading.p>
       Here's a list of some of my technical content published online and
@@ -33,7 +33,7 @@ import data from '../../data/about/dkundel.json';
   </Heading>
   </SectionHeader>
   <SubsectionHeader>Online Posts</SubsectionHeader>
-  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} />
+  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} client:load />
   <SubsectionHeader>Printed Articles</SubsectionHeader>
-  <ArticleList list={data.technicalWriting.print._list} />
+  <ArticleList list={data.technicalWriting.print._list} client:load/>
   </Layout>

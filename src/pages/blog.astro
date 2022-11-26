@@ -2,6 +2,8 @@
 import { Picture } from "@astrojs/image/components";
 import Layout from "@layouts/default.astro";
 import { getFormattedDate } from "@utils/date";
+import Heading from '../components/Heading.jsx';
+import SectionHeader from '../components/SectionHeader.jsx';
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
@@ -13,40 +15,45 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
 
 <Layout title="Blog">
   <div>
-    <h3>
-      <Fragment slot="title">Our Blog</Fragment>
-      <Fragment slot="desc"
-        >We write about building startups and thoughts going on our mind.</Fragment
-      >
-    </h3>
+    <SectionHeader>
+      <Heading>
+      <Heading.h1>
+        Blog
+      </Heading.h1>
+      <Heading.p>
+        Below you can find articles written on my personal blog. Additionally to writing on my personal blog, I'm writing also on other platforms. For a full list of articles <a href="/writing">check out my writing page</a>.
+      </Heading.p>
+    </Heading>
+    </SectionHeader>
+    
     <main class="mt-16">
-      <ul class="grid gap-16 max-w-4xl mx-auto">
+      <ul class="grid gap-8 max-w-4xl mx-auto">
         {
           posts.map((post, index) => (
-            <li>
-              <a href={post.url}>
+            <li class="bg-white shadow-md rounded-lg p-3 hover:shadow-xl focus:shadow-xl focus-within:shadow-xl hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform">
+              <a href={post.url} class="">
                 <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
                   <Picture
                     src={post.frontmatter.image}
                     widths={[200, 400, 800]}
                     sizes="(max-width: 800px) 100vw, 800px"
-                    aspectRatio="16:9"
+                    aspectRatio="2:1"
                     alt="Thumbnail"
                     loading={index === 0 ? "eager" : "lazy"}
-                    class="w-full rounded-md aspect-video"
+                    class="w-full rounded-md"
                   />
                   <div>
-                    <span class="text-blue-400 uppercase tracking-wider text-sm font-medium">
+                    <span class="text-purple-300 uppercase tracking-wider text-sm font-medium">
                       {post.frontmatter.category}
                     </span>
 
-                    <h2 class="text-3xl font-semibold leading-snug tracking-tight mt-1 ">
+                    <h2 class="text-2xl font-semibold leading-snug tracking-tight mt-1  mb-2 text-transparent bg-clip-text bg-gradient-to-tr from-[#DF3C83] to-purple-700">
                       {post.frontmatter.title}
                     </h2>
 
-                    <div class="flex gap-2 mt-3">
+                    <div class="flex gap-2 mt-3 small-all-caps">
                       <span class="text-gray-400">
-                        {post.frontmatter.author}
+                        {post.frontmatter.author || 'Dominik Kundel'}
                       </span>
                       <span class="text-gray-400">• </span>
                       <time

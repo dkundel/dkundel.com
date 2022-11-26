@@ -35,8 +35,22 @@
   }
   
   a {
-    @apply text-purple-300;
+    @apply text-primaryPurple;
     text-decoration: none;
+  }
+
+  .talk-entry a {
+    text-decoration: none;
+    @apply text-purple-300;
+  }
+
+  h3 > a {
+    @apply text-inherit
+  }
+
+  p a {
+    @apply underline;
+    /* color: rgb(151,60,105); */
   }
   
   a:hover,
@@ -53,9 +67,25 @@
   li {
     margin-bottom: calc(1.61rem / 2)
   }
+
+  .large-headings {
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .purple-gradient {
+    @apply bg-gradient-to-tr from-[#DF3C83] to-purple-700
+  }
+
+  .text-highlight-gradient {
+    @apply text-transparent bg-clip-text purple-gradient ;
+  }
   
   .small-all-caps {
     @apply text-gray-500 text-xs m-0 tracking-wide uppercase;
+  }
+
+  .article-list-container {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
   
   .footer-container {

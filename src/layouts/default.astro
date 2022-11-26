@@ -6,7 +6,7 @@ import siteMetaData from '../../data/siteMetadata.json';
 
 const Container = styled('div', 'bg-gray-50 flex w-full h-full flex-col items-center min-h-[100vh]');
 
-const Main = styled('div', 'flex-1 max-w-[800px] w-full p-[20px]');
+const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
 
 const {title, canonical_url, image} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
@@ -22,7 +22,7 @@ const pageImage = image || '';
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
   <meta name="description" content={siteMetaData.description}>
   <meta property="og:title" content={siteTitle}>
   <meta property="og:description" content={siteMetaData.description}>
@@ -47,7 +47,7 @@ const pageImage = image || '';
     @tailwind base;
 	</style>
   <Container>
-    <Header name={siteMetaData.name} />
+    <Header name={siteMetaData.name} path={Astro.url.pathname} />
     <Main role="main"><slot/></Main>
     <Footer />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>

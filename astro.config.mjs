@@ -4,6 +4,7 @@ import { defineConfig } from 'astro/config';
 import image from '@astrojs/image';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
+import a11yEmoji from '@fec/remark-a11y-emoji';
 
 // https://astro.build/config
 import sitemap from '@astrojs/sitemap';
@@ -20,9 +21,11 @@ export default defineConfig(
       plugins: [imagetools(), VitePWA()],
     },
     markdown: {
+      extendDefaultPlugins: true,
       shikiConfig: {
         theme: 'rose-pine-moon',
       },
+      remarkPlugins: [a11yEmoji],
     },
     integrations: [
       react(),

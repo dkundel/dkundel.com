@@ -3,8 +3,8 @@ title: '10 TypeScript Features You Might Not Know'
 publishDate: '2017-06-18 19:00:00'
 image: '/blog/typescript-header.png'
 imageAlt: 'Decorative header image with title of the post.'
-# imageWidth: 1200
-# imageHeight: 630
+imageWidth: 1200
+imageHeight: 630
 desc: 'TypeScript constantly evolves with monthly updates to the langauge. This is a list of 10 of my favorite recent additions to the language and its tooling that you might have missed.'
 author: 'Dominik Kundel'
 layout: '@layouts/BlogLayout.astro'

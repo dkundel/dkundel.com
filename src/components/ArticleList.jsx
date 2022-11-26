@@ -3,7 +3,7 @@ import styled from '../utils/styled';
 import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
 
-const ArticleListContainer = styled('div', 'flex flex-wrap justify-around lg:justify-start');
+const ArticleListContainer = styled('div', 'grid article-list-container justify-items-center justify-around lg:justify-start');
 
 function ArticleWrapper({ hasImage, children, ...props }) {
   const imageClasses = hasImage ? 'min-h-[14rem] max-w-full' : 'min-h-0';
