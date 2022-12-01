@@ -14,7 +14,7 @@ let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
   canonicalURL = canonical_url;
 }
-const pageImage = image || '';
+const pageImage = image || '/og-preview.png';
 ---
 <html lang="en">
 <head>
