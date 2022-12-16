@@ -30,7 +30,7 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
       <ul class="grid gap-8 max-w-4xl mx-auto">
         {
           posts.map((post, index) => (
-            <li class="bg-white dark:bg-slate-800 shadow-md rounded-lg p-3 hover:shadow-xl focus:shadow-xl focus-within:shadow-xl hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform">
+            <li class="bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 shadow-md rounded-lg p-3 hover:shadow-xl focus:shadow-xl focus-within:shadow-xl hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform">
               <a href={post.url} class="">
                 <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
                   <Picture

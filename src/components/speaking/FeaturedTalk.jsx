@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@utils/styled';
 
-const FeaturedTalkWrapper = styled('div', 'bg-white dark:bg-slate-800 rounded-lg shadow-md px-3 py-4 sm:pt-1 flex sm:inline-block w-full sm:w-[300px]')
+const FeaturedTalkWrapper = styled('div', 'bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 rounded-lg shadow-md px-3 py-4 sm:pt-1 flex sm:inline-block w-full sm:w-[300px]')
 const TalkTitle = styled('p', 'font-bold mt-2 text-purple-300 dark:text-gray-300 truncate text-ellipsis overflow-hidden sm:no-wrap');
 const YoutubeFrame = styled('iframe', 'aspect-video hidden sm:block sm:w-full');
 const YoutubeImage = styled('img', 'sm:hidden')

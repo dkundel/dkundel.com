@@ -12,7 +12,7 @@ const PageTitle = styled('h2', 'm-0 p-0 min-w-[226px] shrink-0 large-headings tr
 const Header = ({ name, path }) => {
   const normalizedPath = path === '/' ? path : (path.endsWith('/') ? path.substr(0, path.length - 1) : path);
   const Link = ({href, ...props}) => {
-    return <a href={href} {...props} className={"border-b-2 text-black/80 dark:text-gray-400 box-border no-underline border-solid border-secondaryGreen-500  hover:border-secondaryGreen-500 focus:border-secondaryGreen-500 focus:no-underline hover:no-underline " + (normalizedPath === href ? 'dark:text-secondaryGreen-500' : "border-transparent")}/>
+    return <a href={href} {...props} className={"border-b-2 text-black/80 dark:text-gray-400 box-border no-underline border-solid border-secondaryGreen-500  hover:border-secondaryGreen-500 focus:border-secondaryGreen-500 focus:no-underline hover:no-underline " + (normalizedPath === href ? 'dark:text-white font-bold' : "border-transparent")}/>
   }
   return (
   <HeaderContainer>
