@@ -4,7 +4,7 @@ import styled from '../utils/styled';
 import Anchor from './Anchor';
 import SocialChannels from './SocialChannels';
 
-const HeaderContainer = styled('div', 'flex flex-wrap justify-between p-[20px] w-full min-h-fit flex-col md:flex-row')
+const HeaderContainer = styled('div', 'flex flex-wrap justify-between p-[20px] w-full min-h-fit max-w-[1000px] flex-col md:flex-row')
 const Navigation = styled('nav', 'navigation-container leading-8');
 const PageTitleContainer = styled('hgroup', 'page-title-container items-center');
 const PageTitle = styled('h2', 'm-0 p-0 min-w-[226px] shrink-0 large-headings tracking-wider text-base/80 dark:text-white');
