@@ -27,9 +27,10 @@ const socialChannels = {
   }
 }
 
-export const SocialChannels = () => {
+export const SocialChannels = ({ channels }) => {
+  channels = channels || ['twitter', 'linkedin', 'github', 'instagram'];
   return <SocialChannelsWrapper>
-    {Object.entries(siteMetaData.socials).map(([channel, href]) => {
+    {Object.entries(siteMetaData.socials).filter(([entry]) => channels.includes(entry)).map(([channel, href]) => {
       let socialChannel = socialChannels[channel];
       if (socialChannel) {
         return (<a key={channel} href={href} target="_blank" rel="noopener noreferrer">

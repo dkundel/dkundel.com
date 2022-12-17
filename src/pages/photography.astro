@@ -1,0 +1,117 @@
+---
+import Layout from '@layouts/default.astro';
+import Heading from '@components/Heading';
+import InstagramFeed from '@components/InstagramFeed';
+import PageSubheading from '@components/common/PageSubheading';
+import instagramFeedData from '../../data/instagram.json';
+import SectionHeader from '@components/SectionHeader';
+import cocktailImage from '../images/me-cocktails.png';
+
+const links = [
+  { href: '#', title: 'About Me' },
+  { href: '#cocktails', title: 'Cocktails' },
+  { href: '#food', title: 'Food' },
+  { href: '#product', title: 'Product' }
+]
+
+const cocktailPortfolio = [
+  {src: '/portfolio-images/portfolio--39.jpg', alt: 'Three mini bottles of gin, sweet vermouth, and campari being poured on a floating ice sphere in front of a white background. ', style: 'tall'},
+  {src: '/portfolio-images/portfolio--08.jpg', alt: 'Yellow hurricane cocktail on a wooden table.', style: ''},
+  {src: '/portfolio-images/portfolio--28.jpg', alt: 'Hand holding a yellow cocktail with a person wearing a gray t-shirt in the background', style: ''},
+  {src: '/portfolio-images/portfolio--20.jpg', alt: 'A hand pouring a pink sparkling drink into a champagne fluet with pink roses on the table.', style: ''},
+  {src: '/portfolio-images/portfolio--10.jpg', alt: 'Hand holding a tilted old fashioned glass with a bit of whiskey and a clear ice cube in it.', style: 'square'},
+  {src: '/portfolio-images/portfolio--09.jpg', alt: 'Red to yellow gradient cocktail in front of a black background with a red liquid poured on top.', style: 'tall'},
+  {src: '/portfolio-images/portfolio--12.jpg', alt: 'Purple drink in a fancy glass with a dried lemon slice attached to it', style: ''},
+]
+
+const cocktailPortfolioPartTwo = [
+  {src: '/portfolio-images/portfolio--32.jpg', alt: 'Bartender flaming off a grapefruit slice holding it over a beer glass with a grapefruit beer in it.', style: 'tall'},
+  {src: '/portfolio-images/portfolio--13.jpg', alt: 'Photo of bartender pouring a Negroni into a glass', style: ''},
+  {src: '/portfolio-images/portfolio--14.jpg', alt: 'Small Nick & Nora glass with a Manhattan cocktail and a festive garnish in front of festive lights and mini christmas trees.', style: ''},
+  {src: '/portfolio-images/portfolio--03.jpg', alt: 'Three small egg shaped shot glasses with colorful miniature cocktails among artificial green grass and easter bunny statues.', style: ''},
+  {src: '/portfolio-images/portfolio--38.jpg', alt: 'Photo of person reading a cocktail book with the same cocktail next to it.', style: 'wide'},
+  {src: '/portfolio-images/portfolio--19.jpg', alt: 'Rich creamy red/pink cocktail with the foam dripping down the glass and a cherry balanced on top of it.', style: ''},
+]
+
+const foodPortfolio = [
+  {src: '/portfolio-images/portfolio--27.jpg', alt: 'Picture of frozen cherry plums', style: 'tall'},
+  {src: '/portfolio-images/portfolio--04.jpg', alt: 'Table with blue table cloth full of various different dishes', style: ''},
+  {src: '/portfolio-images/portfolio--29.jpg', alt: 'Picture of scallops with mashed root vegetables and carrots on white plate on a wooden table.', style: ''},
+  {src: '/portfolio-images/portfolio--44.jpg', alt: 'Plate with an heirloom tomato tarte on a blue plate and white background', style: ''},
+  {src: '/portfolio-images/portfolio--37.jpg', alt: 'Frenched pork chop with carrots and herbs draped on top of it', style: 'square'},
+  {src: '/portfolio-images/portfolio--47.jpg', alt: 'Sauce being poured on a plate with a duck leg and mixed grains', style: 'tall'},
+  {src: '/portfolio-images/portfolio--40.jpg', alt: 'Lobster with asparagus, caviar, window pane potatoes and a green sauce.', style: ''},
+]
+
+const productPortfolio = [
+  {src: '/portfolio-images/portfolio--33.jpg', alt: 'Can of Schofferhoffer Weizen Grapefruit', style: 'tall'},
+  {src: '/portfolio-images/portfolio--42.jpg', alt: 'Star-wars themed ceramic mug with a blue stream of liquid pouring into it like a lightsaber.', style: ''},
+  {src: '/portfolio-images/portfolio--36.jpg', alt: 'Hand with a Twilio coding glove being pulled on in front of a black background.', style: ''},
+  {src: '/portfolio-images/portfolio--18.jpg', alt: 'Wooden table with a collection of bitters on top of it.', style: 'square'},
+  // {src: '/portfolio-images/portfolio--20.jpg', alt: 'A hand pouring a pink sparkling drink into a champagne fluet with pink roses on the table.', style: ''},
+  // {src: '/portfolio-images/portfolio--09.jpg', alt: 'Red to yellow gradient cocktail in front of a black background with a red liquid poured on top.', style: 'tall'},
+  {src: '/portfolio-images/portfolio--43.jpg', alt: 'Star-Wars gambling props on a table with someone holding a beer.', style: ''},
+]
+
+---
+<Layout title="Photography" links={links} channels={['instagram']}>
+  <div class="flex flex-col md:flex-row-reverse">
+    <div class="w-[230px] sm:w-[300px] md:w-[800px] mx-auto mb-7 mt-3 relative">
+      <img {...cocktailImage} alt="Dominik holding a cocktail."/>
+      <div class="absolute scale-[0.375] md:scale-75 top-20 md:top-auto -right-[55%] md:-right-10 md:-bottom-20">
+        <img class="border-[6px] box-border z-20 md:translate-x-11 inline-block border-solid border-white -rotate-[20deg]" src="/portfolio-images/portfolio--37.jpg" width="173" height="173" alt="" />
+        <img class="border-[6px] box-border z-10 inline-block border-solid border-white rotate-12" src="/portfolio-images/portfolio--12.jpg" width="173" height="229" alt="" />
+      </div>
+    </div>
+    <SectionHeader style={{"align-content": "flex-start"}}>
+      <Heading>
+        <Heading.h1>Photography</Heading.h1>
+        <Heading.p>
+          During my time as a developer, I learned a lot from my peers and
+          as a result I try to give back whenever possible. One way for me
+          to do this is by giving presentations about a variety of topics.
+        </Heading.p>
+      </Heading>
+    </SectionHeader>
+  </div>
+  <div class="overflow-hidden relative">
+    <PageSubheading.h2 id="cocktails">Cocktails</PageSubheading.h2>
+    <img class="w-full md:w-[90%] h-64 object-cover blur-[2px] opacity-30 dark:brightness-50 dark:opacity-50" src="/portfolio-images/portfolio--02.jpg" alt="" />
+    <!-- <div class="top-0 bottom-0 left-0 right-0 absolute purple-gradient mix-blend-color"></div> -->
+  </div>
+  <div class="gallery ml-auto -translate-y-48">
+    { cocktailPortfolio.map(({src, alt, style}) => {
+      return <img class={`${style}`} src={src} alt={alt} width="375px" height="375px"/>
+    })}
+  </div>
+
+  <!-- <div class="overflow-hidden relative">
+    <img class="w-auto absolute h-full object-cover blur-[2px] opacity-30 dark:brightness-50 dark:opacity-50" src="/portfolio-images/portfolio--34.jpg" alt="" />
+    <div class="gallery">
+      { cocktailPortfolioPartTwo.map(({src, alt, style}) => {
+        return <img class={`${style}`} src={src} alt={alt} width="375px" height="375px"/>
+      })}
+    </div>
+  </div> -->
+  <div class="overflow-hidden relative">
+    <PageSubheading.h2 id="food">Food</PageSubheading.h2>
+    <img class="w-full md:w-[90%] h-64 object-cover blur-[2px] opacity-30 dark:brightness-50 dark:opacity-50" src="/portfolio-images/portfolio--01.jpg" alt="" />
+  </div>
+  <div class="gallery ml-auto -translate-y-48">
+    { foodPortfolio.map(({src, alt, style}) => {
+      return <img class={`${style}`} src={src} alt={alt} width="375px" height="375px"/>
+    })}
+  </div>
+  <div class="overflow-hidden relative">
+    <PageSubheading.h2 id="product">Product</PageSubheading.h2>
+    <img class="w-full md:w-[90%] h-64 object-cover blur-[2px] opacity-30 dark:brightness-50 dark:opacity-50" src="/portfolio-images/portfolio--02.jpg" alt="" />
+  </div>
+  <div class="gallery ml-auto -translate-y-48 md:grid-cols-3">
+    { productPortfolio.map(({src, alt, style}) => {
+      return <img class={`${style}`} src={src} alt={alt} width="375px" height="375px"/>
+    })}
+  </div>
+  <PageSubheading.h2>Instagram</PageSubheading.h2>
+  <Heading.p>You'll find my most recent work on my <a href="https://www.instagram.com/cocktail.and.code">Instagram</a> feed. Below are some recent posts of mine:</Heading.p>
+  <InstagramFeed feed={instagramFeedData.feed} />
+</Layout>

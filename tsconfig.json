@@ -21,6 +21,9 @@
       "@pages/*": [
         "pages/*"
       ],
+      "@images/*": [
+        "images/"
+      ]
     }
   }
 }

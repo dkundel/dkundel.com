@@ -6,9 +6,9 @@ import siteMetaData from '../../data/siteMetadata.json';
 
 const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]');
 
-const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
+const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px] md:pt-[94px] ');
 
-const {title, canonical_url, image} = Astro.props;
+const {title, canonical_url, image, channels} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
@@ -18,6 +18,13 @@ let pageImage = new URL('/og-preview.png', Astro.site);
 if (image) {
   pageImage = image.startsWith('/') ? new URL(image, Astro.site) : image;
 }
+
+const links = Astro.props.links ?? [
+  { href:"/", title: "About Me" },
+  { href:"/writing", title: "Writing" },
+  { href:"/blog", title: "Blog" },
+  { href:"/speaking", title: "Speaking" },
+]
 ---
 <html lang="en">
 <head>
@@ -25,7 +32,7 @@ if (image) {
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,400;0,900;1,900&display=swap" rel="stylesheet">
   <meta name="description" content={siteMetaData.description}>
   <meta property="og:title" content={siteTitle}>
   <meta property="og:description" content={siteMetaData.description}>
@@ -58,7 +65,7 @@ if (image) {
     @tailwind base;
 	</style>
   <Container>
-    <Header name={siteMetaData.name} path={Astro.url.pathname} client:load />
+    <Header name={siteMetaData.name} path={Astro.url.pathname} links={links} channels={channels} client:load />
     <Main role="main"><slot/></Main>
     <Footer client:load />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>

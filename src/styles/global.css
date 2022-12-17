@@ -255,6 +255,27 @@
   .speaking-icon .cls-6 {
     @apply fill-secondaryGreen-500;
   }
+
+  .gallery {
+    @apply grid w-full md:w-[500px] gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 grid-rows-[minmax(1fr,187.5px)];
+  }
+
+  .gallery img {
+    @apply object-cover w-full h-full;
+  }
+
+  .gallery .tall {
+    @apply row-span-1 md:row-span-2;
+  }
+
+  .gallery .wide {
+    @apply col-span-1 md:col-span-2;
+    max-height: 187.5px;
+  }
+
+  .gallery .square {
+    @apply row-span-1 md:row-span-2 col-span-1 md:col-span-2 md:aspect-square;
+  }
 }
 
 @layer components {
