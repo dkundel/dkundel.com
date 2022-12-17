@@ -12,6 +12,8 @@ const globLib = require('glob');
 const { promisify } = require('util');
 const cheerio = require('cheerio');
 
+const { fetchInstagram } = require('./fetchInstagram');
+
 const writeFile = promisify(fsWriteFile);
 const pipeline = promisify(stream.pipeline);
 const glob = promisify(globLib);
@@ -21,6 +23,7 @@ const PAGE_GITHUB = `https://github.com/dkundel/about-me/blob`;
 const DATA_URL = `${RAW_GITHUB}/master/README.md`;
 const OUTPUT = resolve(process.cwd(), 'data/about/dkundel.json');
 const OUTPUT_MD = resolve(process.cwd(), 'data/dkundel-md.json');
+const OUTPUT_INSTAGRAM = resolve(process.cwd(), 'data/instagram.json');
 const OUTPUT_IMAGES = resolve(process.cwd(), 'public/blog-headers/external/');
 
 function getLocalImageFileName(baseUrl) {
@@ -87,9 +90,12 @@ async function run() {
     })
   );
 
+  const instagramData = await fetchInstagram();
+
   return Promise.all([
     writeFile(OUTPUT, JSON.stringify(data), 'utf8'),
     writeFile(OUTPUT_MD, JSON.stringify(mdData), 'utf8'),
+    writeFile(OUTPUT_INSTAGRAM, JSON.stringify(instagramData), 'utf8'),
   ]);
 }
 

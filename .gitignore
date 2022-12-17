@@ -7,6 +7,7 @@ yarn-error.log
 # Build directory
 /data/about/*.json
 /data/dkundel-md.json
+/data/instagram.json
 /dist
 # Local Netlify folder
 .netlify
