@@ -8,7 +8,7 @@ const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full
 
 const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px] md:pt-[94px] ');
 
-const {title, canonical_url, image, channels} = Astro.props;
+const {title, canonical_url, image, channels, subtitle} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
@@ -65,7 +65,7 @@ const links = Astro.props.links ?? [
     @tailwind base;
 	</style>
   <Container>
-    <Header name={siteMetaData.name} path={Astro.url.pathname} links={links} channels={channels} client:load />
+    <Header name={siteMetaData.name} path={Astro.url.pathname} links={links} channels={channels} title={subtitle} client:load />
     <Main role="main"><slot/></Main>
     <Footer client:load />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
