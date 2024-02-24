@@ -7,7 +7,7 @@ import Layout from "./default.astro";
 const { frontmatter } = Astro.props;
 ---
 
-<Layout title={frontmatter.title} canonical_url={frontmatter?.canonical_url} image={frontmatter.image}>
+<Layout fullTitle={frontmatter.title} canonical_url={frontmatter?.canonical_url} image={frontmatter.image} description={frontmatter.excerpt}>
   <style is:global>
     @import "../styles/blog.css";
   </style>
@@ -41,7 +41,7 @@ const { frontmatter } = Astro.props;
       </div>
     </div>
 
-    <div class="mx-auto prose prose-slate prose-base dark:prose-invert max-w-[80ch] inline-code-prose prose-img:max-h-[500px] prose-img:mx-auto prose-a:text-primaryPurple dark:prose-a:text-white dark:prose-a:no-underline dark:prose-a:border-b dark:prose-a:border-secondaryGreen-500 dark:hover:prose-a:border-b-2 dark:focus:prose-a:border-b-2 mt-6">
+    <div class="mx-auto prose prose-slate prose-base dark:prose-invert max-w-[80ch] inline-code-prose prose-img:max-h-[500px] prose-img:mx-auto prose-a:text-primaryPurple dark:prose-a:text-white dark:prose-a:no-underline dark:prose-a:border-b dark:prose-a:border-secondaryGreen-500 dark:hover:prose-a:border-b-2 dark:focus:prose-a:border-b-2 mt-6 prose-figcaption:text-center prose-figcaption:italic prose-figcaption:text-xs">
       <slot />
     </div>
     <div class="text-center mt-8">
