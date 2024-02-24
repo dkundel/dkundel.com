@@ -8,7 +8,7 @@ const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full
 
 const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
 
-const {title, canonical_url, image} = Astro.props;
+const {title, canonical_url, image, description} = Astro.props;
 const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
@@ -18,6 +18,7 @@ let pageImage = new URL('/og-preview.png', Astro.site);
 if (image) {
   pageImage = image.startsWith('/') ? new URL(image, Astro.site) : image;
 }
+const pageDescription = description || siteMetaData.description;
 ---
 <html lang="en">
 <head>
@@ -26,15 +27,15 @@ if (image) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
-  <meta name="description" content={siteMetaData.description}>
+  <meta name="description" content={pageDescription}>
   <meta property="og:title" content={siteTitle}>
-  <meta property="og:description" content={siteMetaData.description}>
+  <meta property="og:description" content={pageDescription}>
   <meta property="og:type" content="website">
   <meta property="og:image" content={pageImage}>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content={siteMetaData.author}>
   <meta name="twitter:title" content={siteTitle}>
-  <meta name="twitter:description" content={siteMetaData.description}>
+  <meta name="twitter:description" content={pageDescription}>
   <meta name="twitter:image" content={pageImage}>
   <link rel="shortcut icon" type="image/png" href="/favicon-32.png"/>
   <link rel="apple-touch-icon" href="/favicon-192.png">

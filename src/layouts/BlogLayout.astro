@@ -7,7 +7,7 @@ import Layout from "./default.astro";
 const { frontmatter } = Astro.props;
 ---
 
-<Layout title={frontmatter.title} canonical_url={frontmatter?.canonical_url} image={frontmatter.image}>
+<Layout title={frontmatter.title} canonical_url={frontmatter?.canonical_url} image={frontmatter.image} description={frontmatter.excerpt}>
   <style is:global>
     @import "../styles/blog.css";
   </style>
