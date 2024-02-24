@@ -8,8 +8,8 @@ const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full
 
 const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
 
-const {title, canonical_url, image, description} = Astro.props;
-const siteTitle = title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
+const {title, fullTitle, canonical_url, image, description} = Astro.props;
+const siteTitle = fullTitle ? fullTitle : title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
   canonicalURL = canonical_url;
