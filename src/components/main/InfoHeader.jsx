@@ -20,7 +20,7 @@ const InfoHeader = ({ headerInfo }) => {
           </p>
           <p className="mb-0 sm:min-w-[444px] text-highlight-gradient leading-[1.1em] text-6xl md:text-8xl">Dominik <br className="hidden md:block" /> Kundel</p>
         </Heading.h1>
-        <Heading.p><span className="small-all-caps sm:medium-all-caps font-light">Developer | Product Manager | Public Speaker</span></Heading.p>
+        <Heading.p><span className="small-all-caps sm:medium-all-caps font-light">Developer | Product Leader | Public Speaker</span></Heading.p>
       </Heading>
     </div>
     // <Html as={Container} sanitizeOptions={allowImages}>
