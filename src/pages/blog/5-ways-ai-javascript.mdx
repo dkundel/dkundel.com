@@ -1,0 +1,191 @@
+---
+title: 'Five ways to work with Generative AI in JavaScript'
+publishDate: '2024-07-27 16:00:00'
+image: '/blog/5-ways-ai-javascript/5-ways-ai-javascript-header.png'
+imageAlt: 'Decorative header image with the title "Five ways to work with Generative AI in JavaScript"'
+imageWidth: 1200
+imageHeight: 632
+excerpt: "AI is primarily dominated by Python whether it's code samples or the tools themselves. In this blog post, we'll talk about five ways how you can work with generative AI using JavaScript/TypeScript without brushing up your Python skills."
+layout: '@layouts/BlogLayout.astro'
+tags: [javascript, generative-ai, llm]
+---
+
+Machine Learning and AI development is traditionally dominated by Python and because of that the ecosystem of tutorials, libraries, and examples is primarily dominated by Python. However, with the rise of the [AI Engineer](https://www.latent.space/p/ai-engineer) concept, we are seeing more full-stack web developers begin to work on AI, and with it the demand for JavaScript/Typescript compatible tooling rises. In fact in February 2024, [Jared Palmer](https://x.com/jaredpalmer) from Vercel even claimed that "The AI engineer of the future is a TypeScript engineer". 
+
+![Jared Palmer standing in front of a black slide with white text reading "The AI engineer of the future is a TypeScript engineer"](/blog/5-ways-ai-javascript/vercel-quote.jpg)
+
+In this blog post, we'll go through five ways how you as a JavaScript developer can use different generative AI tools without brushing up on your Python skills.
+
+## Cloud APIs
+
+If you are just getting started and especially if you are planning to use a Large Language Model (LLM) like [OpenAI's GPT models](https://platform.openai.com/docs/models) or [Anthropic's Claude models](https://docs.anthropic.com/en/docs/about-claude/models) using their APIs directly can be an excellent start.
+
+Interacting with the model is just one `fetch` call away.
+
+```js
+fetch("https://api.openai.com/v1/chat/completions", {
+ body: JSON.stringify({
+    "model": "gpt-4o-mini",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Who won the world series in 2020?"
+      },
+      {
+        "role": "assistant",
+        "content": "The Los Angeles Dodgers won the World Series in 2020."
+      },
+      {
+        "role": "user",
+        "content": "Where was it played?"
+      }
+ ]
+  }),
+ headers: {
+ Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    "Content-Type": "application/json"
+  },
+ method: "POST"
+})
+```
+
+In fact, OpenAI's "Chat Completions" API has become the de-facto standard for a lot of other model providers. Providers like [Groq](https://console.groq.com/docs/openai) or [Together.ai](https://docs.together.ai/docs/openai-api-compatibility) provide OpenAI compatibility meaning you just need to change the URL to switch to a different provider to choose a different model.
+
+If you are looking to use other models there are also providers like [Replicate](https://replicate.com) that specialize in hosting open-source models with a [consistent REST API](https://replicate.com/docs/reference/http#predictions.create) and even [expose APIs to fine-tune some models on their platform](/blog/fine-tuning-sdxl).
+
+## Docker
+
+While Cloud APIs are great to get started, sometimes you don't want to rely on a cloud-hosted provider for your use case. For example, maybe you want to explicitly run a model like [Llama 3 8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B) directly on your local machine or you want to use an open-source library like [Unstructured.io](https://github.com/Unstructured-IO) that's written in Python and use it within your JavaScript project without paying for the hosted API.
+
+Some projects provide for that reason [Docker](https://www.docker.com) container that will expose an HTTP API when run. For example, you can start the [Unstructured API](https://github.com/Unstructured-IO/unstructured-api) Docker container by running:
+```bash
+docker run -p 8000:8000 -d --rm --name unstructured-api downloads.unstructured.io/unstructured-io/unstructured-api:latest 
+--port 8000 --host 0.0.0.0
+```
+
+Once the container is running you now have a localhost version of the Unstructured API that you can use to chunk documents to later store in your vector database.
+
+```js
+const form = new FormData();
+
+const buffer = // e.g. `fs.readFileSync('./fileLocation');
+const fileName = 'test.txt';
+
+form.append('file', buffer, {
+ contentType: 'text/plain',
+ name: 'file',
+ filename: fileName,
+});
+
+const response = await fetch('http://localhost:8000/general/v0/general', { 
+ method: 'POST',
+ body: form,
+ headers: {
+ Accept: "application/json",
+    "Content-Type": "multipart/form-data"
+  },
+})
+```
+
+Similarly, you could use [`llama.cpp` docker container](https://github.com/ggerganov/llama.cpp/blob/master/docs/docker.md) or [Ollama](https://ollama.com) to run local APIs for your LLM models such as Llama 3.
+
+If you are working with an ML team that trained their own model or you want to host any model off [Huggingface](https://huggingface.co) and use the same Docker container approach, you can also check out [`cog` by Replicate](https://github.com/replicate/cog). It wraps Docker and is specifically designed for creating Docker containers for ML models.
+
+All of this works great if you have a relatively small surface area of tasks you want to perform and the composability is limited. 
+
+## JavaScript-native libraries
+
+Now this one might be the most obvious option but the best option remains picking a library or tool that was natively written in JavaScript or TypeScript and fortunately, this ecosystem continues to grow.
+
+Most cloud API model providers offer a JavaScript native SDK incl. [OpenAI](https://www.npmjs.com/package/openai), [Anthropic](https://npm.im/@anthropic-ai/sdk), and [Google](https://npm.im/@google/generative-ai).
+
+Additionally, two of the most popular open-source LLM frameworks [Langchain](https://www.langchain.com) and [LlamaIndex](https://www.llamaindex.ai) provide TypeScript versions of their frameworks. Vercel also offers the [`ai` SDK](https://sdk.vercel.ai) that is built from the ground up with a stronger focus on bringing together LLMs and the front-end experiences they power. Even though the documentation is heavily focused on Vercel's own Next.js framework, the SDK also works with other frameworks.
+
+```js
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
+
+const { text } = await generateText({
+ model: openai('gpt-4o'),
+ prompt: 'Write a vegetarian lasagna recipe for 4 people.',
+});
+```
+
+However, since most of these ultimately wrap other tools and frameworks as integrations, you are still often left with more limited functionality than their Python counterparts. For example, the Python version of Langchain has 18 different document transformer integrations while the JavaScript one has 5. 
+
+## Native LLM APIs
+
+Now this one is still more forward-looking. Google Chrome recently released an [experimental set of APIs](https://developer.chrome.com/docs/ai/built-in) into the [Chrome Dev](https://www.google.com/chrome/dev/?extra=devchannel) and [Chrome Canary](https://www.google.com/chrome/canary/) channels that expose access to a locally run [Gemini Nano model](https://blog.google/technology/ai/google-gemini-ai).
+
+```js
+const session = await window.ai.createTextSession();
+await session.prompt("Translate the following to German: Hello how are you?")
+// " Hallo, wie gehts"
+```
+
+Since the model is so small compared to state-of-the-art models including smaller ones like [GPT-4o mini](https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/) or [Llama 3.1 8B](https://ai.meta.com/blog/meta-llama-3-1/), you will likely have a harder time prompting this reliably though. With the pace of model development, this will likely change quickly though.
+
+While this API is still experimental and only spearheaded by Chrome, the trend of local LLMs might change this quickly as more companies get interested. Mozilla, for example, recently announced that they are focused on moving "local AI" forward incl. creating a new [dedicated accelerator program](https://blog.mozilla.org/en/mozilla/mozilla-builders-accelerator/) and Apple is already using local models for their new Apple Intelligence feature.
+
+If you want to give the `window.ai` API a shot, check out [Google's explainer repository](https://github.com/explainers-by-googlers/prompt-api) as well as the [`chrome-ai` package for Vercel's `ai` SDK](https://github.com/jeasonstudio/chrome-ai) to get started.
+
+## Pythonia
+
+One interesting approach to using Python tools in JavaScript is [`pythonia`](https://www.npmjs.com/package/pythonia). It's one half of the [`JSPyBridge` project](https://github.com/extremeheat/JSPyBridge) that creates an interface to call JavaScript from Python and Python from JavaScript by facilitating the interprocess communication so that you can write code in the language of your choice. 
+
+It uses inter-process communication (IPC) and [JavaScript Proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) to enable you to almost use identical code when calling a Python library in JavaScript than in Python and then actually executing it in Python.
+
+For example, here's a code snippet taken from the [getting started guide of the Python library `haystack-ai`](https://haystack.deepset.ai/overview/quick-start):
+
+```python
+from haystack import Pipeline, PredefinedPipeline
+
+pipeline = Pipeline.from_template(PredefinedPipeline.CHAT_WITH_WEBSITE)
+result = pipeline.run({
+    "fetcher": {"urls": ["https://haystack.deepset.ai/overview/quick-start"]},
+    "prompt": {"query": "Which components do I need for a RAG pipeline?"}}
+)
+print(result["llm"]["replies"][0])
+```
+
+By using the `pythonia` npm package we can write the same equivalent code:
+
+```js
+import { python } from "pythonia";
+
+const haystack = await python("haystack");
+const { Pipeline, PredefinedPipeline } = await haystack;
+
+const template = await PredefinedPipeline("chat_with_website");
+const pipeline = await Pipeline.from_template(template);
+const result = await pipeline.run({
+ fetcher: { urls: ["https://haystack.deepset.ai/overview/quick-start"] },
+ prompt: { query: "Which components do I need for a RAG pipeline?" },
+});
+
+console.log((await result.valueOf()).llm.replies[0]);
+python.exit();
+```
+
+You might notice that this code is slightly longer and heavily uses `await`. That's because of the IPC communication. `pythonia` does a lot of optimizations behind the scenes to effectively communicate between the channels. For example, the actual data is not being sent back from Python to Node.js unless you call `valueOf()`. However, outside of that the code is very similar and is using native Python libraries.
+
+### Performance of `pythoia`
+
+One concern for you might be performance and while it would be slower than entirely running in Python, the actual performance might surprise you. If you want to use a Python library, like [RAGatoille](https://github.com/bclavie/RAGatouille), but the rest of your system is written in JavaScript, really the only alternative to `pythonia` is exposing the library through an HTTP API and using `fetch` to bridge the systems. 
+
+If we run a benchmark where we use the `haystack-ai` code snippet from above and run it both using `pythonia` and expose it using [FastAPI](https://fastapi.tiangolo.com), both requests are slow because of their calls to OpenAI but `pythonia` actually slightly wins the race.
+
+<figure>
+![Benchmark screenshot where pythonia is 13% faster across 10 runs](/blog/5-ways-ai-javascript/performance-benchmark.png)
+<figcaption>Using `pythonia` results in an average of 13% faster results but both take longer than 1.2s per run</figcaption>
+</figure>
+
+Overall while there is a performance hit of using `pythonia` over using only native Python, given the long-running nature of most generative AI calls, the overhead becomes relatively negligible especially when compared to making local HTTP requests.
+
+## Conclusion
+
+While more and more JavaScript developers are getting into the Generative AI space, we still have ways to go to catch up to an ecosystem that has the breadth of the Python space. Cloud APIs, running local Docker containers, and bridging projects such as `pythonia` are great options to tap into this space without moving all of your logic into Python. Ultimately it's up to us though to either grow the space of available AI JavaScript tools by contributing to existing open-source projects or even starting new ones if you want to maintain a project. In the meantime, AI tools such as [GitHub Copilot](https://github.com/features/copilot), [Cursor](https://www.cursor.com), or [Codeium](https://codeium.com) can help you with writing some Python code.

@@ -18,19 +18,19 @@ So even just using open-source models like [Stability AI's Stable Diffusion XL (
 
 In this blog post we'll explore how you can create your own image generation model on top of SDXL without needing any specific hardware and just using JavaScript and APIs.
 
-### How to create your own image generation model
+## How to create your own image generation model
 
 Creating an image generation model is extremely hard and requires a lot of data and the results can be mixed. For that reason various companies are working on their proprietary models like [Adobe's Firefly](https://www.adobe.com/products/firefly.html) or [OpenAI's DALL·E 3](https://openai.com/dall-e-3). The problem with these models is that they are more of the "you get what you get" variety, meaning while you might be able to influence them with some example images they are largely static. 
 
 That's where open-source models come into play as base models for our project.
 
-#### Choosing a base model
+### Choosing a base model
 
 There are a multitude of open-source text-to-image generation models. Stability AI's Stable Diffusion XL (SDXL) is probably the most popular one among them though. It's both versatile, produces high quality output and is licensed in a way that you can use it for commercial use cases, unlike some alternative models.
 
 The other reason why we want to use SDXL is that it not only allows for fine-tuning but it allows fine-tuning through a technique called LoRA.
 
-#### What is fine-tuning? What does LoRA mean?
+### What is fine-tuning? What does LoRA mean?
 
 <figure>
 <img alt="picture of my corgi in a lab coat" src="/blog/fine-tuning-sdxl/lab-coat-corgi.png" />
@@ -45,7 +45,7 @@ With LoRA rather than changing the whole matrix of weights, an "adapter" gets cr
 
 So now we know what LoRA is but how do we apply it? A quick Google you'll find lots of Python based tutorials that are often heavy in machine learning terms and on top of that require you to have NVIDIA hardware that's compatible with NVIDIA's CUDA tooling. So what if you don't have that or don't have time to learn all the Python concepts?
 
-### Introducing Replicate
+## Introducing Replicate
 
 That's where [Replicate](https://replicate.com) comes in. They're goal is "making machine learning accessible to every software developer." There are some other offerings that provide ways for you to fine-tune your model but for this blog post we'll use Replicate.
 
@@ -108,7 +108,7 @@ console.log('Done!', output)
 
 Now that we were able to generate our first image using SDXL, it's time to create our own model.
 
-### Gathering your data
+## Gathering your data
 
 Before we can start the process of fine-tuning we'll need some data, or rather some images, that we can train the model on using LoRA. 
 
@@ -118,17 +118,17 @@ For my project I used 21 images of various sizes but with my subject being very 
 
 Once you have collected all the images of what you want to train the model on(20-30 is a good amount to have for a pet for example), put them in a folder and ZIP up the folder so we can start our fine-tuning.
 
-### Starting your fine-tuning
+## Starting your fine-tuning
 
 Now that you have your files together let's do the fine-tuning! With Replicate there are two ways we can do this. 
 
-#### Using the website
+### Using the website
 
 The first option and maybe the easiest to try things out is [using the website interface](https://replicate.com/stability-ai/sdxl/train). You can upload the ZIP file you created directly there and generate your model.
 
 ![Screenshot of the Replicate website with the SDXL training UI](/blog/fine-tuning-sdxl/replicate-training-ui.png)
 
-#### Using the JavaScript
+### Using the JavaScript
 
 The alternative way is using [Replicate's Trainings API](https://replicate.com/docs/reference/http#trainings.create) for example through the Node.js client library. 
 
@@ -177,7 +177,7 @@ The output will include a link to your training process or alternatively you can
 
 On this page you'll be able to watch the logs live as the training is going on.
 
-### Testing your new model
+## Testing your new model
 
 Once your training run is complete it's time to test our new model. Update your `index.js` file to point to your own model. 
 
@@ -238,7 +238,7 @@ And here we go! My corgi on a throne 🎉
 </figure>
 
 
-### Getting ready for production
+## Getting ready for production
 
 As you start using your new model you might notice that it's taking a bit of time to execute and sometimes might even get queued for a while. That's because by default your model runs on shared infrastructure until you are ready to "Deploy" your model. 
 
@@ -264,7 +264,7 @@ console.log(prediction.output);
 
 And with that you are ready to create all the pictures your heart desires.
 
-### Running it locally
+## Running it locally
 If you have the right CUDA compatible NVIDIA hardware on your local computer you can also use Replicate's [`cog` tool](https://github.com/replicate/cog) to run the model you trained locally instead:
 
 ```bash
@@ -287,7 +287,7 @@ cog predict r8.im/<your-username>/<your-model-name>@sha256:<your-version> \
 
 Under the hood this will leverage Docker to set up the environment to run your predictions.
 
-### Conclusion
+## Conclusion
 
 Stability AI's SDXL model is an extremely powerful open-source text-to-image generation model and there is a variety of different guides and ways to fine-tune SDXL for your own purposes. But with Replicate we were able to train the model without having to understand how LoRA works in detail, deal with having the right infrastructure or having to understand how to use Python libraries like PyTorch.
 

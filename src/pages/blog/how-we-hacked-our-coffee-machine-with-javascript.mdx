@@ -15,7 +15,7 @@ IoT or "smart home" devices are probably the biggest current buzzword aside of "
 
 ![Comic strip from Geek & Poke about their coffee machine unfollowing them on Twitter](/blog/coffee-machine/geek-and-poke-iot.jpg)
 
-### Story Time
+## Story Time
 
 My flatmate and I already have a few internet-enabled devices in our apartment that we can control using our Amazon Echo Dots. It's definitely convenient (read lazy). But the thing that is really missing is being able to trigger the coffee machine right from the bed.
 
@@ -23,11 +23,11 @@ Luckily my flatmate had a DeLonghi Latissima standing around that he wasn't too 
 
 But why would we use JavaScript? Well my flatmate isn't a developer and I haven't written a single line of C++ in 3 years. JavaScript on the other hand is a language that I'm quite comfortable with. Hardware and JavaScript also both have a very event-driven focus, both center around events like "was this button pressed?". Additionally, it seemed like one more challenge since there is definitely less documentation about hardware-hacking with JavaScript.
 
-### The Hardware Options
+## The Hardware Options
 
 I was planning to do a hardware hack with JavaScript for a while and I had a couple of different options flying around my apartment already that we all considered for the hack:
 
-#### Espruino
+### Espruino
 
 ![Espruino Logo](/blog/coffee-machine/espruino-header.png)
 
@@ -37,25 +37,25 @@ Espruino comes with a Web-based IDE that allows you to easily write JavaScript a
 
 The only Espruino board that I had at home was an Espruino Pico which also doesn't contain WiFi. I could have soldered an ESP8266 onto it for WiFi but who got time for that? We want coffee!
 
-#### Tessel
+### Tessel
 
 ![Logo of Tessel](/blog/coffee-machine/tessel-header.png)
 
-The next alternative is another open source hardware project called [Tessel](https://tessel.io/). Part of the Tessel project is the Tessel 2. A piece of hardware that can not only be controlled with JavaScript but it can run full [Node.js](https://nodejs.org) and it can store the whole program on the hardware so we don't have to keep a computer connected to it.
+The next alternative is another open source hardware project called [Tessel](https://www.bairesdev.com/tools/tessel/). Part of the Tessel project is the Tessel 2. A piece of hardware that can not only be controlled with JavaScript but it can run full [Node.js](https://nodejs.org) and it can store the whole program on the hardware so we don't have to keep a computer connected to it.
 
 ![Photo of a Tessel 2 board](/blog/coffee-machine/tessel-photo.jpg)
 
-#### Johnny-Five
+### Johnny-Five
 
 ![Logo of Johnny Five](/blog/coffee-machine/johnny-five-header.png)
 
-The third alternative was to use [Johnny-Five](http://johnny-five.io/). It is actually an [npm module](https://www.npmjs.com/package/johnny-five) that can talk to a variety of microcontrollers. Initially it uses the [Firmata protocol](https://github.com/firmata/protocol) to talk to Arduinos, but there are also a [variety of other platforms](http://johnny-five.io/platform-support/) that can be controlled with Johnny-Five via I/O plug-ins. This way we could for example use a [Particle Photon](https://www.particle.io/products/hardware/photon-wifi-dev-kit), a [Raspberry PI](https://www.raspberrypi.org/) or even the [Tessel 2](https;//tessel.io).
+The third alternative was to use [Johnny-Five](http://johnny-five.io/). It is actually an [npm module](https://www.npmjs.com/package/johnny-five) that can talk to a variety of microcontrollers. Initially it uses the [Firmata protocol](https://github.com/firmata/protocol) to talk to Arduinos, but there are also a [variety of other platforms](http://johnny-five.io/platform-support/) that can be controlled with Johnny-Five via I/O plug-ins. This way we could for example use a [Particle Photon](https://www.particle.io/products/hardware/photon-wifi-dev-kit), a [Raspberry PI](https://www.raspberrypi.org/) or even the [Tessel 2](https://www.bairesdev.com/tools/tessel/).
 
-#### Our Choice
+### Our Choice
 
 We decided to go for the combination of Tessel and Johnny-Five. This way we can write code that is fairly platform agnostic and yet have code that can be run directly on the hardware without having to have a computer connected to it or run some code in the cloud.
 
-### Trust Me I'm An Engineer
+## Trust Me I'm An Engineer
 
 Alright now that we knew what tools we would use it was time to start hacking! Since hardware doesn't have a version control systems let's have a last look at our beautiful and **working** coffee machine and store it in our memories:
 
@@ -82,7 +82,7 @@ Luckily this seems doable. Because if we look closely we can see that the contro
 
 So if we can emulate the signal that is sent between the control plate and the microprocessor we would be able to control the coffee machine. Now we only need to figure out what the signal is.
 
-### What Are We Doing Here?
+## What Are We Doing Here?
 
 To figure out what the signal is that is being sent around, let's first take a look at the control plate:
 
@@ -217,7 +217,7 @@ Alright that's something but not great. How are we supposed to figure out which 
 
 ![Gif of monkey pushing down a laptop](/blog/coffee-machine/monkey-laptop.gif)
 
-### Back To The Drawing Board
+## Back To The Drawing Board
 
 ![Logo of the Friting software](/blog/coffee-machine/fritzing-header.png)
 
@@ -248,7 +248,7 @@ And we got it! We finally solved the secret of the mysterious protocol:
 - 💡 LED7 (Power lamp) = P1 ➡ P6
 - etc.
 
-### Did Someone Say Coffee?
+## Did Someone Say Coffee?
 
 How can we make coffee with this knowledge though? Since the switches dependent on the power that is being sent between two pins, faking the protocol entirely will be complicated. But there is an easier solution. We can use relays!
 
@@ -306,13 +306,13 @@ Yay it's alive! It took 10 hours and the sun had started to rise but hey we got 
 
 ![Gif of cast of Friends jumping](/blog/coffee-machine/celebration.gif)
 
-### The Internet of Coffee Pots
+## The Internet of Coffee Pots
 
 Great so we can brew coffee if my laptop is connected to the Tessel that is connected to the coffee machine and if I then write some code into the REPL. Now that's not really the internet of coffee pots that we have here. Time to change that!
 
 Luckily on this day 19 years ago there were some smart folks that developed the most life changing protocol in the world! The [Hyper Text Coffee Pot Control Protocol](https://www.ietf.org/rfc/rfc2324.txt) or short HTCPCP for the purpose of being able to control internet-enabled coffee pots. If that isn't a sign that we should revive this forgotten protocol in 2017 and use it to control our coffee machine.
 
-#### What is HTCPCP?
+### What is HTCPCP?
 
 So as you might have noticed HTCPCP is an April fools from 1998. The reason why it's great is that it suggested as part of the RFC an HTTP status code `418 - I'm a teapot`. This status code is up to today not an actual standard, yet a lot of software uses it as small easter eggs. Take Google for example: [google.com/teapot](https://google.com/teapot).
 
@@ -336,7 +336,7 @@ Additionally, we have to deal with the fact that our coffee machine supports mul
 
 Let's implement it!
 
-#### `418 - I'm a teapot`
+### `418 - I'm a teapot`
 
 ![Gif of a happy teapot](/blog/coffee-machine/teapot.gif)
 
@@ -457,7 +457,7 @@ Some features of JavaScript that we used in here were not available in the Node 
 
 As for the server we decided to implement the following subset of features:
 
-#### 1. `GET`, `POST` and `BREW`
+### 1. `GET`, `POST` and `BREW`
 
 We implemented the acceptance of the `BREW` method as well as traditional `GET` to get the status of the coffee machine and `POST` to issue commands.
 
@@ -483,7 +483,7 @@ return res.end();
 if (req.method === 'POST' || req.method === 'BREW') {
 ```
 
-#### 2. `Content-Type` verification
+### 2. `Content-Type` verification
 
 We only accept `application/coffee-pot-command` and `text/plain` as valid content types for `POST` and `BREW` requests. We had to add `text/plain` for our later integration with Alexa.
 
@@ -496,7 +496,7 @@ function hasCorrectContentType(req) {
 }
 ```
 
-#### 3. Initial `Accept-Additions` support
+### 3. Initial `Accept-Additions` support
 
 With just four relays we didn't have enough to control the full functionality of the coffee machine and therefore our coffee machine doesn't support any additions. However, we did add verification of the header and the correct behavior when someone orders an addition that our coffee machine doesn't support. Which, at the moment, are all additions.
 
@@ -534,7 +534,7 @@ function getAdditionsRequested(req) {
 }
 ```
 
-#### 4. `418 - I'm a teapot`
+### 4. `418 - I'm a teapot`
 
 Well obviously, we had to implement this trivial check that simply checks if the coffee pot that is connected to our server is in fact a disguised tea pot. In which case we return the appropriate status code.
 
@@ -548,7 +548,7 @@ return res.end();
 }
 ```
 
-#### What we didn't implement:
+### What we didn't implement:
 
 We are currently unable to programatically check for the state of the coffee machine. The LEDs are showing the respective state but we have to solve the problem of being able to detect this state inside the Tessel 2. Otherwise, we are not able to properly implement the `Safe` header or the `GET` status.
 
@@ -570,7 +570,7 @@ And it works! 🎉 You can see a working version of the HTCPCP protocol here:
 
 The [full code is also available on GitHub](https://github.com/dkundel/htcpcp-delonghi).
 
-### IFTTC - If This Then Coffee
+## IFTTC - If This Then Coffee
 
 Now that we had a working HTTP server that we could use to control our coffee machine it was time to connect it to Alexa. The optimal solution here would be to build a Smart Home skill to be able to use it in combination with the other smart home devices in the household. However, time is valuable so let's try a quicker approach: [IFTTT](https://ifttt.com) (If-This-Then-That).
 
@@ -594,7 +594,7 @@ The great thing was that it was easy as it sounds. In just 3 minutes we had our 
   allowfullscreen
 />
 
-### What's Next?
+## What's Next?
 
 We are still super excited that we got this initial version but obviously there is so much work left of things we have to, should and can do. Some of the things on our agenda are:
 
@@ -608,9 +608,9 @@ We are still super excited that we got this initial version but obviously there 
 
 Basically every day this list is getting longer because we have some new cool idea and I'm certain you might have an idea, too, what we should do. If you do, make sure to send me a tweet [@dkundel](https://twitter.com/dkundel). We would love to hear your ideas!
 
-### Conclusion
+## Conclusion
 
-It was great doing this little side project. Our modern devices are so closed up that we rarely anymore open devices to check up what's going on on the inside. I must also say that working with the [Tessel 2](https://tessel.io), [Johnny-Five](http://johnny-five.io) and JavaScript was amazing. It's a great way to get started in hardware hacking. I personally have a [Johnny-Five Inventors Kit from Sparkfun](https://www.sparkfun.com/products/13847) at home and I can't wait to find some time and play around with other pieces in the kit for more projects.
+It was great doing this little side project. Our modern devices are so closed up that we rarely anymore open devices to check up what's going on on the inside. I must also say that working with the [Tessel 2](https://www.bairesdev.com/tools/tessel/), [Johnny-Five](http://johnny-five.io) and JavaScript was amazing. It's a great way to get started in hardware hacking. I personally have a [Johnny-Five Inventors Kit from Sparkfun](https://www.sparkfun.com/products/13847) at home and I can't wait to find some time and play around with other pieces in the kit for more projects.
 
 I think JavaScript's event-oriented approach is a perfect match for hardware. Sure if you want to build the most energy and space efficient project you should resort back to writing C++ but for hacking projects like this it's a great solution.
 

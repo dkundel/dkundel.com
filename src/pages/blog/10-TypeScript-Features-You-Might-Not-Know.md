@@ -15,7 +15,7 @@ Recently [TypeScript](http://www.typescriptlang.org/) is increasingly gaining po
 
 Here is a list of 10 of my favorite recent additions to the language since version 2.0:
 
-### 1. `tsc --init`
+## 1. `tsc --init`
 
 This is a great feature if you want to start off a new TypeScript project. If you run in a folder:
 
@@ -31,7 +31,7 @@ If you just want an overview of all available options you can also try out this 
 tsc --help --all
 ```
 
-### 2. `extends` in `tsconfig.json`
+## 2. `extends` in `tsconfig.json`
 
 Have you found yourself in the situation where you needed two separate `tsconfig.json` files for example for tests but most of the options were shared? With the `extends` option we can specify a configuration file that we want to base our current file on.
 
@@ -65,7 +65,7 @@ If we now run the compiler with this file it will take the flags from the `tscon
 tsc -p tsconfig-es5.json
 ```
 
-### 3. `type` vs `interface`
+## 3. `type` vs `interface`
 
 Typically you type objects in two different ways in TypeScript. Either by using `type` or by using `interface`:
 
@@ -106,7 +106,7 @@ class MyClass implements MyObjectUsingInterface {
 
 Addtionally you will be able to redefine an interface multiple times which means you will be able to add addtional parameters at different parts in your code.
 
-### 4. `keyof`
+## 4. `keyof`
 
 This is one of my favorite recent additions that was added version `2.1`. Let's say we have a type of an interface `Configuration`:
 
@@ -137,7 +137,7 @@ set('baseUrl', true); // Invalid! Compiler catches this.
 
 Now we have a function that will not only check that we are passing in a valid value for `key` but also that the type of `value` is the right one for the respective option.
 
-### 5. Mapped Types
+## 5. Mapped Types
 
 Now that we know about the power of `keyof` let me show you one more awesome thing related to this. This is not limited to types generated with `keyof` though.
 
@@ -175,7 +175,7 @@ const rgbMap: ColorToRgb = {
 };
 ```
 
-### 6. Mixin classes
+## 6. Mixin classes
 
 Mixin classes are an addition that came in TypeScript version `2.2` in February 2017. It's a way for you to extend classes in a dynamical fashion. Let's say we have a set of 2D classes:
 
@@ -220,7 +220,7 @@ const p = new Point3D();
 p.z = -1;
 ```
 
-### 7. `object` vs `Object`
+## 7. `object` vs `Object`
 
 `Object` has been around as a type for quite a while but in `2.2` TypeScript introduced a new type `object`. The difference in spelling is minimal but they represent completely different groups of objects.
 
@@ -234,7 +234,7 @@ const bar: object = 'bar'; // ==> This is invalid
 const bla: object = new Date();
 ```
 
-### 8. Transpiling `async`/`await` to ES5/ES3
+## 8. Transpiling `async`/`await` to ES5/ES3
 
 If you are a fan of [`async`/`await`](https://www.twilio.com/blog/2015/10/asyncawait-the-hero-javascript-deserved.html) but were bummed out that you had to support ES5 or even ES3 as your target, you will love this. TypeScript is able to transpile `async`/`await` to both ES5 and ES3 as long as you have a `Promise` polyfill.
 
@@ -264,7 +264,7 @@ hello().then((x: string) => {
 });
 ```
 
-### 9. String valued enums
+## 9. String valued enums
 
 This is a feature that has been long in the making. In fact some of the [issues date back to 2014](https://github.com/Microsoft/TypeScript/issues/1206) and earlier. Now in TypeScript version `2.4` we are finally getting them: string valued enums 🎊
 
@@ -299,7 +299,7 @@ console.log(ErrorCodes.Unknown === 'unknown');
 
 In this case we specify a numeric value for `ErrorCodes.NotFound` of `404` and because `ErrorCodes.MethodNotAllowed` follows in the listing, it will automatically be assigned `405`. `ErrorCodes.Unknown`, however, is assigned to a string value of `'unknown'`. This is only possible due to the strict enforcing of having an initializer for string values.
 
-### 10. `allowJs`, `checkJs`, `// @ts-check`
+## 10. `allowJs`, `checkJs`, `// @ts-check`
 
 These three options are very exciting if you are new to TypeScript or if you have existing JavaScript.
 
@@ -317,7 +317,7 @@ Similarly you can disable it on selected files using `// @ts-nocheck` of for a s
 
 These features also work in combination with the respective editor integrations like in VS Code. It's super useful if you want to move your code base over to TypeScript but you can't change the actual files to TypeScript yet for whatever reason.
 
-### Summary
+## Summary
 
 This is just a small overview of a few features that are currently in TypeScript (or are coming this month) that I'm excited about. But there is much more planned, including [Variadic types](https://github.com/Microsoft/TypeScript/issues/5453), [ambient decorators](https://github.com/Microsoft/TypeScript/issues/2900) (decorators that are only there during compile time) but don't affect runtime and much more. A great overview of what's planned is the [Roadmap in the TypeScript wiki](https://github.com/Microsoft/TypeScript/wiki/Roadmap).
 
