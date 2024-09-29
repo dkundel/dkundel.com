@@ -10,7 +10,7 @@ layout: '@layouts/BlogLayout.astro'
 tags: [generative-ai, llm]
 ---
 
-Recently I was sitting in a waiting room with an expected eight-hour wait.  While scrolling through social media on my phone, I suddenly had an idea for a project, but my laptop was nowhere near.  I could have done what I (and probably you) have done before when an idea strikes while I'm out and about: open my notes app and write it down, only to have it get burried and never seen again.
+Recently I was sitting in a waiting room with an expected eight-hour wait.  While scrolling through social media on my phone, I suddenly had an idea for a project, but my laptop was nowhere near.  I could have done what I (and probably you) have done before when an idea strikes while I'm out and about: open my notes app and write it down, only to have it get buried and never seen again.
 
 Instead, I decided to try out the new [Replit Agent](https://replit.com/blog/replit-agent), which had launched on mobile just a few days earlier.  I gave it a prompt, it devised a plan, and then started executing it by installing dependencies, creating checkpoints, asking me to verify steps, and ultimately offering to deploy it.  While far from perfect, it was a magical experience that made me think that, thanks to AI, we might be closer than ever to a world where anyone can code from anywhere, whether it's at home on your laptop or in a waiting room on your phone.  In this blog post, we'll go through the history of development on mobile, how we got here, and how I believe we might finally get there with the help of AI. 
 
@@ -57,19 +57,23 @@ As a result creating development environments for mobile is not just a matter of
 
 Even older than the idea of developing on your smartphone is the idea of "cloud development environments" (CDEs) and we've gone through various levels of sophistication over the last 15+ years. From early offerings like [PHPanywhere](https://jaypeeonline.net/freeware/phpanywhere/) in 2009 — essentially a web-based FTP client that would later become [Codeanywhere](https://codeanywhere.com) — over web dev tools like [CodePen](https://codepen.io) and [JSFiddle](https://jsfiddle.net) to full own instances & forks of Visual Studio Code running in the browser connected to a remote server — incl. as [GitHub Codespaces](https://github.com/features/codespaces), [CodeSandbox](https://codesandbox.io) or [Project IDX](https://idx.google.com) — the level of sophistication of these tools has increased dramatically.
 
-At the same time though the reality is that while some of these tools gained some traction especially for developer education purposes such as sample applications or to make contributing to open-source easier, they haven't really taken off as a mainstream development tool. The reasons for this area likely multifacted but we'll cover some of them in a later section.
+At the same time though, the reality is that while some of these tools gained some traction especially for developer education purposes such as sample applications or to make contributing to open-source easier, they haven't really taken off as a mainstream development tool. The reasons for this area likely multifaceted but we'll cover some of them in a later section.
 
 The fact is that without the concept of CDEs, development on mobile devices would still be incredibly impractical. A lot of the challenges that CDEs had to solve are the same that made a full development flow on mobile devices hard: running multiple different processes & tools at the same time, handling multi-tasking while being restricted to a single window, exposing a development server that the user can access, dealing with hardware & software limitations on the device the developer is accessing the CDE from, etc.
 
-At the same time CDEs have increasingly begun to include AI-powered features into their tooling by leveraging cloud-based AI models since running AI directly locally in browsers is still mostly infeasible. 
+At the same time, CDEs on their own don't solve the mobile development problems as David East, Lead DevRel of Project IDX, shows in a post. 
+
+<div style="display: flex; justify-content: center">
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">What&#39;s stopping you from coding like this? <a href="https://t.co/vujhxHrZnB">pic.twitter.com/vujhxHrZnB</a></p>&mdash; David East (@_davideast) <a href="https://twitter.com/_davideast/status/1839723095088586798?ref_src=twsrc%5Etfw">September 27, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
 
 ## How AI Agents are changing the development game
 
-With having an overall "integrated" development flow seemingly being a hard but solved problem, the remaining challenge is comes down to the user experience of writing and navigating code. Enter: Generative AI.
+With having an overall "integrated" development flow seemingly being a hard but solved problem, the remaining challenge is comes down to the user experience of writing and navigating code. Enter: **Generative AI.**
 
 If you are a developer the chances are high that you've had an LLM (Large Language Model) like OpenAI's GPT-4o or Claude's 3.5 Sonnet write code for you at least once in the last three years. In fact according to the StackOverflow survey from 2024, 82% of developers who used AI tools used it to write code, even if only ~42% trust the AI code [^4].
 
-With LLMs' continous advancements in their coding abilities, syntax will no longer be a barrier to writing code and enable to [focus both engineers and non-engineers to focus on semantics](https://www.alessiofanelli.com/posts/syntax-to-semantics) and the problems at hand instead.
+With LLMs' continuous advancements in their coding abilities, syntax will no longer be a barrier to writing code and enable to [focus both engineers and non-engineers to focus on semantics](https://www.alessiofanelli.com/posts/syntax-to-semantics) and the problems at hand instead.
 
 The same goes for navigating code. With the help of LLMs, developers can now ask questions like "what does this function do" or "what does this variable do" and get a response back. This is especially useful for developers who are not familiar with the codebase and need to understand what a particular function or variable does. It also reduces the overall need of reading large amounts of code to understand the overall relationship and structure of your codebase.
 
@@ -80,7 +84,7 @@ Where these capabilities get supercharged though is when we introduce the concep
 - Search the web for additional documentation
 - etc.
 
-Some promosing early versions of programming specific AI Agents are [Cognition's Devin](https://www.cognition.ai/blog/introducing-devin), [GitHub Copilot Workspace](https://github.blog/news-insights/product-news/github-copilot-workspace/) or [Replit Agent](https://blog.replit.com/introducing-replit-agent). 
+Some promising early versions of programming specific AI Agents are [Cognition's Devin](https://www.cognition.ai/blog/introducing-devin), [GitHub Copilot Workspace](https://github.blog/news-insights/product-news/github-copilot-workspace/) or [Replit Agent](https://blog.replit.com/introducing-replit-agent). 
 
 ## Development coming to the phone near you
 
@@ -95,7 +99,7 @@ Anthropic's Claude added support for their "artifacts" feature to their mobile a
 <figcaption>Demo of the Claude mobile app (sped up 1.6x)</figcaption>
 </figure>
 
-When [GitHub Copilot Workspace](https://github.blog/news-insights/product-news/github-copilot-workspace/) was announced in April 2024 they immediately announced support for their GitHub mobile app along side it.
+When [GitHub Copilot Workspace](https://github.blog/news-insights/product-news/github-copilot-workspace/) was announced in April 2024 they immediately announced support for their GitHub mobile app alongside it.
 
 <figure>
 <div style="display: flex; justify-content: center;">
@@ -117,14 +121,18 @@ Replit's mobile app takes this all one step further though by enabling the mobil
 
 Whether the current contenders are going to be the ones to win the race or not, I think the future of writing code is incredibly exciting. Smartphones have long taken over computers and laptops for entire generations and communities as the gateway to the world. Writing code on mobile devices could no longer be just a gimmick but in combination with AI it could enable people to build who were previously held back not by lack of ideas but through access and coding ability.
 
-For the concept of coding from anywhere to become a reality for professional & widespread use though we still have ways to go and questions to answer. Apart from continuing to improve Generative AI models ability to write code, because these tools require a more integrated approach to development they need to:
-- provide a seamless experience across different platforms
-- integrate with the vast ecosystem of tools that developers tend to already
+For the concept of coding from anywhere to become a reality for professional & widespread use though we still have ways to go and questions to answer. Apart from continuing to improve Generative AI models ability to write code, because these tools require a more integrated approach to development, they need to:
+- provide a seamless experience across mobile and desktop
+- integrate with the vast ecosystem of tools that developers already use
 - pass the rigorous security and privacy standards of the companies whose developers who will be using them
-- continue to iterate on the user experience that while better, is still far from perfect
-- be accessible to developers both at work and at home because developers try to bring their personal tools to work
+- continue to iterate on the user experience of mobile editing
+- have the tools be accessible to developers both at work and at home because developers try to bring their personal tools to work
 
-Even with its current limitations, I'd encourage you to check out some of the tools mentioned (or others), since we are getting faster than ever towards a world where we can have an idea on the go that we can immediately begin turning into reality, no matter where we are using just text or voice and our phone.
+While the technology is still not quite ready for every use case, we are getting faster than ever to a world where we can have an idea on the go that we can immediately begin to turn into reality, no matter where we are are using just text or voice and our phone. 
+
+**So the next time an idea strikes, give a mobile AI code editor, like those mentioned above, a try and build right from your phone. Hit me up afterwards; I'd love to hear what you built!**
+
+_Thank you [Greg Bauges](https://twitter.com/greggyb), [Ricky Robinett]( https://twitter.com/rickyrobinett) and [Craig Dennis](https://twitter.com/craigsdennis) for reviewing early versions of this article._
 
 ---
 
