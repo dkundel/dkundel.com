@@ -255,6 +255,14 @@
   .speaking-icon .cls-6 {
     @apply fill-secondaryGreen-500;
   }
+
+  [data-footnotes] {
+    @apply text-xs
+  }
+
+  [data-footnotes] li > p {
+    @apply my-2
+  }
 }
 
 @layer components {
