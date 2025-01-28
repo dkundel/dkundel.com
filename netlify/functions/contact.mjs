@@ -1,6 +1,19 @@
 
 import { Resend } from 'resend';
 
+import fetch, {
+  Headers,
+  Request,
+  Response,
+} from 'node-fetch'
+
+if (!globalThis.fetch) {
+  globalThis.fetch = fetch
+  globalThis.Headers = Headers
+  globalThis.Request = Request
+  globalThis.Response = Response
+}
+
 export const handler = async function(event, context) {
   // Check if the request is coming from a browser
   const isBrowser = event.headers['user-agent']?.includes('Mozilla') || 

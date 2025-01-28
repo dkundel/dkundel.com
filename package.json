@@ -18,6 +18,7 @@
     "emoji-regex": "^8.0.0",
     "glob": "^8.0.3",
     "got": "^9.6.0",
+    "node-fetch": "^3.3.2",
     "prop-types": "^15.7.2",
     "resend": "^4.1.1",
     "sanitize-html": "^2.7.0",
