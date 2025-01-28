@@ -1,6 +1,7 @@
-const { Resend } = require('resend');
 
-exports.handler = async function(event, context) {
+import { Resend } from 'resend';
+
+export const handler = async function(event, context) {
   // Check if the request is coming from a browser
   const isBrowser = event.headers['user-agent']?.includes('Mozilla') || 
                     event.headers['user-agent']?.includes('Chrome') || 
@@ -89,6 +90,7 @@ exports.handler = async function(event, context) {
           await resend.emails.send({
             from: 'contact@email.dominik.dev',
             to: 'hi@dkundel.com',
+            replyTo: From,
             subject: `From ${From}: ${Subject}`,
             text: Body
           });
@@ -98,7 +100,7 @@ exports.handler = async function(event, context) {
             headers: {
               'Content-Type': 'text/plain'
             },
-            body: 'Ahoy'
+            body: 'Ahoy! We sent an email to Dominik and he will get back to you :)'
           };
         } catch (error) {
           console.error('Resend API error:', error);
