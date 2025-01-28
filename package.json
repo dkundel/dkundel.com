@@ -19,6 +19,7 @@
     "glob": "^8.0.3",
     "got": "^9.6.0",
     "prop-types": "^15.7.2",
+    "resend": "^4.1.1",
     "sanitize-html": "^2.7.0",
     "styled-components": "^5.3.3"
   },

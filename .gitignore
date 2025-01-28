@@ -8,3 +8,5 @@ yarn-error.log
 /data/about/*.json
 /data/dkundel-md.json
 /dist
+# Local Netlify folder
+.netlify
