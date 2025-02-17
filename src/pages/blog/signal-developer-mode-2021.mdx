@@ -1,0 +1,125 @@
+---
+title: 'SIGNAL Developer Mode 2021'
+publishDate: '2021-10-15 09:00:00'
+image: '/blog-headers/external/4bd8b96d3baf70de37d6e7ad3e810b74188c0509cf0cc1fcca0ab304ac1dc7cd.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Augment your SIGNAL 2021 conference experience with the SIGNAL Developer Mode. View your schedule, download, setup, install code samples in minutes, and chat with fellow attendees.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/signal-developer-mode-2021'
+---
+
+## SIGNAL Developer Mode 2021
+
+![Decorative header image](signal-developer-mode-2021/2SiSZpvwvhZytsKf3F5PlGOXeNKvpYZrpIc9u5IGoXr0ipQsI8Hw5Z4gTVHLZV_LKIPL11_vlXrEFs.png)
+
+For last year's [SIGNAL](https://signal.twilio.com) conference, we introduced [SIGNAL Developer Mode](https://www.twilio.com/blog/signal-developer-mode) to bring the conference to your terminal and give you the ability to build right alongside us. This year we are bringing SIGNAL Developer Mode back. Learn what it's all about, what's new this year, and how to get started so that you can get the most out of SIGNAL 2021.
+
+### What is SIGNAL Developer Mode?
+
+SIGNAL Developer Mode is an augmentation to your existing SIGNAL experience that runs inside your Terminal. It's a [Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart) plugin and available to any SIGNAL ticket holder ([get your free ticket](https://s.signal.twilio.com/)).
+
+Its functionality includes some of last year's favorite features, including:
+
+- **Access to schedules** - both for SIGNAL and SIGNAL TV, as well as the ability to add events directly to your agenda.
+- **Packed demos section** - find a collection of Twilio applications that help you get started with a variety of Twilio products.
+- **Collection of helpful resources** - all right at your fingertips, just a key press away.
+- **Automatic demo set up** - once you’ve picked a demo you’re interested in, we'll help you automatically download it, install dependencies, and configure any necessary values.
+
+### What's new?
+
+This year we added two brand new features to SIGNAL Developer Mode to make sure you can get the most out of the event.
+
+#### Checkout
+
+During the [Developer Spotlight Session on October 20, 2021](https://signal.twilio.com/sessions/647473), we'll be covering a variety of tools you can use to get the most out of Twilio. With SIGNAL Developer Mode's new Checkout functionality, you'll be able to code right along with us.
+
+Throughout the session, we'll be displaying 7-character hashes on the screen that you can use to run:
+
+```bash
+twilio signal:checkout hash
+```
+
+This will get you right to where we are. Whether that's opening relevant resources in the browser, setting up a brand new Twilio Functions project locally for you to work on, or cloning the right branch of a demo application onto your system.
+
+In addition to the hashes shared during that session, you'll be able to discover more directly within SIGNAL Developer Mode, as well as in Superclass and on SIGNAL TV.
+
+#### Chat
+
+One of our favorite things about conferences is the "hallway track" – the time between sessions where you can talk with other attendees – but if you are at a virtual conference, this aspect is easily lost. This year, "All Access" ticket holders will be able to use SIGNAL Developer Mode to chat with other attendees who either use Developer Mode or the SIGNAL platform.
+
+Once you enter Developer Mode, open the chat panel, Tab through channels to find a topic of your choice, and start chatting with others.
+
+We certainly got some nostalgic feelings the moment we sent the first message from within Developer Mode, and hope you'll enjoy it as well! We can't wait to see you in chat.
+
+![Screenshot of the chat view in Developer Mode](signal-developer-mode-2021/VoTQBNILCiEAklDl52ac2ZLTwrcHIVD0rwAaA_IfhvzTEnAsc-nD_E8oM88O-hva-0ffnxLPi8A23o.png)
+
+### How do I join Developer Mode?
+
+Start by opening your Terminal of choice. Every system comes with a built-in terminal application and any terminal should work, but [check out our GitHub project for a list of tested and recommended terminals](https://github.com/twilio-labs/plugin-signal2021). You'll run all these commands in your terminal.
+
+```bash
+twilio login
+```
+
+If you haven't yet, install the [Twilio CLI](https://twil.io/cli) onto your system and log into it using and your Twilio account ([sign up for free](https://www.twilio.com/try-twilio)). Once you have it installed, you can install the SIGNAL Developer Mode plugin by running:
+
+```bash
+twilio plugins:install @twilio-labs/plugin-signal2021
+```
+
+The first time you use Developer Mode, you'll be prompted to log into the SIGNAL website from your browser. Once you are logged in, you'll be prompted to close the browser window and go back into your terminal to confirm that you are logged in.
+
+That's it, you successfully entered SIGNAL's Developer Mode!
+
+### How do I use Developer Mode?
+
+Developer Mode takes over your entire terminal and can be navigated using your keyboard. When you start Developer Mode, you'll see a sidebar on the left showing you a variety of hotkeys you can press to change into different sections. You can toggle the sidebar using the `b` key on your keyboard.
+
+Additionally, you can use the arrow keys to move the cursor in the schedule to pick another session and the Tab key to cycle through options, such as the programming language for a given demo. Whenever you want to perform an action like opening a link, `Return / Enter` and `Space` will be your friends.
+
+At any point in the application, you can exit using `Ctrl + C`.
+
+While we tried to make the application as responsive as possible to fit any terminal size, you'll notice that some terminal sizes will work better than others. So you might have to resize your terminal to find the right fit, or hide the sidebar using `b`.
+
+![Screenshot of the schedule view in Developer Mode](signal-developer-mode-2021/UmGRzUi5clbzvJoFwxuivY-PNms_ZF4Sr0rRSo8_Y-UJ46KEeO1EEZHjOd_QJlMwQVTq3KPCjR_GkR.png)
+
+### I'm having trouble with Developer Mode
+
+If you encounter any issues with the SIGNAL Developer Mode during the show, you have a couple of options.
+
+Start by making sure you have the latest version of the Developer Mode. The CLI might inform you about it automatically, but even if it doesn't, you can make sure you have the latest version by running:
+
+```bash
+twilio plugins:remove @twilio-labs/plugin-signal2021
+twilio plugins:install @twilio-labs/plugin-signal2021@latest
+```
+
+You can also check for [known issues in the project's GitHub repository](https://github.com/twilio-labs/plugin-signal2021/issues).
+
+If that doesn't solve your problem, it's time to reach out for help. For us to help you best, we need some information on your environment. So, start by running:
+
+```bash
+twilio signal2021 -d -o = json
+```
+
+This will output some data that you can provide to us as we are helping you. From here, you can request help in two ways:
+
+- Everyone is welcome to [open issues on the project's GitHub repository](https://github.com/twilio-labs/plugin-signal2021/issues/new).
+- Anyone with a paid ticket can use SIGNAL Concierge on the SIGNAL website to get support.
+
+Please don't try to reach out to individuals for help as we'll likely not be able to monitor Twitter DMs or Emails during SIGNAL, but we'll actively monitor both SIGNAL Concierge and the GitHub issues.
+
+### How is SIGNAL Developer Mode built?
+
+The entire project is written in JavaScript, combining React.js and different open-source projects. You can [check out the source code on the Twilio Labs GitHub org](https://github.com/twilio-labs/plugin-signal2021). Alternatively, you can [read our dedicated blog post on how it's built](https://www.twilio.com/blog/building-conference-cli-in-react).
+
+```bash
+echo "Enjoy SIGNAL and we can't wait to see what you build!"
+```
+
+![Screenshot of terminal saying "echo Enjoy SIGNAL and we can't wait to see what you build!"](signal-developer-mode-2021/HD9JwWTLoRPRc-Ye-7O3PYcwlLBNQtp-Qoia9KJZN2q9w4Tv0BisKRixYN6q6M_L0UIOJMagh9nnRG.png)
+
+We hope you are as excited about SIGNAL Developer Mode as we are! This was built based on what we felt was missing when we attended other events, but ultimately we built this for you and [would love to hear your feedback](https://twil.io/signal-dev-mode-feedback)!

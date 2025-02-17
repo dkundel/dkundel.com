@@ -1,0 +1,213 @@
+---
+title: 'Developing and Managing Tools for Twilio AI Assistants'
+publishDate: '2024-07-23 09:00:00'
+image: '/blog-headers/external/3bb02b7a378a04f53b9bba0d3c35cac8978270a0db2dcebb5bdea6295629fa25.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "Learn how to use Tools with Twilio's AI Assistants and call trusted external data sources for better quality responses."
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/developing-managing-tools-twilio-ai-assistants'
+---
+
+With [Twilio AI Assistants](https://www.twilio.com/en-us/blog/introducing-twilio-ai-assistants) you can build customer-aware agents that can learn about your customer and solve customer problems by connecting to existing systems to retrieve real-time data and perform tasks. The key to this is what we call Tools.
+
+Tools are APIs that your Assistant can use to accomplish specific tasks and solve targeted problems. Unlike [Knowledge sources](https://www.twilio.com/docs/alpha/ai-assistants#knowledge), which provide unstructured data for context and information retrieval, Tools are designed to perform specific actions, such as querying a weather service, finding directions, or processing an order.
+
+In this post we'll cover what Tools are, some common use cases for which customers use Tools and how to secure them. Afterwards we'll dive into setting up a basic weather Tool for your AI Assistant to showcase a real example and get you comfortable with the process.
+
+## Requirements
+
+If you want to follow along to create your own Tool for AI Assistants, make sure you have all the prerequisites in place:
+
+- **Twilio Account**: You must have an active Twilio account. If you don't have one, you can sign up at [Twilio](https://www.twilio.com/try-twilio).
+- **Access to Twilio AI Assistants**: Ensure that the [AI Assistants](https://www.twilio.com/docs/alpha/ai-assistants) feature is available in your Twilio Console. If you don't see it, make sure to request access by [joining the waitlist](https://pages.twilio.com/ai-assistants).
+- **Basic Knowledge of Twilio Console**: Familiarity with navigating and using the Twilio Console will help you follow the steps smoothly.
+- **[Optional] Weatherapi.com Account**: If you want to implement the weather checking Tool you'll need a free tier account of [weatherapi.com](http://Weatherapi.com). Make sure to note down your API Key.
+
+If you are still waiting to be taken off the waitlist, you can still read out this blog post so that you are ready to go by the time that you receive access.
+
+## What are Tools?
+
+[Tools in the Twilio AI Assistant framework](https://www.twilio.com/docs/alpha/ai-assistants#tools) are similar to webhooks; they are endpoints that the Assistant can call to carry out tasks. Each Tool is purpose-built for a particular function, allowing the Assistant to choose the most appropriate Tool based on a user's query. This modular approach helps you keep your Assistant's capabilities organized and easy to manage.
+
+If you've used Large Language Models (LLMs) that support function calling, this might be familiar to you, except in this case every function will result in an HTTP request to your endpoint.
+
+## How Tools work
+
+Tools are triggered based on specific user requests. For instance, if a user asks about the weather, the AI Assistant can employ a weather-checking Tool to fetch the latest forecast.
+
+Behind the scenes, the Tool makes an API call to the relevant service, processes the response, and conveys the information back to the user in a conversational manner.
+
+![AI Assistant architecture diagram showing how it incorporates Tools into the flow](developing-managing-tools-twilio-ai-assistants/compressed-original.webp)
+
+## Types of tasks
+
+Generally a Tool can perform any task you can think of, but here are some common categories of tasks that Tools can handle:
+
+- **Dynamic Real-Time Information Retrieval**: Accessing structured dynamic data from various APIs, such as weather updates, stock prices, or news headlines. For more unstructured semi-real-time, check out [AI Assistants' Knowledge functionality](https://www.twilio.com/en-us/blog/knowledge-twilio-ai-assistants).
+
+- **Operations**: Performing actions like booking a service, placing an order, or updating a customer record.
+
+- **Calculations**: Executing complex calculations, unit conversions, or financial estimates using external services.
+
+## Security and permissions
+
+Security is paramount when integrating external APIs as Tools. AI Assistants support several methods to secure your Tools.
+
+- **Authentication**: Out of the box Tools support various authentication methods for Tools including Oauth, Basic Auth, and custom auth headers. You can also create a proxy API endpoint that the Assistant can access which allows you to maintain control over sensitive credentials and interactions with external services.
+- **Input validation**: When you define the input schema for your Tool (more about that later), we will automatically verify that the input the AI generated adheres to that schema.
+- **HTTP headers**: With every HTTP request we send an `X-Identity` and `X-Session-Id` HTTP header to your tool endpoint. These cannot be manipulated by the AI and can therefore be used to implement access controls to limit on whose behalf the AI can perform actions. For example, rather than letting the AI pass the phone number to a `send-sms-confirmation` tool as an input, you should look up the phone number from your database using the `X-Identity` value.
+
+## Benefits of using Tools
+
+- **Enhanced Functionality**: Expand the capabilities of your AI Assistant by integrating it with diverse services.
+
+- **Flexibility**: Define custom APIs tailored to the specific needs of your business and customers.
+
+- **Scalability**: Easily add or modify Tools as your Assistant evolves, without disrupting existing workflows.
+
+- **Security**: Maintain strong security practices through controlled authentication mechanisms.
+
+With this foundational understanding of what Tools are and how they can be leveraged, you are now prepared to dive into the specifics of Tool definition and implementation. The following sections will guide you through the attributes required to define a Tool, the steps to implement a common Tool, and best practices to ensure your Assistant operates smoothly and securely.
+
+## Tool definition attributes
+
+Creating a Tool for your Twilio AI Assistant involves defining various attributes that dictate how the Tool functions and interacts with external APIs. Understanding these attributes will help you configure your Tools effectively and ensure they integrate seamlessly with your Assistant's workflow.
+
+#### Key attributes of a Tool
+
+- **Name**
+
+  - Description: A unique name for your Tool, used to identify it within the Twilio Console.
+  - Example: `WeatherCheck`
+
+- **Description**
+
+  - Description: A brief explanation of what the Tool does, its purpose, and any pertinent details. This helps in keeping track of the Tool's functionality and influences the decision making of the AI.
+  - Example: Fetches the current weather information based on the provided location.
+
+- **Input Schema**
+  - Description: These are the parameters that the Tool requires to function. These parameters are usually derived from user input and are passed to the Tool's API endpoint. This uses [TypeScript type definitions](https://www.typescriptlang.org/docs/handbook/2/objects.html) to control what gets passed in. If the HTTP method is `POST` it will send the data as JSON payload, otherwise it will convert it into query parameters.
+  - Example:
+
+```typescript
+export type Data = {
+  location: string; // The location for which the weather data is fetched
+};
+```
+
+- **HTTP Method**
+
+  - Description: Specifies the HTTP method to be used when making the API call. Available methods include `GET` and `POST`.
+  - Example: `GET`
+
+- **Webhook URL**
+
+  - Description: The endpoint URL where the request should be sent. This URL will handle the business logic and interact with the external API.
+  - Example: `https://api.weather.com/v3/wx/forecast/current`
+
+- **Verified Endpoint**
+
+  - Description: Indicates whether the customer should be verified with a six digit passcode through [Twilio Verify](https://www.twilio.com/docs/verify) before the Assistant can use the tool.
+  - Example: `false`
+
+- **Security and Authentication**
+  - Description: Defines the authentication method to be used.
+  - Example: Basic Authentication
+    - Username: your user name
+    - Password: your password
+
+## Implementing your first Tool
+
+Let's dive into the practical aspect of integrating a Tool into your Twilio AI Assistant.
+
+In this guide, we'll implement a commonly used Tool: a `weather-check` Tool. This Tool will fetch the current weather information based on the user's location. Follow the steps below to create and configure this Tool for your Assistant.
+
+We'll be using the [Weatherapi.com API](http://Weatherapi.com) to pull the actual weather information. So if you want to follow along, make sure to create a free tier account and note down your API key.
+
+#### Step 1: Create a proxy endpoint (optional)
+
+For our use case we'll be creating a little proxy in front of the Tool. This makes it easier for us to swap out the API down the line without having to reconfigure our Tool on the Assistant. We could use any publicly hosted HTTP server for this but in our case we'll be using [Twilio Functions](https://www.twilio.com/docs/serverless/functions-assets/functions). Twilio Functions lets you host Node.js code directly within Twilio.
+
+To create your own Twilio Function:
+
+- Head over into the [Functions part of the Twilio Console and create a Service](https://www.twilio.com/console/functions/overview/services). You can give the service any name like `assistant-tools`.
+- Click Add + at the top left and add a new Function. Give it the path of `/weather-check`. Click the lock next to the path and mark it as Public.
+- Copy and paste the code below and press Save
+- Go into "Environment Variables" and add a new entry with "Key" as `WEATHER_API_KEY` and the "Value" as your Weatherapi.com API Key
+- Click Deploy All at the bottom left
+- Once deployed click the three dots next to `/weather-check` and Copy URL. You will need this in a minute when we define our Tool.
+
+```javascript
+exports.handler = async function(context, event, callback) {
+  const url = new URL('https://api.weatherapi.com/v1/current.json');
+  url.searchParams.append('q', event.location);
+  url.searchParams.append('key', context.WEATHER_API_KEY);
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    return callback(new Error('failed to fetch weather'));
+  }
+  const data = await resp.json();
+  return callback(null, data);
+};
+```
+
+The URL you copied will be your Webhook URL for your tool and should look something like this: [https://assistant-tools-1111.twil.io/weather-check](https://assistant-tools-1111.twil.io/weather-check).
+
+If you choose to run your own server instead, you will need a publicly accessible URL for Twilio to call your Webhook URL. For more information, [see this blog post.](https://www.twilio.com/en-us/blog/expose-localhost-to-internet-with-tunnel)
+
+#### Step 2: Configure the Tool in your Twilio Console
+
+- Create an [AI Assistant](https://console.twilio.com/us1/develop/ai-assistants/assistants) in the Console in case you don't have one yet.
+- Navigate to the Tools section in your AI Assistant configuration panel.
+- Click on Add Tool.
+- Fill out the form with the attributes defined in Step 1.
+  - Name: `weather-check`
+  - Description: Fetches the current weather information based on the provided location.
+  - Input Schema:
+
+```typescript
+export type Data = {
+  location: string; // The location for which the weather is fetched
+};
+```
+
+- HTTP Method: `GET`
+- Webhook URL: Set the URL of your proxy endpoint. Should look like this: [https://assistant-tools-1111.twil.io/weather-check](https://assistant-tools-1111.twil.io/weather-check)
+- Verified Endpoint: False
+- Security and Authentication: None
+- Save the configuration.
+- Enable the toggle next to your new Tool.
+
+#### Step 3: Test the Tool with the Simulator
+
+We can test the newly implemented Tool using the Simulator within the Twilio Console to make sure it operates as expected.
+
+- Open the Simulator from the top right of the Assistant Configuration screen.
+- Define an identity like `email:demo@example.com` and create a new Simulator session.
+- Enter a test query such as "What's the weather like in London?"
+- Verify that the AI Assistant calls the WeatherCheck Tool and returns the appropriate weather information.
+
+![AI Assistant using a Tool to show the weather in London](developing-managing-tools-twilio-ai-assistants/compressed-original.webp)
+
+#### Step 4: Debugging
+
+If your Tools don't work as expected, here are a few tips to debug the issue:
+
+- **Check Logs**: Use logging in your proxy server to monitor incoming requests and responses.
+
+- **Verify API Keys**: Ensure your API keys and OAuth credentials are correct.
+
+- **Use Postman**: Test the endpoint separately using Postman to validate the API responses.
+
+- **Network Accessibility**: Ensure that the endpoint URL is accessible from the Twilio platform.
+
+## Conclusion
+
+Tools can be incredibly powerful to connect your AI Assistant to real-time information and enable it to solve customer problems on its own. In this blog post you learned how to connect your AI Assistant to a weather API, but that's just the start. Check out our documentation to learn how you can use Tools to [transfer a conversation to a Flex agent](https://www.twilio.com/docs/alpha/ai-assistants/code-samples/transition-flex), [hand it off to a Studio flow](https://www.twilio.com/docs/alpha/ai-assistants/code-samples/transition-studio), or even [trigger actions on a website](https://www.twilio.com/docs/alpha/ai-assistants/code-samples/react#use-ui-tools-to-have-your-assistant-interact-with-the-ui) that has an AI Assistant web chat. If you don't have access to AI Assistants yet, don't forget to [sign up for our waitlist](https://pages.twilio.com/ai-assistants).
+
+_Christopher Brox is a solutions engineer on Twilio’s Emerging Technology and Innovation team. He believes automation can free humanity from mundane work, allowing people to live more fulfilling and creative lives. His mission in life is to automate as much work as possible and his focus at Twilio is the automation of work via conversational AI._
+
+_Dominik leads Product for the Emerging Tech & Innovation organization at Twilio. His team builds next gen prototypes and iterates quickly to help craft the long term product vision and explore the impact of autonomous agents & AGI on customer engagement. Deeply passionate about the Developer Experience, he’s a JavaScript enthusiast who’s integrated it into everything from CLIs to coffee machines. Catch his tweets @dkundel and his side ventures in cocktails, food and photography._

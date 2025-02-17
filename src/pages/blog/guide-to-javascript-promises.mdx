@@ -1,0 +1,381 @@
+---
+title: 'A quick guide to JavaScript Promises'
+publishDate: '2016-10-03 09:00:00'
+image: '/blog-headers/external/68f6058f84a5530bc617f82595f7415496abb4e7ec0e69b43626d105aecd6e2b.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how to work with JavaScript Promises, how to chain them, execute them in parallel and in series and free yourself from "callback hell".'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/guide-to-javascript-promises.html'
+---
+
+When you are writing JavaScript, callbacks are one of the most confusing concepts. Promises are the new approach to improve working with async code.
+
+One of the biggest problems of callbacks is the chaining of different asynchronous activities. You end up calling anonymous function after function to pass around values. The result is an unmaintainable “callback hell”. Promises try to solve this problem but can be a bit confusing in the beginning.
+
+![Callback Hell](guide-to-javascript-promises/31orCejQRkSvmchYeZC2GKswNtst-d_xEoSPoP3X-bAm9RRe8hxz59vVZrrRm78VvJgVbuUo5R.png)
+
+Let’s define what Promises are, why they are incredibly useful and how to do things like executing calls in parallel or in series. For this we will look at different examples of doing HTTP requests using two different Node.js libraries.
+
+### Setup
+
+Before we get started you need the following things to try our code examples:
+
+```bash
+node -v
+```
+
+Node.js version 6.0 or higher. You can check your version by running the above command in your command line. You can upgrade by downloading the latest binary from their [website](https://nodejs.org/en/download/) or by using a tool like [nvm](https://github.com/creationix/nvm).
+
+Once you have this, you need to create a new folder. I’ll create a `promises` folder in my home directory. Install the `node-fetch` and `request` libraries by running the following command in that folder:
+
+```bash
+npm install node-fetch request --save
+```
+
+Create a new file called `promises.js` and place the following lines in there to load the library:
+
+```javascript
+'use strict';
+const fetch = require('node-fetch');
+const request = require('request');
+```
+
+We will be working out of the same `promise.js` file throughout the whole post.
+
+### Quick Promise Overview
+
+To understand the benefits of Promises let’s first look at how to do an asynchronous call without promises. For this we will do an HTTP GET request using the `request` library.
+
+Add the following lines to `promises.js`:
+
+```javascript
+request.get('http://httpbin.org/get', (error, response, body) => {
+  if (error) {
+    console.error('Oh shoot. Something went wrong:');
+    console.error(error.message);
+    return;
+  }
+  console.log('Request done. Response status code: %d', response.statusCode);
+});
+```
+
+Now run this code by executing the following command:
+
+```bash
+node promises.js
+```
+
+As you can see, we pass in the callback function as a second argument to `request.get` call. The library will automatically execute this function when the response for the HTTP request comes in. It will pass three arguments. The first argument is the potential error or `null` if it was successful. The second argument is the HTTP response and the third argument is the response body.
+
+If we use `fetch` instead of the `request.get` we can leverage Promises as fetch will return a `Promise` instead of accepting a callback as a second argument. A `Promise` is an object that has two important methods: `then()` and `catch()`. `then()` can receive 1 or 2 arguments and `catch()` can be used to handle errors.
+
+For `then()`, the first function argument is called if the result of the call was successful. The second function will be called if there was an error resolving the Promise. We’ll look into the difference between that error handler and `catch()` later.
+
+Replace the previous code with the following to start using Promises:
+
+```javascript
+fetch('http://httpbin.org/get')
+  .then(response => {
+    console.log(
+      'Request using Promises done. Response status code: %d',
+      response.status
+    );
+  })
+  .catch(error => {
+    console.error('Oh shoot. Something went wrong with the promise code:');
+    console.error(error.message);
+  });
+```
+
+Re-run the code by executing again `node promises.js`.
+
+So far there is no big difference from the callback code aside from it being a bit cleaner. The real magic comes when we want to do some data manipulation or make multiple calls. For this the general rule is that if the handler function that we pass to `then` or `catch` returns a value or another Promise, the Promise-chain will continue.
+
+As an example add a function that extracts the status code and returns it:
+
+```javascript
+function extractStatusCode(response) {
+  return response.status;
+}
+
+fetch('http://httpbin.org/get')
+  .then(extractStatusCode)
+  .then(statusCode => {
+    console.log(
+      'Request using Promises, part II. Response status code: %s',
+      statusCode
+    );
+  })
+  .catch(error => {
+    console.error('Oh shoot. Something went wrong with the promise code:');
+    console.error(error.message);
+  });
+```
+
+Run the code again. The output in the console should be the same but our code is more structured.
+
+This code will first perform the HTTP request, then call the `extractStatusCode` function and once that function returned it will execute our anonymous function that will log the response status code.
+
+### Catching Errors
+
+![Catching Errors](guide-to-javascript-promises/YS8PLVpcyhjaXzBZwzJ93O93W5blxqXQg-qqTIFEBXG0EG-OLRlgERwItSphhZ9imcpJQ35f0I.png)
+
+Now that we are using Promises we might hit an issue. All of our code will fail silently if we don’t catch errors properly.
+
+Imagine using Promises like wrapping your whole code into a `try {}` block. Your code will just silently fail unless you catch them explicitly. Catching errors is hugely important and not just ‘common courtesy’.
+
+In order to properly catch errors we have two options. The first way is to pass a second function into our `then()` call.
+
+Make the following changes to your code to test this:
+
+```javascript
+function extractStatusCode(response) {
+  return response.status;
+}
+
+fetch('invalid URL')
+  .then(extractStatusCode, errorInFetch => {
+    console.error('An error occurred in the fetch call.');
+    console.error(errorInFetch.message);
+    // return null as response code since no request has been performed
+    return null;
+  })
+  .then(statusCode => {
+    console.log('Request using Promises. Response status code: %s', statusCode);
+  })
+  .catch(error => {
+    console.error('This will never be executed');
+  });
+```
+
+When you run this code you’ll see that it will hit the error handler we added and print the respective messages to the screen:
+
+![Error Handling](guide-to-javascript-promises/MDMEk6tcP9UztGgMMeYhTJVy9vSDPNxF-TE5gkr5HHGeoFimdsz1v985Uu0kAVwqQvzdRE25IX.png)
+
+However it is not executing the `catch` handler because we are returning a value of `null` in the handler. From that point on the Promise chain is considered to be on the happy path again since the error has been handled.
+
+We can make sure that it continues treating this as an error by `throw`ing the error or returning by returning a new Promise using `Promise.reject(error)`:
+
+```javascript
+function extractStatusCode(response) {
+  return response.status;
+}
+
+fetch('invalid URL')
+  .then(extractStatusCode, errorInFetch => {
+    console.error('An error occurred in the fetch call.');
+    console.error(errorInFetch.message);
+    // forward the error
+    return Promise.reject(errorInFetch);
+  })
+  .then(statusCode => {
+    console.log('Request using Promises. Response status code: %s', statusCode);
+  })
+  .catch(error => {
+    console.error('This will now be executed as another exception handler.');
+  });
+```
+
+Now that we know how to handle an error with `then()` what’s the difference between this and `catch()`?
+
+To understand this let’s fix our `fetch` snippet again to use a valid url and instead break the `extractStatusCode` function by overriding `response` with `undefined` before accessing the `status` property:
+
+```javascript
+function extractStatusCode(response) {
+  response = undefined;
+  return response.status;
+}
+
+fetch('http://httpbin.org/get')
+  .then(extractStatusCode, errorInFetch => {
+    console.error('This will not be executed.');
+    console.error(errorInFetch.message);
+    // forward the error
+    return Promise.reject(errorInFetch);
+  })
+  .then(statusCode => {
+    console.log('Request using Promises. Response status code: %s', statusCode);
+  })
+  .catch(error => {
+    console.error('There was an error somewhere in the chain.');
+    console.error(error.message);
+  });
+```
+
+![Error Chain](guide-to-javascript-promises/6i33oKjzuVOypuMfZrOrLoDwwpQZNnqg1Bj6A96ggBi1f1jykx51RNVvHUoZity2m8ssF7dTdA.png)
+
+The error handler in the `then()` part isn’t executed because this handler is only for the previous Promise and not the `catch()` handler. However our `catch()` handler will be executed since it catches any errors that happen in the chain.
+
+### Executing in Parallel
+
+![Executing in Parallel](guide-to-javascript-promises/gkYYQjOd3_hIFskG7pg6MBnP8uvvZFAL2j7xUHL-nPB7OvM835olCSo0594rCSnmvMl63Zyms_.png)
+
+This is where the magic of Promises comes in. Consider the case in which we want to send multiple HTTP requests or do multiple asynchronous calls and want to know when they’re done.
+
+The endpoints we want to request are held in an array. Using callbacks this can be quite a mess. To accomplish it we have to use counters in the callbacks to check if we are done and other similar hacks.
+
+With Promises we can simply map over the array of messages, return the Promise in the map function and pass the resulting array into the built-in function `Promise.all()`. This will return a new Promise that resolves as soon as all calls succeed, or rejects once one of them fails.
+
+```javascript
+const queryParameters = ['ahoy', 'hello', 'hallo'];
+
+const fetchPromises = queryParameters.map(queryParam => {
+  return fetch(`http://httpbin.org/get?${queryParam}`)
+    .then(response => {
+      // parse response body as JSON
+      return response.json();
+    })
+    .then(response => {
+      // extract the URL property from the response object
+      let url = response.url;
+      console.log('Response from: %s', url);
+      return url;
+    });
+});
+
+Promise.all(fetchPromises)
+  .then(allUrls => {
+    console.log('The return values of all requests are passed as an array:');
+    console.log(allUrls);
+  })
+  .catch(error => {
+    console.error('A call failed:');
+    console.error(error.message);
+  });
+```
+
+If you run this code you should multiple requests being made. However there is no guarantee in which order the calls are run and finished as they are executed in parallel.
+
+### Executing in Series
+
+![Executing in Series](guide-to-javascript-promises/5vTdWZEcbtgpgO-Wg4a7P_BPjeCG0DWjeK4uMsPlUvYgoAx0fASq-NJHwN9n_hjtkzly4zc2D0.png)
+
+While executing in parallel is cool and performant we sometimes have to make several calls in series due to restrictions or dependencies. We can also use Promises for this.
+
+Chaining Promises when you know all necessary calls is super easy to do. However, it’s more complicated if we dynamically generate the asynchronous functions we need to execute.
+
+There is a way we can get this done:
+
+```javascript
+const queryParameters = ['ahoy', 'hello', 'hallo'];
+
+let mostRecentPromise = Promise.resolve([]); // start with an immediately resolving promise and an empty list
+queryParameters.forEach(queryParam => {
+  // chain the promise to the previous one
+  mostRecentPromise = mostRecentPromise.then(requestedUrlsSoFar => {
+    return fetch(`http://httpbin.org/get?${queryParam}`)
+      .then(response => {
+        // parse response body as JSON
+        return response.json();
+      })
+      .then(response => {
+        // extract the URL property from the response object
+        let url = response.url;
+        console.log('Response from: %s', url);
+        requestedUrlsSoFar.push(url);
+        return requestedUrlsSoFar;
+      });
+  });
+});
+
+mostRecentPromise
+  .then(allUrls => {
+    console.log('The return values of all requests are passed as an array:');
+    console.log(allUrls);
+  })
+  .catch(error => {
+    console.error('A call failed:');
+    console.error(error.message);
+  });
+```
+
+The concept here is to chain the calls and execute the next one once the previous one resolves by wrapping it into a `then()` handler. This is the same approach we would do manually if we knew the amount of calls.
+
+Right now we are using a `forEach` loop for this. This works but it isn’t really the most readable solution. To improve this we can use the `reduce` method of our array.
+
+Modify the code accordingly:
+
+```javascript
+const queryParameters = ['ahoy', 'hello', 'hallo'];
+
+let mostRecentPromise = queryParameters.reduce(
+  (previousPromise, queryParam) => {
+    return previousPromise.then(requestedUrlsSoFar => {
+      return fetch(`http://httpbin.org/get?${queryParam}`)
+        .then(response => {
+          // parse response body as JSON
+          return response.json();
+        })
+        .then(response => {
+          // extract the URL property from the response object
+          let url = response.url;
+          console.log('Response from: %s', url);
+          requestedUrlsSoFar.push(url);
+          return requestedUrlsSoFar;
+        });
+    });
+  },
+  Promise.resolve([])
+);
+
+mostRecentPromise
+  .then(allUrls => {
+    console.log('The return values of all requests are passed as an array:');
+    console.log(allUrls);
+  })
+  .catch(error => {
+    console.error('A call failed:');
+    console.error(error.message);
+  });
+```
+
+The overall approach here is the same as with the `forEach` loop. We specify a starting value of `Promise.resolve([])` and call the `reduce` method on the `messages` array with a function that receives two arguments. One is the previous return value and the other is the current value of the array that we are accessing. This way we can `reduce` the array to a single value. In our case this will be the most recent Promise that we can then use to know when everything is done.
+
+### Turning Callback Code Into a Promise
+
+![Turning Callback Code Into a Promise](guide-to-javascript-promises/Q0xjaIUmUq2RHKEB4HRutU3d4duoEWWzJWk9r04eZVHsXPpTahkErszFU9CxUd3yPC16EM_gzR.png)
+
+Now that we know how to use Promises we have a problem to solve. What do we do with asynchronous code that doesn’t support Promises? For this we can wrap the function into a new function and use the `new Promise()` constructor. This constructor receives a function with two arguments: `resolve` and `reject`. These arguments are functions we call when we want to resolve or reject a promise.
+
+Here’s an example function that reads a file from disk and returns the content in a Promise:
+
+```javascript
+const fs = require('fs');
+
+function readFileWithPromise(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, content) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(content);
+    });
+  });
+}
+
+readFileWithPromise('/etc/hosts')
+  .then(content => {
+    console.log('File content:');
+    console.log(content);
+  })
+  .catch(err => {
+    console.error('An error occurred reading this file.');
+    console.error(err.message);
+  });
+```
+
+When we call `new Promise()` with a function as an argument, this function will immediately get executed asynchronously. We then execute `fs.readFile` with the necessary arguments. Once the callback of the `readFile` call is executed we check whether there is an error or not. If there is an error we will `reject` the Promise with the respective error. If there is no error we `resolve` the Promise.
+
+### Conclusion
+
+Now you hopefully have a better idea of Promises and are ready to ditch the times of the old callback hell for some cleaner and more maintainable code. And if you are hooked you should check out what the future of JavaScript is going to bring with [async/await](https://www.twilio.com/blog/asyncawait-the-hero-javascript-deserved.html) to further improve asynchronous programming in JavaScript.
+
+Also make sure to let me know what your experience with Promises is and why you love it (or hate it). Maybe you even have a crazy hack using Promises you want to show off? Just drop me a line:
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Twitch (streaming live code): [twilio](https://twitch.tv/twilio)

@@ -1,0 +1,35 @@
+---
+title: 'Announcing General Availability of Twilio Functions and Assets'
+publishDate: '2022-10-17 09:00:00'
+image: '/blog-headers/external/97d6635fced8cb375328b808abc52b127da1feed298974731962df8ac51b507d.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: ''
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/functions-assets-general-availability'
+---
+
+We are excited to announce that starting today, [Twilio Functions and Assets](https://www.twilio.com/serverless/functions/) are now in General Availability (GA)! Functions & Assets are part of our offering of [Serverless on Twilio](https://www.twilio.com/serverless) solutions. With Functions, you can host your Node.js application logic with Twilio and let us handle the hosting and scaling. With Assets, you can store static files, such as audio files for your phone calls or Flex Plugins directly in Twilio's infrastructure.
+
+### What does General Availability of Functions and Assets mean for me?
+
+Back in 2020, we announced [Function Invocations as GA](https://www.twilio.com/blog/announcing-general-availability-functions-invocations). This guaranteed that invocations of Functions – after they were deployed – were backed by an increased reliability and service level quality of a 99.95% [service level agreement](https://www.twilio.com/legal/service-level-agreement). Today we are extending this Service Level Agreement (SLA) to the authoring & deployment of Functions and Assets, as well as to the [Serverless API](https://www.twilio.com/docs/serverless/api). It also means that in the rare event you encounter a problem, you can raise a support ticket backed by the service agreement.
+
+> **Important:** Functions (Classic) and Assets (Classic) are not covered by this SLA. If you are still using Classic, you are encouraged to start the transition over to Functions and Assets to take advantage of the SLA, a more powerful editor, and access to the Serverless API. Additionally, the [Serverless Toolkit](https://www.twilio.com/docs/labs/serverless-toolkit) will remain a [Twilio Labs](https://www.twilio.com/labs) project. The same Serverless API backs it, but if you encounter any issues, we cannot offer any SLA yet to help resolve them. Instead, please [raise an issue on the project's GitHub](https://github.com/twilio-labs/serverless-toolkit/issues).
+
+### What else is new?
+
+Aside from investing in making Functions and Assets even more resilient, there are some recent changes you might not be aware of yet.
+
+- **Brand new docs.** We've overhauled our documentation, added a series of new examples, split the [Serverless API documentation](https://www.twilio.com/docs/serverless/api) from the [Functions and Assets authoring documentation](https://www.twilio.com/docs/serverless/functions-assets), and updated the navigation to make it easier to find what you need.
+- **New Runtime Handler versions.** To make introducing new features easier without risking your deployments, we introduced the concept of [Runtime Handlers](https://www.twilio.com/docs/runtime/handler). We are continuously releasing new versions with everything from bug and security fixes to new features such as access to [request headers and cookies](https://www.twilio.com/docs/serverless/functions-assets/functions/headers-and-cookies).
+- **One central home for Functions and Assets.** In the past, Functions and Assets were separate entries in your Twilio Console navigation bar. Now you can find them in one central place.
+- **Assets Plugin (Twilio Labs).** While the Serverless Toolkit offers you a great way to integrate Functions and Assets into your DevOps flow, sometimes you want to quickly upload a local file to your Assets for hosting. With the [Assets Plugin](https://www.twilio.com/docs/labs/serverless-toolkit/assets-plugin) from Twilio Labs, that's just one command away.
+
+### Give it a try!
+
+If you've never used Functions and Assets – or it's been a while – now is the right time to give it a shot. We know starting with a blank editor can be hard, so why don't you give one of our Quick Deploy applications a shot? Head over to [CodeExchange and pick any Quick Deploy enabled application](https://www.twilio.com/code-exchange?q=&f=serverless), such as the [SMS Forwarding application](https://www.twilio.com/code-exchange/simple-sms-forwarding), fill out the form, and hit Deploy to create your brand new project hosted by Twilio Functions and Assets.
+
+We can't wait to see what you build!

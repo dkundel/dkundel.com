@@ -1,0 +1,66 @@
+---
+title: 'US A2P10DLC for Developers'
+publishDate: '2021-03-15 09:00:00'
+image: '/blog-headers/external/db3d6c2eafcea166dec75a48e8e6c48a67889ba137614e319a5790f3754d316d.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Carriers in the US are currently introducing changes in how businesses and developers can send SMS to consumers. In this blog post we cover what A2P10DLC means and how it affects you as a developer.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/us-a2p10dlc-for-developers'
+---
+
+## US A2P10DLC for Developers
+
+![decorative header image](us-a2p10dlc-for-developers/ZxvxJ85TzQLu5s6sMUp9917fhoKzhQoRMBSyabojrztspIkCoPQt7laaOmmH59RIivAx7nAA8zu7w-.png)
+
+**What is A2P10DLC?**
+
+A2P10DLC stands for Application to Person (A2P) Ten Digit Long Code (10 DLC). Let's break that down a bit more:
+
+Ten Digit Long Codes refer to regular, local phone numbers in the US that follow a format similar to this: `+1 415 111 2222`. Two other common phone number types are Toll-Free numbers and [Short Codes](https://www.twilio.com/docs/glossary/what-is-a-short-code) (usually five to six digit phone numbers with no area code prefix). The changes we'll be discussing specifically apply to these 10DLC numbers. In the Twilio Console and the API, these phone numbers are typically referred to as **Local**.
+
+Application-to-Person refers to the way or route in which the message is being sent. Another alternative is Person-to-Person (P2P). Carriers handle these types of messages differently since the two routes were built for different purposes. P2P is meant for low-volume of consumers texting each other, like you texting your friends. Until now, if you sent SMS through a provider like Twilio using a 10DLC (as opposed to a shortcode or toll-free phone number), these were sent over the P2P route. But since the P2P route wasn't really designed for application-to-person messaging, you had a limited throughput of messages you could send using a 10DLC, and you ran into higher risks of being filtered.
+
+The A2P10DLC changes are introducing a way to send messages from an application to a person using a 10DLC through the appropriate A2P route, as opposed to the P2P route. This allows carriers to handle each type of message more appropriately and subsequently, increase the throughput for trusted senders.
+
+Still confused? Don't worry; I was too. Here's an analogy from my colleague Chris Piwinski that might be helpful.
+
+> **In our current US SMS environment, there are bikes (P2P messages) trying to commute on the same road as cars and trucks (A2P) messaging. A2P10DLC is the carriers’ way of putting up a toll-booth and forcing the trucks and cars to get out of the bike lane, which should be reserved for P2P, into their own speed-appropriate thoroughfare.**
+
+Carrying Chris’ traffic metaphor a little further, a benefit of the new A2P10DLC changes is that A2P traffic (cars and trucks) will be able to travel faster with increased throughput, without bumping into slower P2P bikes. Carriers are moving all business messaging via 10-digit long codes over to A2P routes over the coming months. This brings a collection of changes with it.
+
+**How does A2P10DLC impact me as a developer?**
+
+Twilio remains a developer-first company, and we know that all of you use Twilio for a wide variety of use cases. We want to make sure that the impact for every developer is as minimal as possible. But that also means that depending on what you are using Twilio for, the impact might differ.
+
+First of all: If you are not using Twilio's Programmable Messaging for SMS in the US, you are not impacted by any of this, and while you are welcome to continue reading, you are all set! This includes our Authy and Verify APIs. Additionally if you are using a toll-free number or a [short code](https://www.twilio.com/docs/glossary/what-is-a-short-code) there are no changes required.
+
+So what if you send SMS in the US using Twilio? There are a few changes and we'll only cover them broadly in this post. But we have [set up an article on our Support page that we are continuously keeping up to date with changes](https://support.twilio.com/hc/en-us/articles/1260800720410-What-is-A2P-10DLC-). Some of these changes include:
+
+- increased (use-case dependent) carrier-imposed fees
+- brand and use case (campaign) registration requirements
+- an introduction of a [Trust Score](https://support.twilio.com/hc/en-us/articles/1260800720410-What-is-A2P-10DLC-#h_01EX7FW1M9K0XDFDBAXXVRSMDZ) concept
+- changes to the throughput of your 10-digit long code numbers
+- a ban of certain use cases related to things such as cannabis
+
+If you are a developer building an application for a business, you'll have to register your business and use cases through Twilio. Check out the [support page](https://support.twilio.com/hc/en-us/articles/1260800720410-What-is-A2P-10DLC-) for more information on deadlines and the process or fill out this form to request more information. If you are sending more than 3000 messages per day, make sure to reach out to our Sales team.
+
+If you are an independent developer and can't register a brand because you do not have a DUNS or Tax ID, [please check out this post](https://www.twilio.com/blog/a2p10dlc-developers-small-businesses/). We care about everyone in our developer community and want to make sure you can continue to be creative with the Twilio API. We'll notify you if there are any relevant updates. In the meantime, feel free to keep an eye on our regularly updated support page.
+
+We understand that this change might be confusing or frustrating and we are here to help you all through it. With registration, SMS will continue to thrive as a trusted, high-engagement ecosystem. We can't wait to see what you build!
+
+**Related Posts**
+
+- [Twilio’s Bug Bounty Program: Celebrating 10 years of Bug Bounty Security](https://www.twilio.com/en-us/blog/ten-years-bug-bounty-updates)
+- [Introducing Voice for AI Assistants, now in Developer Preview](https://www.twilio.com/en-us/blog/introducing-voice-ai-assistants-dev)
+- [Announcing the Winners of the Twilio.org Climate Tech Prize](https://www.twilio.com/en-us/blog/twilio-org-2024-climate-tech-prize-winners)
+
+**Related Resources**
+
+- [Twilio Docs](https://www.twilio.com/docs)
+- [Resource Center](https://www.twilio.com/en-us/resource-center)
+- [Ahoy](https://www.twilio.com/en-us/ahoy)
+
+We can't wait to see what you build.

@@ -1,0 +1,135 @@
+---
+title: 'Move your Twilio Functions Project to Node 12'
+publishDate: '2021-02-23 09:00:00'
+image: '/blog-headers/external/c8935882e5cdc134c1508d7ed8639be106effa8718e81b9f249ee66be27ea92c.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how you can move your existing Twilio Functions code from Node.js version 10 to Node.js version 12 using the Twilio CLI and the Serverless Toolkit.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/move-twilio-functions-node-12'
+---
+
+In April 2021 Node.js v10 is officially going into [end of life status](https://nodejs.org/en/about/releases/). This means that Node.js won't release any more updates or security patches for this version of Node.js. If you are currently using Twilio Functions your project is likely still running using Node.js v10 and you'll have to update it. In this blog post we'll go through the steps that you can take to test and update your [Twilio Functions project to Node.js 12](https://www.twilio.com/changelog/twilio-functions-is-adding-support-for-node-v12).
+
+> **Please Note:** These steps are specific to projects that were created using the Twilio CLI. For general steps on how to update and what the changes entail, [please refer to our docs](https://www.twilio.com/docs/runtime/twilio-functions-node-v12-upgrade). Any new projects will already be using Node.js v12 and no action is required.
+
+### Prerequisites
+
+- The latest Twilio CLI version - [get it here](https://twil.io/cli)
+- Version 1.9.0 or newer of the Serverless Plugin for Twilio CLI. - `@twilio-labs/plugin-serverless`
+  ```bash
+  twilio plugins:remove && twilio plugins:install @twilio-labs/plugin-serverless@latest
+  ```
+- An existing Twilio Functions project created through the Twilio CLI. If you haven't created a project yet, you'll be automatically using Node.js v12.
+
+### Considerations
+
+It's important to note that this blog post will cover some general steps but they'll have to be adjusted to your own respective project, especially when it comes to environments. We'll be using Twilio Functions' Environments functionality to create a version of our project in Node.js v12 to test it before moving it into our regular environment.
+
+In our example we'll use a "stage" and a production environment. Our stage environment normally gets deployed through:
+
+```bash
+twilio serverless:deploy --environment=stage
+```
+
+For our production environment we either deploy directly to it using:
+
+```bash
+twilio serverless:deploy --production
+```
+
+or via:
+
+```bash
+twilio serverless:promote --from=stage --production
+```
+
+The respective URL formats look similar to this:
+
+- `https://example-1010-stage.twil.io/my-function`
+- `https://example-1010.twil.io/my-function`
+
+Your environment names and URLs might differ so you'll have to adjust them accordingly.
+
+### Overview
+
+You can specify which Node.js version your Twilio Functions should use by specifying the runtime when you deploy by using the dedicated `--runtime` flag. We'll use this flag to deploy our project to the `node12` runtime in order to enable Node.js v12. Afterwards we'll verify that the behavior is correct.
+
+If we verify successfully that our code works with `node12` we'll promote our deployment to our main production environment and if something is wrong, we'll rollback the deployment to `node10`.
+
+> **Important:** During your migration process if other developers are working on your project as well, or if you are planning to do additional deployments, you should explicitly pass `--runtime node10` or `--runtime node12` during those deployments to avoid surprises. Alternatively avoid any deployments until you are done with the verification.
+
+### Deploying your first Node.js v12 build
+
+Go into your existing project directory and verify that you have the [right version](https://www.twilio.com/docs/labs/serverless-toolkit/getting-started?code-sample=code-update-the-serverless-toolkit&code-language=twilio-cli&code-sdk-version=default) of the Serverless Toolkit by running:
+
+```bash
+twilio plugins
+```
+
+The output should include:
+
+```text
+@twilio-labs/plugin-serverless 1.9.0
+```
+
+We also recommend that you test your code locally first using Node.js v12 to make sure everything works. A working local environment is not a guarantee that it will work, once deployed to Twilio Functions but it will help catch issues early. To test it locally, change the Node.js version on your development system by [downloading the latest Node.js v12](https://nodejs.org/en/download/) or switch using a tool such as [nvm](https://github.com/nvm-sh/nvm). Once you have switched your local Node.js version, you can start the local development environment using:
+
+```bash
+twilio serverless:start
+```
+
+You might see a warning about the fact that you are using a different Node.js version. You can ignore this message since you are intentionally using a different version.
+
+[To learn more about local development and debugging check out the Twilio docs](https://www.twilio.com/docs/labs/serverless-toolkit).
+
+If you don't hit any issues, you are ready to deploy your project using Node.js v12. In our case we'll deploy it to our stage environment but you can deploy it to any environment by changing the environment name value. To deploy run the following command in your project:
+
+```bash
+twilio serverless:deploy --environment=stage --runtime=node12
+```
+
+> **Important:** If this deployment was successful, any deployments from now on that don't have a `--runtime=node12` flag will automatically use `node12` as runtime until you deploy a new successful build using `--runtime=node10`.
+
+### Verify your deployment
+
+Now that you have deployed your changes, it's time to verify that your code works accordingly. This highly depends on your project but a couple of ways you can test that your application works are:
+
+- Manually end-to-end test your whole application functionality. If this is a Twilio application, try to set up another phone number for example and connect it to the URL of your respective environment and manually test your application.
+- Test your individual Functions. If they are public Functions, you can use tools such as Postman or curl to perform an HTTP request against your Function. If your Function is protected, make sure to generate a `X-Twilio-Signature` and pass it in the HTTP headers. Check out [the Twilio docs for code snippets on how to generate the signature](https://www.twilio.com/docs/usage/webhooks/webhooks-security#validating-signatures-from-twilio).
+- Run your automated tests. If your team has any automated testing, try pointing it against your environment.
+
+If you have validated that everything still works, feel free to jump to the next section to deploy your changes to your production environment. If something failed, you should do two steps:
+
+1. Rollback your changes by deploying version Node.js v10 to your environment by running:
+
+```bash
+twilio serverless:deploy --environment=stage --runtime=node10
+```
+
+From this point on all your future deployments will use `node10` again until you successfully deploy `node12` again.
+
+2. Identify the issues in your code and fix them. [Check out the Node.js v12 release post](https://nodejs.medium.com/introducing-node-js-12-76c41a1b3f3f) for some pointers on what might have changed.
+
+### Deploying Node.js v12 to production
+
+Once you have validated everything, you are ready to update your production environment. There are two ways you can do this. You could do a full new deployment but the recommended way is to promote the current build that is deployed to your staging environment to production. Again the flag values might differ for your project but in our case we'll use:
+
+```bash
+twilio serverless:promote --from=stage --production
+```
+
+Once this command succeeded you should have Node.js v12 in your production environment 🎉.
+
+Unless you explicitly deploy future deployments using `--runtime=node10`, you are all set. If you want to be safe you can also make future deployments to the Node.js v12 runtime explicitly with the `--runtime=node12` flag.
+
+After April 30, the `--runtime=node10` flag will no longer be valid. If for some reason you encounter an error that forces you to roll back to Node.js v10, please contact our support team.
+
+**We can't wait to see what you build!**
+
+You are all set and live on Node.js v12 and you can go back to focusing on building on Twilio. If you have any questions, feel free to reach out to me or to our support team.
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)

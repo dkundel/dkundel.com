@@ -1,0 +1,42 @@
+---
+title: 'How U.S. A2P 10DLC Affects Developers and Small Businesses'
+publishDate: '2021-06-22 09:00:00'
+image: '/blog-headers/external/6138d16683d0b715ccaea5c1493d5072bd59d7c0959c3db4cd57cd135f385368.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "U.S. A2P 10DLC aims to create a trusted SMS ecosystem. In this blog post we'll cover how this affects developers and small businesses who use Twilio to send SMS to phone numbers in the United States of America."
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/a2p10dlc-developers-small-businesses'
+---
+
+There have been updates to Twilio’s Starter Brand registration based on changes from The Campaign Registry (TCR) and mobile carriers. Twilio Starter Brands are no longer available and brands with EINs will no longer be able to use Twilio’s Starter Brand registration going forward. In the meantime, if you have existing Twilio Starter Brands you will need to register your 10DLC campaigns via Standard Registration by November 17th, 2022 or you will begin incurring unregistered fees. For more information please visit [this blog post outlining these changes](https://www.twilio.com/en-us/blog/a2p10dlc-developers-small-businesses#How-US-A2P-10DLC-Affects-Developers-and-Small-Businesses).
+
+If you send programmatic SMS in the United States, you might have heard about the current plans by AT&T and T-Mobile to create a more trusted SMS ecosystem through A2P 10DLC. If you haven't heard about A2P 10DLC yet, [head over to this blog post to learn more](https://www.twilio.com/blog/us-a2p10dlc-for-developers). In this blog post we'll discuss how these changes impact developers and small businesses using Twilio to send SMS and what Twilio did to address your concerns.
+
+U.S. A2P 10DLC brings along a variety of changes including registration changes, carrier fees and daily caps. However, some of these changes are hard (or even impossible) to understand and follow for developers and very small businesses, and we heard your concerns and are here to help.
+
+Since day one of Twilio, we’ve focused on making sure telecommunications is as accessible as possible for developers to create everything from garage door openers, to wedding invitations over SMS, or even businesses built entirely on SMS.
+
+Over the last six months we've been working with our partners at T-Mobile and AT&T to create a verified SMS ecosystem that remains accessible for builders/developers while increasing trust and reducing fraud. Today we are excited to announce the outcome of these changes.
+
+## Questions
+
+You might have a lot of questions about these changes and we are here to help you. You can find the most common questions we get from developers below. If you can’t find your answer, [head over to our dedicated A2P 10DLC page and request to talk to an expert](https://twilio.com/a2p-10dlc).
+
+**[What if I need to send more messages?](https://www.twilio.com/en-us/blog/a2p10dlc-developers-small-businesses#What-if-I-need-to-send-more-messages)**
+
+In order to send more messages than your 3000 per day, you'll have to register a Business Profile in our Trust Hub and create a [Messaging Service](https://www.twilio.com/docs/messaging/services) with the appropriate Campaign Use Case. [Check out our docs to learn more.](https://www.twilio.com/docs/sms/a2p-10dlc/onboarding) If you reach your daily cap you'll receive a [dedicated 30023 error code](https://www.twilio.com/docs/api/errors/30023) from Twilio and you should only resume sending messages the next day. You can reduce such errors by registering your business profile as explained above.
+
+**[What if I have more US phone numbers in my Twilio account?](https://www.twilio.com/en-us/blog/a2p10dlc-developers-small-businesses#What-if-I-have-more-US-phone-numbers-in-my-Twilio-account)**
+
+You can keep more phone numbers but you will only be able to use five US local phone numbers to send SMS to US recipients. Additional numbers can still be used for Programmable Voice or to text to Canada or internationally.
+
+**[Is this a Twilio specific change?](https://www.twilio.com/en-us/blog/a2p10dlc-developers-small-businesses#Is-this-a-Twilio-specific-change)**
+
+While we partnered with carriers to find a solution that works for the entire messaging ecosystem, Twilio continues to focus on simplifying the process for our customers. We are still working on defining the final process on the Twilio side with the goal to abstract away most, if not all, of the complexity of A2P 10DLC as long as you send fewer than 3000 SMS segments and MMS messages per day with 5 or less local phone numbers. We'll focus on making as many changes backwards compatible as possible so that you, ideally, are not required to do any additional work or change your code. Twilio will also cover the registration fees that have been established across the ecosystem. This is all to make sure you can focus on building your applications and providing delightful experiences to your end users.
+
+**[I have other questions.](https://www.twilio.com/en-us/blog/a2p10dlc-developers-small-businesses#I-have-other-questions)**
+
+Implications of U.S. A2P 10DLC can differ for everyone. If you have any other questions, please [head over to our A2P 10DLC page and request to talk to an expert](https://twilio.com/a2p-10dlc).

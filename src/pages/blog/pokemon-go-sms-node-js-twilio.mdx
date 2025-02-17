@@ -1,0 +1,402 @@
+---
+title: 'Build your own Pokemon Go SMS Service with Node.js, Express and Twilio'
+publishDate: '2016-07-29 09:00:00'
+image: '/blog-headers/external/11522f65162b512ba68fa3335861356ff7759296ba58da1958ce45d0aca19ae9.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "Pokemon GO is everywhere right now. Learn how you can build your own SMS notification service using Node.js and Twilio to catch 'em all!"
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/pokemon-go-sms-node-js-twilio.html'
+---
+
+Pokemon GO is everywhere right now and if you are like Ash Ketchum or me you want to catch ’em all. This journey can be difficult but tools such as PokeVision can help us on our quest. The problem with these tools is that they require you to actively check them. Let’s build a service using [Twilio SMS](https://www.twilio.com/docs/api/rest/sending-messages) that notifies you via SMS when certain Pokemon are found around your location.
+
+> **DISCLAIMER:** Pokemon Go doesn’t have an official API and the mechanisms the community uses for tools around the game are shifting constantly. This might totally break.
+
+Now let’s learn how to build this ourselves!
+
+## Choose your Starter
+
+![Starter Pokemon](pokemon-go-sms-node-js-twilio/starter-pokemon-1.gif)
+
+To get started we need to make a couple of choices. Unlike the choices that Professor Oak gives you, for this project, you can choose from a [variety of programming languages](https://www.twilio.com/docs/libraries) and web frameworks, as long as they can make and [receive HTTP requests](https://www.twilio.com/blog/how-to-receive-a-post-request-in-node-js.html).
+
+For this tutorial we’ll use a basic [Express](http://expressjs.com/) server and [Node.js](https://nodejs.org/en/). The things you need for this journey are:
+
+- [Node.js](https://nodejs.org/en/) version 6.0 or higher. Check your version with `node -v`.
+- A Twilio Account to send and receive SMS – [Sign up for free!](https://www.twilio.com/try-twilio)
+- [ngrok](https://ngrok.com/) – You can read more about ngrok [here](https://www.twilio.com/blog/test-your-webhooks-locally-with-ngrok.html).
+
+To get a [basic Express server](https://www.twilio.com/blog/how-to-receive-a-post-request-in-node-js.html#Express), start by cloning the following `template` branch of [this project](https://github.com/dkundel/pokemon-go-sms/tree/template) and install the dependencies:
+
+```javascript
+git clone -b template https://github.com/dkundel/pokemon-go-sms.git
+cd pokemon-go-sms
+npm install
+```
+
+With the code in place, spin up the app by running:
+
+```javascript
+npm start
+```
+
+Navigate to [http://localhost:3000/Kanto](http://localhost:3000/Kanto). You should see a message saying **Ahoy! Kanto**. Feel free to change `Kanto` in the URL with other things. It should change the message.
+
+![Ahoy! Kanto](pokemon-go-sms-node-js-twilio/ca7pzMaHm7pRhV4Bn3SPgM_148t3Sx86VdC-w7hb9HsUmLyOHSHpOaDGOjrN6mUexi1wqnjRhb.png)
+
+## Initialize your Pokedex
+
+![Pokedex](pokemon-go-sms-node-js-twilio/qx0iFQoomvyJ2j6ErKMPeNqdlvYTiGW8QZREwuudUQ7vVT1dM6QigndIoY-427VEorfDiS6wTF.png)
+
+You can’t be the very best on this journey without having the necessary data. Or in other words, you need your Pokedex. In our case, we will use a Node module called [pokespotter](https://github.com/brentschooley/pokespotter). It’s a basic wrapper around the Niantic API that will return you the list of Pokemon around a certain location.
+
+Start by installing `pokespotter`:
+
+```javascript
+npm install pokespotter --save
+```
+
+Require the `pokespotter` module at the top of the `index.js` file:
+
+```javascript
+'use strict';
+const express = require('express');
+const bodyParser = require('body-parser');
+const Pokespotter = require('pokespotter');
+```
+
+You need at least one Pokemon GO account for `pokespotter` to work. This can be either a Google account or a Pokemon Trainer Club account. Save your account credentials along with the account provider you have chosen (`google` if you are using a Google account or `ptc` for Pokemon Trainer Club accounts) as the environment variables `PGO_USERNAME`, `PGO_PASSWORD`, and `PGO_PROVIDER`. You can also pass these values directly as arguments to the `Pokespotter()` call.
+
+Add the following two lines to your `index.js` file:
+
+```javascript
+const PORT = process.env.PORT || 3000;
+const POKEDEX = Pokespotter.Pokedex;
+const spotter = Pokespotter(
+  process.env.PGO_USERNAME,
+  process.env.PGO_PASSWORD,
+  process.env.PGO_PROVIDER
+);
+```
+
+Now add a function that will call `spotter.getNearby` and executes a function that simply returns the list of Pokemon for now:
+
+```javascript
+const spotter = Pokespotter();
+function getPokemonByAddress(address) {
+  return spotter.getNearby(address, { steps: 2 }).then(pokemon => {
+    return pokemon;
+  });
+}
+
+app.get('/:address', (req, res) => {
+```
+
+The `getNearby` method gets two properties. An address or set of coordinates as well as an options object where we specify a steps value. For now, we chose `2` which gives you roughly a radius of 200m. The current time for a scan for this radius is roughly 30 seconds. You can reduce this time by passing into the `Pokespotter()` constructor an array of users. At the current radius, 7 spots are visited so the optimal number of accounts will be 7. You can also increase the radius but it also increases the response time significantly.
+
+Now that we have this function we need to consume it. Modify the handler for `/:address`:
+
+```javascript
+app.get('/:address', (req, res) => {
+  getPokemonByAddress(req.params.address)
+    .then(pokemon => {
+      res.type('application/json').send({ result: pokemon });
+    })
+    .catch(err => {
+      res
+        .type('text/plain')
+        .status(500)
+        .send('An error occurred. Check your console.');
+      console.error(err);
+    });
+});
+```
+
+Open again [http://localhost:3000/Central Park, New York](http://localhost:3000/Central%20Park,%20New%20York) and you should get a first glimpse of the Pokemon around Central Park. Feel free to replace everything after the `3000/` with your own address to check the Pokemon near you.
+
+## Identify your Pokemon
+
+![Identify Pokemon](pokemon-go-sms-node-js-twilio/tQZ-j7kxefxBU6zXYKorV3KQWCoYBfl0E_g5paStDfbtwH4Ku2CU7mmBBMrhDgJ5LhFRlPGjzg.png)
+
+For our text messages, we are interested in 3 pieces of information for every Pokemon:
+
+- Name of the Pokemon
+- Distance from location
+- Time till disappearance
+
+The first two are already provided by `pokespotter`. For the third one, we have a timestamp when the Pokemon is going to disappear. We can use that and the [moment](https://www.npmjs.com/package/moment) module to provide the information. Additionally, we will sort the result by distance.
+
+Install `moment`:
+
+```javascript
+npm install moment --save
+```
+
+Require the two modules at the top of the file:
+
+```javascript
+const Pokespotter = require('pokespotter');
+const moment = require('moment');
+```
+
+Add a new function that uses `moment.duration().humanize()` to add a readable version of the duration to every Pokemon and a function that compares the distance of two Pokemon. Alter the `getPokemonByAddress` function to use the two new functions:
+
+```javascript
+function enhancePokeInfo(pokemon) {
+  pokemon.duration = moment
+    .duration(pokemon.expirationTime - Date.now())
+    .humanize();
+  return pokemon;
+}
+
+function sortClosestPokemon(pokemonA, pokemonB) {
+  return pokemonA.distance - pokemonB.distance;
+}
+
+function getPokemonByAddress(address) {
+  return spotter.getNearby(address, { steps: 2 }).then(pokemon => {
+    return pokemon.map(enhancePokeInfo).sort(sortClosestPokemon);
+  });
+}
+```
+
+Restart the server and refresh the browser. You should see more useful information now.
+
+## Enhancing your Pokedex with Twilio
+
+![Enhancing Pokedex](pokemon-go-sms-node-js-twilio/bKhCcWapodQkZN24gKZLUQfZe_6XddMXaT3TZzlc5OHNWdI1eB2YtpXnnZLFivXZlKx1JfdZGO.png)
+
+Alright, we got the basic information going. But we didn’t want to create a web service for our Pokedex but an SMS service. This is where [Twilio SMS](https://www.twilio.com/sms/api) comes into play.
+
+In order to receive SMS, we need to create a new `POST` endpoint for our web server that will handle all [incoming SMS](https://www.twilio.com/docs/api/twiml/sms/twilio_request). Twilio will then pass the content of our SMS and all related information to that endpoint.
+
+First, add a function that makes our information look more readable and limits it to only 6 Pokemon to keep the SMS short:
+
+```javascript
+function formatPokeList(pokeList, address) {
+  let formattedPokemon = pokeList.map(pokemon => {
+    return `${pokemon.name}, ${pokemon.distance} m, ${pokemon.duration}`;
+  }).join('\n');
+  return `There are the following Pokemon around ${address}:\n${formattedPokemon}`;
+}
+
+app.get('/:address', (req, res) => {
+```
+
+Now add a new `POST` endpoint for `/incoming` that uses the [Body](https://www.twilio.com/docs/api/twiml/sms/twilio_request#request-parameters) that Twilio sends as an address and logs the lookup result to the console. Feel free to adjust the other endpoint to use the format function, too:
+
+```javascript
+app.get('/:address', (req, res) => {
+  let address = req.params.address;
+  getPokemonByAddress(address)
+    .then(pokemon => {
+      res.type('text/plain').send(formatPokeList(pokemon, address));
+    })
+    .catch(err => {
+      res
+        .type('text/plain')
+        .status(500)
+        .send('An error occurred. Check your console.');
+      console.error(err);
+    });
+});
+
+app.post('/incoming', (req, res) => {
+  let message = req.body.Body;
+  res.send(
+    `<Response><Message>Searching for your Pokemon! One moment.</Message></Response>`
+  );
+  getPokemonByAddress(message)
+    .then(pokemon => {
+      console.log(formatPokeList(pokemon, message));
+    })
+    .catch(err => {
+      console.error(err);
+    });
+});
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+```
+
+Make sure to restart the server. In order to receive SMS, we first need to expose our local server to the web for Twilio to access it. Run in a separate console window:
+
+```javascript
+ngrok http 3000
+```
+
+![ngrok](pokemon-go-sms-node-js-twilio/0ZKId-JlqZlgWuLkO1_wHLW64oI_275SFcZBzSMOEgfcEZjCZIo7NhDMw4b9Wsmp3ziC-MAMdv.png)
+
+[Get a Twilio phone number](https://www.twilio.com/console/phone-numbers/incoming) and configure the webhook URL for incoming messages to be `http://.ngrok.io/incoming`. Afterwards, send an SMS to your [Twilio phone number](https://www.twilio.com/console/phone-numbers/incoming) with an address and you should see the result show up in your terminal window.
+
+![SMS Response](pokemon-go-sms-node-js-twilio/Screen-Shot-2016-07-29-at-5.46.29-PM-1024x460.png)
+
+Now the last step is to actually reply with an SMS. If we would know the response immediately we could directly reply to the request that Twilio does to our server using [TwiML](https://www.twilio.com/docs/api/twiml/sms/your_response#twiml-interpreter). However, because it takes a fairly long time to request the data we need to use the [Twilio REST API](https://www.twilio.com/docs/api/rest/sending-messages) or in our case the [Twilio helper library](https://www.twilio.com/docs/libraries) to reply to the message at a later point.
+
+Install it via:
+
+```javascript
+npm install twilio --save
+```
+
+Make sure your Twilio Account SID (`TWILIO_ACCOUNT_SID`) and [Twilio Auth Token](https://www.twilio.com/help/faq/twilio-basics/what-is-the-auth-token-and-how-can-i-change-it) (`TWILIO_AUTH_TOKEN`) are set as the respective environment variables. Require the helper library at the top of your file:
+
+```javascript
+const moment = require('moment');
+const twilio = require('twilio');
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
+```
+
+Modify the `POST` request handler to send a message with the result:
+
+```javascript
+app.post('/incoming', (req, res) => {
+  let message = req.body.Body;
+  res.send(
+    `<Response><Message>Searching for your Pokemon! One moment.</Message></Response>`
+  );
+  getPokemonByAddress(message)
+    .then(pokemon => {
+      let response = formatPokeList(pokemon, message);
+      return client.messages.create({
+        from: req.body.To,
+        to: req.body.From,
+        body: response,
+      });
+    })
+    .catch(err => {
+      console.error(err);
+    });
+});
+```
+
+Restart your server and send another SMS to your Twilio phone number. You will now get a reply SMS with the 6 closest Pokemon to that location.
+
+![SMS Reply](pokemon-go-sms-node-js-twilio/p5yC_k9GrHPc4ZJbVAcEJGGqIlgXzkk_kr9x_aOCUwGfG9SoROxR9oEEMrYpmDgkO9OUZdXAE7.png)
+
+![SMS Screenshot](pokemon-go-sms-node-js-twilio/IMG_0949-169x300.jpg)
+
+## A Wild SMS Appeared!
+
+Lastly, we have one more problem. How do we get informed if that one Pokemon that we are looking for shows up at a certain location? Let’s add an SMS notification whenever this happens and an easy way to subscribe to it.
+
+First, create a new map instance at the top of your file that will hold all the necessary subscriber information:
+
+```javascript
+const PokeWatchers = new Map();
+const PORT = process.env.PORT || 3000;
+```
+
+Next, we need to add subscribers to this map. We will add them based on the format of SMS they send. If you send something such as: `Subscribe: Pikachu; Alexanderplatz, Berlin` it will notify you when there is a Pikachu around Alexanderplatz in Berlin.
+
+For this modify our SMS request handler:
+
+```javascript
+app.post('/incoming', (req, res) => {
+  let message = req.body.Body;
+  if (
+    message
+      .toLowerCase()
+      .trim()
+      .indexOf('subscribe:') === 0 &&
+    message.indexOf(';') !== -1
+  ) {
+    message = message.substr('subscribe:'.length);
+    let [pokemonName, location] = message.split(';').map(m => m.trim());
+
+    if (POKEDEX.indexOf(pokemonName) !== -1) {
+      PokeWatchers.set(`${req.body.From},${pokemonName}`, location);
+      res
+        .type('text/plain')
+        .send(`We will be on the watch for ${pokemonName} around ${location}`);
+    } else {
+      res
+        .type('text/plain')
+        .send(`The Pokemon with the name ${pokemonName} doesn't exist.`);
+    }
+  } else {
+    res.send(
+      `<Response><Message>Searching for your Pokemon! One moment.</Message></Response>`
+    );
+    getPokemonByAddress(message)
+      .then(info => {
+        let { location, pokemon } = info;
+        let response = formatPokeList(pokemon, location);
+        return client.messages.create({
+          from: req.body.To,
+          to: req.body.From,
+          body: response,
+        });
+      })
+      .catch(err => {
+        console.error('An error occurred');
+        console.error(err);
+      });
+  }
+});
+```
+
+Now that we know which Pokemon we should be looking for and where, all we need to do is to look for them on a regular basis. We will be doing this every 60 seconds. Once we found the respective Pokemon for someone, we will also stop looking for it. You can re-subscribe by sending the same message again.
+
+In order to send a message without previously receiving one we again need to use the the [Twilio helper library](https://www.twilio.com/docs/libraries).
+
+Create a new function `watchForPokemon` and run `setInterval` when the server starts. Make sure to replace `{{YOUR TWILIO NUMBER}}` with your own Twilio phone number:
+
+```javascript
+function watchForPokemon() {
+  console.log('Looking for Pokemon...');
+  for (let [keyInfo, address] of PokeWatchers) {
+    let [number, wantedPokemon] = keyInfo.split(',');
+    getPokemonByAddress(address)
+      .then(pokemon => {
+        let availablePokemon = pokemon.filter(
+          poke => poke.name.toLowerCase() === wantedPokemon.toLowerCase()
+        );
+        if (availablePokemon.length !== 0) {
+          let body = formatPokeList(availablePokemon, address);
+          let from = '{{YOUR TWILIO NUMBER}}';
+          let to = number;
+          PokeWatchers.delete(keyInfo);
+          return client.messages.create({ body, from, to });
+        }
+        return Promise.resolve(true);
+      })
+      .catch(err => {
+        console.error('An error occurred. Check your console.');
+        console.error(err);
+      });
+  }
+}
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+  watchForPokemon();
+  setInterval(watchForPokemon, 60 * 1000);
+});
+```
+
+That’s it! Restart your server and you can start sending `Subscribe` messages. To test it, I recommend searching for a Pokemon that is very common to the area that you want to watch for. This way you should get instantly an SMS.
+
+![Subscribe](pokemon-go-sms-node-js-twilio/iP3IbN8UOTBAnr8ZTXKys7P16jeocNC0eS9WExAsxhalQVauq8zSHuLebyBKJZUTQ3-k-ZPdsC.png)
+
+## Go and Explore
+
+![Flying Away](pokemon-go-sms-node-js-twilio/flying-away.gif)
+
+We made it! Hopefully, now we will be able to catch ’em all. You don’t have to stop here though. How about filtering out common Pokemon or providing a way to sort them by rarity?
+
+I can’t wait to see what you build with this! Feel free to contact me to tell me what you build or if you have any questions:
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Twitch (streaming live code): [dkundel](https://www.twitch.tv/dkundel)
+
+Please remember that this system is based on an unofficial API that isn’t guaranteed to always work and they might block you. So you might have to sometimes fallback to travel across the land to search for Pokemon.

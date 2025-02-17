@@ -1,0 +1,249 @@
+---
+title: 'Locally developing and debugging Twilio Functions'
+publishDate: '2019-02-20 09:00:00'
+image: '/blog-headers/external/998dec6b009e3ff89e0ddbe3e3633a4d7b78697b6945a1d89121959471bbcba9.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Twilio Functions allow you to host Serverless Node.js code direct on Twilio. Learn how you can locally develop and debug them using VS Code or Chrome.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/locally-developing-and-debugging-twilio-functions'
+---
+
+Twilio is all about HTTP endpoints & webhooks. From responding to incoming SMS, to controlling the flow of a voice call to blocking unwanted chat messages with an `onMessageSend` webhook, chances are that you'll end up writing an HTTP endpoint for the Twilio product you're interacting with. Twilio Functions allow you to write and host those endpoints directly in the Twilio cloud while relying on the power of Node.js.
+
+What if you want to develop these functions with your IDE or editor of choice and run them locally? What if something goes wrong and you want to use your debugger to dive deeper into it? For this reason I built [`twilio-run`](https://npm.im/twilio-run), a command-line tool that allows you to run your Twilio Functions in your local environment.
+
+Let's dive into how it works, and how it can help your development flow with Twilio.
+
+If you prefer watching a video to learn how to use `twilio-run`, [check out this YouTube video](https://www.youtube.com/watch?v=8s8cwjh4_7Q).
+
+## Installation
+
+`twilio-run` is built with Node.js and therefore requires you have Node.js installed as well as a package manager like `npm` or `yarn`. Once you have those prerequisites, there are multiple ways you can install and use `twilio-run`.
+
+The fastest way, if you just want to occasionally execute it, is to use `npm@5.2` or newer since it has a tool called `npx`. If you have `npx` installed you can run:
+
+```bash
+npx twilio-run
+```
+
+And npm will automatically download the tool if it's the first time, and run it in the local directory. You can also pass in any of the options you'll find below.
+
+If you want to use `twilio-run` more often, I recommend to install it as a devDependency in your project. If you don't have a Node.js project yet, create a new folder and run `npm init -y` before running:
+
+```bash
+npm install -D twilio-run
+# or alternatively with yarn:
+yarn add -D twilio-run
+```
+
+This will add `twilio-run` into your `node_modules` folder and there are multiple ways you can execute it:
+
+```bash
+# specify the path to the executable
+node_modules/.bin/twilio-run
+
+# run it using npx (this won't reinstall it)
+npx twilio-run
+
+# run it using yarn
+yarn twilio-run
+
+# Add "start": "twilio-run" into your package.json's scripts section. Then:
+npm start
+```
+
+Now that we have `twilio-run` installed, let's look at how we can use it. In the rest of the post I'll omit the respective ways to run the tool and instead only use `twilio-run`. Please adapt it to the way you are running the tool.
+
+**The basics**
+
+Similar to the real Twilio Functions, we are able to host both JavaScript functions and static assets. For these `twilio-run` will look for a `functions/` and an `assets/` directory in the path that you specified as an argument to the tool. If you don't specify a path, it will use your current working directory as the base directory.
+
+Let's set up a basic function and create an asset to test. Inside your project directory create a `functions/` folder and add a file called `hello-world.js` to it. Place the following code into this file:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  let twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message('Hello World');
+  callback(null, twiml);
+};
+```
+
+Next create an `assets/` directory and place a text file called `hello.txt` into it. Feel free to put whatever content you want into it. I'll just place "Hello Blog!" into it.
+
+Now that we have our basic project setup we can start `twilio-run` by running:
+
+```bash
+twilio-run
+```
+
+Once it's started you should be greeted with an output that shows all available URLs for your Twilio function and assets.
+
+![Twilio Function Output](locally-developing-and-debugging-twilio-functions/C4ZLtDHIOK62qz4zR18fUavYhboSGIv8etpiPxd0WBNT9Ql3Oi7utT4bcVXVIYCb3poFfqbuLbINOu.png)
+
+To verify that it's working open your browser and navigate to [http://localhost:3000/hello-world](http://localhost:3000/hello-world). You should see some TwiML returned to you:
+
+![TwiML Response](locally-developing-and-debugging-twilio-functions/EfnTbLy25VlAdip-w-531AIySo0gcik_pgl94zUqnAWnZ-UMxRH1jzVhd7S5Y-qzwHfCiZBd9_g40c.png)
+
+And if you go to [http://localhost:3000/assets/hello.txt](http://localhost:3000/assets/hello.txt) you'll be able to see "Hello Blog!" or whatever message you placed into it. This will also work with any other static files you might want to serve.
+
+![Static File Response](locally-developing-and-debugging-twilio-functions/oktcvvOjQ_gA9MiYdBLmB07M1Axhi_wVtFteEYQAQAZuFgRCGpJAWh_j8_vAD7AbkntvXpY-oiMcLk.png)
+
+Additionally you should see all successful and failed requests being logged to the console:
+
+![Console Logs](locally-developing-and-debugging-twilio-functions/vlu3fW2KtH5y0Z2hcd6LYUyWiMe2fVIuwbX38zqFpEXiWGVZ-BFpoUyg9UhPmmNxfDkKL5ievWsN_j.png)
+
+This is all it takes to get started with running Twilio Functions locally. Let's talk about a few additional features you have available with `twilio-run`.
+
+**Exposing local Functions to the outside world**
+
+If you want to check how well your locally developed Twilio Function plays with Twilio you'll have to make it available for Twilio to contact it. The tool we tend to recommend for this is called [ngrok](https://ngrok.com/). It creates an HTTP tunnel to your localhost. `twilio-run` comes with this functionality directly built-in. All you have to do is pass the `--ngrok` flag:
+
+```bash
+twilio-run --ngrok
+```
+
+You'll see that the output slightly differs since the tool will now return you the externally available URLs as well as the request inspector of ngrok, a great tool to replay past requests.
+
+![Ngrok Output](locally-developing-and-debugging-twilio-functions/u_VSu-E-oRXQ--h5uUu3C2wVo3W7m9ZK0KCtliw8DB277znTe5VaSunzdp7_gMo4gWv1vfOjgc_-Io.png)
+
+If you have a paid account for ngrok you can also pass a custom subdomain to the `--ngrok` flag: `my-awesome-functions` and it will spawn them as `my-awesome-functions.ngrok.io`.
+
+**Debugging your Functions**
+
+While `console.log` is probably the most popular debugging tool (and yes it works with `twilio-run`), you sometimes have to take out the big guns and use an actual debugger. `twilio-run` allows you to attach your favorite Node.js debugger by using the same command-line flags you are already familiar with from Node.js.
+
+```bash
+twilio-run --inspect
+```
+
+This will open the default debugging port which you can see displayed in the output of the tool:
+
+![Debugging Port](locally-developing-and-debugging-twilio-functions/jkv-NMSSFJY1XxZEWxdHVdgE79hu4eCWKIqwWRa1XG30s5EEiqF0SwnrSh1hjhstrtxestJO0QuCtS.jpeg)
+
+If you are using Visual Studio Code like me, all you have to do now is create a `launch.json` inside a `.vscode` folder in your project and place in the following config:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach",
+      "port": 9229
+    }
+  ]
+}
+```
+
+Now, with `twilio-run` running with the `--inspect` flag, open the debugger pane, choose "Attach", and run it.
+
+![VS Code Debugger](locally-developing-and-debugging-twilio-functions/HddnhtdDCNNdEyXxTFFWv7d5u1zICM7n82G-EZgjPvDnHk59jRdYuYJTMrKOydQuK5tq8zPzOyTRFU.jpeg)
+
+![Debugger Pane](https://www.twilio.com/content/dam/twilio-com/global/en/blog/legacy/2019/locally-developing-and-debugging-twilio-functions/Z6sBzLMSLRIxfG9bWI7LRtpXDjpXuwgzLy51Syza2N7TL6IFr2A-NDteKlrcnG17nbVmfwn1OHFbP.jpeg)
+
+Once it's attached, you can set a break pointer (Don't worry if it appears grey at first) and execute your request. The debugger should catch and set the breakpoint.
+
+![Breakpoint](locally-developing-and-debugging-twilio-functions/87hYw4rhjPBmapVsNjJ7BTPIgBEGSglexGJzLYUCXaO7AnM6YY-T-u8qwQe2BN8gS6Z5WXqkcRMB6N.jpeg)
+
+You can [learn more about debugging Node.js applications with VS Code](https://code.visualstudio.com/docs/nodejs/nodejs-debugging) in their documentation.
+
+If you don't use VS Code, or prefer the [Chrome developer tools](https://medium.com/the-node-js-collection/debugging-node-js-with-google-chrome-4965b5f910f4), open the Chrome dev tools on any page and you should see a Node.js icon. Click on that icon to open the Debugger for your project:
+
+![Chrome Dev Tools](locally-developing-and-debugging-twilio-functions/dfes4APtlkAuKU1s8o1QPg4tQrJW3roQMZmBW6QXT7fqxNs87kDfBd9QCNqWUjP08LB4xZ0akaVe5G.jpeg)
+
+Once it's open we have to load in our project. Go into the Sources tab, click on Filesystem on the side (it might be hidden behind ">>" next to "Page"), and open your project folder. If you haven't previously, you'll have to grant your browser access to the file system before opening the project. You can now set your breakpoint, and once they are hit you are able to debug your app further.
+
+![Filesystem Access](locally-developing-and-debugging-twilio-functions/Extn3Se3_x1cfJ-x2swl9LjR7agfGnnpVkwlOlJLVtFDdUVJjkvLc-5llCdzZDanqLRM4W-o3ze9cg.jpeg)
+
+![Debugging Further](locally-developing-and-debugging-twilio-functions/e2UtQat1JFcjWMp-OTDMcrKsRwpS2JBGIoNN8CDELH-9sW-At92qY2R4X9VM2r-oHgsCHBqQbiRIsR.png)
+
+If none of these options are your jam, you can use whatever tool you prefer that supports attaching to the Node.js debugging protocol.
+
+**Loading in environment variables**
+
+Twilio Functions lets you access environment variables via the `context` object. For security, `twilio-run` won't let you access all of the local environment variables of your development machine. If you want to do so, you can add the `--load-local-env` flag and it will load them in.
+
+```bash
+twilio-run --load-local-env
+```
+
+If you want to configure project specific variables the best way is to use a `.env` file in your project. Make sure you add your `.env` file to your `.gitignore` if you have sensitive data like credentials in it. You can load in `.env` files by using the `--env` flag. If you want to load a specific file, you can also specify the path to it relative to your base directory.
+
+Let's try this. Create a `.env` file in your project root with the following content:
+
+```bash
+PLANET=Mars
+```
+
+And modify your Twilio Function to:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  let twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message(`Hello ${context.PLANET || 'World'}`);
+  callback(null, twiml);
+};
+```
+
+We are going to greet with whatever value is specified in the environment and fallback to "Hello World" if there isn't one. If you restart `twilio-run` without the `--env` variable you should see:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message>Hello World</Message>
+</Response>
+```
+
+If you now restart `twilio-run` with the `--env` flag like so:
+
+```bash
+twilio-run --env
+```
+
+You should see that the message changed to:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message>Hello Mars</Message>
+</Response>
+```
+
+Note that if you combine both `--load-local-env` and `--env`, all variables set in your local environment will be temporarily replaced by the ones set in the `.env` file.
+
+**"Live reloading"**
+
+By default you'll have to restart `twilio-run` if you want to check out changes in one of your Functions since they are cached by Node.js' cache. You can disable this caching by running `twilio-run` with the `--live` flag like so:
+
+```bash
+twilio-run --live
+```
+
+Since this isn't really performant, it is disabled by default.
+
+**What about deploying my functions and assets to run on Twilio?**
+
+Right now, you'll have to copy and paste Functions code and/or drag and drop asset files in the Twilio console to deploy them live. We're working hard on an API for deployment. Look out for that soon, and get in touch with me if you'd like to be one of the first to try it.
+
+**What's next?**
+
+This project was spawned out of my own needs, but I would love to hear what features you would like to see. I'm also totally open to contributions to the project. If you want to check out the source code, file issues, or just say thank you, feel free to go to [https://github.com/dkundel/twilio-run](https://github.com/dkundel/twilio-run)
+
+The project also exposes an API if you want to load a Twilio Function in an existing Express server for testing. You can find it documented in the project's [README.md](https://github.com/dkundel/twilio-run/blob/master/README.md).
+
+Now that you are successfully developing with Twilio Functions locally, why don't you check out some of these Twilio Functions powered blog posts:
+
+- [Forward fax to email with SendGrid and Node.js](https://www.twilio.com/blog/fax-email-sendgrid-nodejs)
+- [Identify Unknown Phone Numbers with JavaScript, Twilio Lookup and SMS](https://www.twilio.com/blog/identify-unknown-phone-numbers-javascript-twilio-lookup-sms)
+- [Building an npm search bot with WhatsApp and Twilio](https://www.twilio.com/blog/build-npm-search-bot-whatsapp-twilio.html)
+- [👉 Emoji translations with the 📞 Twilio API for 💬 WhatsApp and Node.js](https://www.twilio.com/blog/emoji-translations-twilio-api-whatsapp-node-js.html)
+
+And if you have any questions or would love to show me what cool thing you built with Twilio Functions, simply reach out to me:
+
+- Mail: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- GitHub: [dkundel](https://github.com/dkundel)

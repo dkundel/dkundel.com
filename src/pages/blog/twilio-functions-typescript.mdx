@@ -1,0 +1,249 @@
+---
+title: 'Using Twilio Functions with TypeScript'
+publishDate: '2019-09-03 09:00:00'
+image: '/blog-headers/external/29a312e42033664bbc7e69af6e514b3433f227c3849e88643508946fe0c6b4d1.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how you can use TypeScript to author your Twilio Functions and deploy them from the command-line.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/twilio-functions-typescript'
+---
+
+# Using Twilio Functions with TypeScript
+
+![Using Twilio Functions with TypeScript](twilio-functions-typescript/yELXa3t4sUD8ET29Y0jDt-DsR7LiKUJsWsGbKPR1Ar1t4PFpEg0-AC6WWgjUwKoXMUQLJYpg0hEhmz.png)
+
+**Requirements**
+
+Before we can get started, you'll need to make sure to have the following things:
+
+- [Node.js 8.10 (or newer)](https://nodejs.org/en/download/)
+- A Node.js package manager (the examples will be using [npm](https://www.npmjs.com/))
+- A Twilio account. [Sign up for free](https://www.twilio.com/try-twilio)
+
+We'll be using the Serverless Toolkit via the [Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart) but you can also use it as a standalone. [Check out the docs](https://www.twilio.com/docs/labs/serverless-toolkit/getting-started#install-the-twilio-serverless-toolkit) for more on how to use the Toolkit alone.
+
+If you don't have the [Twilio CLI](https://www.twilio.com/docs/twilio-cli/quickstart#install-twilio-cli) and Serverless Toolkit installed run the following commands in your terminal:
+
+```bash
+npm install -g twilio-cli
+twilio plugins:install @twilio-labs/plugin-serverless
+twilio login
+```
+
+Now that we have everything set up let's get started.
+
+**Creating a Project**
+
+We'll be working on a new project but you can also apply these steps to an existing project. To create a new project run the following:
+
+```bash
+twilio serverless:init typescript-demo
+cd typescript-demo
+```
+
+This will create a new `typescript-demo` directory with a few default functions and assets in it.
+
+If this is the first time working with a Twilio Functions project and the Serverless Toolkit, run the following command to start up your local development server:
+
+```bash
+npm start
+```
+
+Open your browser of choice and go to [http://localhost:3000/index.html](http://localhost:3000/index.html). You'll find a page that will walk you through the different files created in this project.
+
+![screenshot of a browser window with the content of the localhost page](twilio-functions-typescript/4RJaxZIvou126SL0355qtV6ih_tTySw9ZvVCUbJN2gJLOXsdqCAe9k6lBg4pcjebaNCMCLiWYOxTFh.png)
+
+**Setting Up TypeScript**
+
+The TypeScript compiler is available via [npm registry](https://npm.im/typescript). Since it's only needed as a build tool but not as a runtime dependency we'll install it as a `devDependency`:
+
+```bash
+npm install typescript --save-dev
+```
+
+Now that we have our compiler installed, we have to set up our project configuration in a `tsconfig.json`. This tells the compiler which options to use and where to place the output. In our case we'll use the existing `functions/` directory as our output directory and a new `src/` directory for input.
+
+Create a new file called `tsconfig.json` at the root of your project and place the following content into it:
+
+```json
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "./functions",
+    "rootDir": "./src",
+    "strict": false,
+    "esModuleInterop": true
+  }
+}
+```
+
+This will set up everything necessary for the compiler to take any TypeScript files inside the `src/` directory, compile them and place the output into the `functions/` directory.
+
+Since the `functions/` directory will be our new output directory, go ahead and delete the current `functions/` directory. The TypeScript compiler will create a new one once we run it.
+
+We can run the TypeScript compiler manually for our changes but let's configure our npm scripts in a way that whenever we run `npm start` or `npm run deploy` we'll run the compiler. Update your `package.json` accordingly:
+
+```json
+{
+  "name": "typescript-demo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "tsc",
+    "start": "twilio-run start",
+    "predeploy": "tsc",
+    "deploy": "twilio-run deploy"
+  },
+  "devDependencies": {
+    "twilio-run": "^2.0.0",
+    "typescript": "^3.6.2"
+  },
+  "engines": {
+    "node": "8.10.0"
+  }
+}
+```
+
+**Creating a Twilio Function in TypeScript**
+
+Now that we have the TypeScript aspect of our project all set-up, it's time to create our first Twilio Function using TypeScript. Create a new `src/` directory inside your project and add a file called `hello-world.ts` with the following content:
+
+```typescript
+export const handler = function(context, event, callback) {
+  callback(null, 'Hello World from TypeScript!');
+};
+```
+
+So far there's nothing TypeScript specific in this file except that we switched to an [ES Module syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) for exporting the `handler` function. This is okay because we are currently not running in `strict` mode. We'll get to that in a minute.
+
+To see if our changes worked, go into your terminal and run:
+
+```bash
+npm start
+```
+
+You should see the TypeScript compiler (`tsc`) being executed and then it should print the same screen we've seen earlier when we ran `npm start`.
+
+![screenshot of terminal showing that tsc was executed and the output of "twilio-run start"](twilio-functions-typescript/mff0PQ-NFOAnEFN2fx6Z96qWOO7fBjzu2P2zs4xyymq51qcKeE4OHp6UFinV2xwE05zJjYhfrEXWVm.png)
+
+Open [http://localhost:3000/hello-world](http://localhost:3000/hello-world) and you should see `Hello World from TypeScript!` printed on the screen.
+
+![browser window with "Hello World from TypeScript" on it](twilio-functions-typescript/9M2kah46vzNFrMymT_nwaYZInLCbi1PLdjW30DwX-Ui6rOIQzK6lh66NatNFxCG3sGVfrRORS2I74f.png)
+
+**Getting Strict and Adding Types**
+
+Right now we have the TypeScript compiler set up but since we are not running in `strict` mode we won't get all the benefits the TypeScript compiler can give us.
+
+Start by enabling strict mode by changing the value of `strict` in your `tsconfig.json` to `true`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "./functions",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true
+  }
+}
+```
+
+Try re-running `npm start` and you'll see the TypeScript compiler complaining that we have three parameters that are implicitly of type `any`. That's because so far we have omitted any time definitions.
+
+We'll have to tell the TypeScript compiler what the types of the arguments are. We could create these types ourselves but to make this easier, we created a package containing all of these types under [@twilio-labs/serverless-runtime-types](http://npm.im/@twilio-labs/serverless-runtime-types). Install the package by running:
+
+```bash
+npm install @twilio-labs/serverless-runtime-types
+```
+
+Go back into your `hello-world.ts` file and add the types for these arguments by adding the following lines:
+
+```typescript
+import {
+  Context,
+  ServerlessCallback,
+  ServerlessFunctionSignature,
+} from '@twilio-labs/serverless-runtime-types/types';
+
+type RequestParameters = {};
+
+export const handler: ServerlessFunctionSignature = function(
+  context: Context,
+  event: RequestParameters,
+  callback: ServerlessCallback
+) {
+  callback(null, 'Hello World from TypeScript!');
+};
+```
+
+Try re-running the TypeScript compiler by running `npm start` again and you should see it's passing again but now with `strict` mode enabled and [http://localhost:3000/hello-world](http://localhost:3000/hello-world) should work again.
+
+Twilio Functions expose a few global objects like a global `Twilio` instance of the [Node.js helper library](https://github.com/twilio/twilio-node). Right now TypeScript is unaware of those. We can change that by importing the `@twilio-labs/serverless-runtime-types` module directly. Let's try this by responding with TwiML instead of just a string in our `hello-world.ts`:
+
+```typescript
+import '@twilio-labs/serverless-runtime-types';
+import {
+  Context,
+  ServerlessCallback,
+  ServerlessFunctionSignature,
+} from '@twilio-labs/serverless-runtime-types/types';
+
+type RequestParameters = {};
+
+export const handler: ServerlessFunctionSignature = function(
+  context: Context,
+  event: RequestParameters,
+  callback: ServerlessCallback
+) {
+  const twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message('Hello World from TypeScript!');
+  callback(null, twiml);
+};
+```
+
+Re-run `npm start` and open [http://localhost:3000/hello-world](http://localhost:3000/hello-world) and you should now see TwiML with the same message being returned.
+
+![browser window screenshot with TwiML and a message "Hello World from TypeScript!" on it](twilio-functions-typescript/K0zTxnuQpqdRpfyr1_KkFCe3lgyW9g1Nt7RDHpFK7LkA8L8KeQAdj_b59uZ0DYMBn53F1A78YpCqU2.png)
+
+Since Twilio Functions are running Node.js you might want to use some Node.js specific functionality at one point. If you want to do that, you can install the Node.js types by running:
+
+```bash
+npm install @types/node --save-dev
+```
+
+This will make any [built-in Node.js module](https://nodejs.org/api/index.html) and [globals](https://nodejs.org/api/globals.html) available for you.
+
+**Deploying your Functions**
+
+Now that we have locally developed our Twilio Functions, all we have to do is, deploy our Functions to Twilio. Deploy your Functions by running:
+
+```bash
+npm run deploy
+```
+
+Once your project has successfully been deployed you should see a list of the Functions and Assets that have been deployed. Your URL should look something like this: [https://typescript-demo-1234-dev.twil.io/hello-world](https://typescript-demo-1234-dev.twil.io/hello-world) where 1234 will be some other number.
+
+![screenshot of terminal showing the deployment output and highlighting the functions URL](twilio-functions-typescript/ylVvRF813HganGOPEvjVd01RuSJxR5q7TXV_tAKgnPdQvx7UhdJy81ovOSZdPEup6huCxANcSSCyv9.png)
+
+**Wrapping It Up**
+
+Congratulations! You built your first Twilio Functions project with TypeScript and successfully deployed it to Twilio. Why not [check out how you can link your new Twilio Function to a phone number using the Twilio CLI](https://www.twilio.com/docs/twilio-cli/general-usage#webhooks)?
+
+Before you leave, here are a few more tips of things you might want to do:
+
+- Add the `functions/` directory to your `.gitignore` file to not track the compiled output. This avoids confusion
+- If you don't want to constantly re-run `npm start` while developing, run `npx tsc --watch`, this will kickoff TypeScript in "watch mode" and triggers a re-compiling whenever your Functions change.
+- Check out the [Serverless Toolkit documentation](https://www.twilio.com/docs/labs/serverless-toolkit) to learn how you can [locally debug your Functions](https://www.twilio.com/docs/labs/serverless-toolkit/developing#debugging-your-functions) or [run ngrok to test them with Twilio](https://www.twilio.com/docs/labs/serverless-toolkit/developing?code-sample=code-start-local-development-server-with-ngrok-2&code-language=Bash%20Session&code-sdk-version=default#exposing-your-localhost)
+
+If you have any questions, feedback or just want to show me what you build, feel free to reach out to me:
+
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- [dkundel.com](https://dkundel.com)

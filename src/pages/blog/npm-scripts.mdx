@@ -1,0 +1,178 @@
+---
+title: "Three Things You Didn't Know You Could Do with npm Scripts"
+publishDate: '2020-03-03 09:00:00'
+image: '/blog-headers/external/59ce4aac044457b570235a8cace829621f28c5fd428ac93d08af80675acf2c25.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "npm scripts are a great way to automate common tasks during your Node.js development flow. In this blog post we'll cover the basics but also three lesser known features of npm scripts and how you can use them to level up your day to day development tasks."
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/npm-scripts'
+---
+
+The Node.js ecosystem is full with useful CLI tools and most of them offer configurations that let you tune them to do exactly what you want. However, sometimes you still have the need for very custom configurations and scripts. This is where "npm scripts" come into place. While you might have used this to set up your "build", "dev" or "start" script, there's a lot of things you can do with them. In this blog post we'll talk about the most useful and some hidden features.
+
+Before we get started, make sure you have the latest version of npm installed. While a lot of these things should work in yarn, berry and pnpm as well, we'll focus on npm in this article. Everything in this post has been tested with npm version 6.10.
+
+## What are npm scripts?
+
+When we talk about "npm scripts" we are talking about entries in the `scripts` field of the `package.json`. The `scripts` field holds an object where you can specify various commands and scripts you want to expose. These can then be executed using `npm run <script-name>`.
+
+For example if our `package.json` looks like this:
+
+```json
+{
+  "name": "demo",
+  "scripts": {
+    "example": "echo 'hello world'"
+  }
+}
+```
+
+You'll be able to run:
+
+```bash
+npm run example
+```
+
+This is especially handy if you want to pass a variety of arguments to a CLI command and don't want to re-type them every time. Additionally, you'll be able to access any scripts that were exposed by your dependencies, which means you no longer need global dependencies.
+
+For example, if you want to use TypeScript, rather than asking everyone to install it globally using `npm install -g typescript`, you can install it as a dev dependency using `npm install --save-dev typescript` and then add a `build` script to your `scripts` section:
+
+```json
+"scripts":{
+   "build": "tsc"
+}
+```
+
+After that, anyone who wants to use your project doesn't have to install TypeScript globally but instead can run `npm run build` after they've run `npm install`. It also means that people can have multiple projects with different versions of the same command installed.
+
+Command aliasing like this might be the thing that npm scripts are most known for. But there is a variety of things you can do to uplevel your npm scripts!
+
+## Pre-/post-scripts
+
+From the tips and tricks we'll cover in this blog post, this might be the best known, but I think it's a very powerful one that should be covered.
+
+Let's say you have the following scripts section:
+
+```json
+"scripts":{
+   "prebuild": "rimraf dist",
+   "build": "tsc",
+   "postbuild": "npm run test",
+   "test": "jest"
+}
+```
+
+If you now run `npm run build` the following things will automatically be triggered:
+
+- `prebuild` will be called executing the [rimraf tool](https://www.npmjs.com/package/rimraf) to delete the `dist` folder
+- `build` is executed running the TypeScript compiler
+- `postbuild` will be called running `npm run test`
+- `test` is executed running the [jest test runner](https://jestjs.io/)
+
+This works because npm will automatically detect if a script has other scripts named the same way but prefixed with `pre` or `post` and will execute those in the respective order. It's a great way to chain commands without convoluting your scripts. Good use cases for this would be:
+
+- deleting build artifacts
+- running a linter before tests
+- downloading data before building your application
+
+The same behavior also applies for built-in commands. For example `preinstall`, `prepack`. An odd one here is `version` because it provides `preversion`, `version`, and `postversion`. Where the difference between `version` and `postversion` is that `postversion` will be called after npm has committed the changes performed in `preversion` and `version`. You can [read more about those lifecycle scripts in the npm docs](https://docs.npmjs.com/misc/scripts).
+
+## Environment variables
+
+The next thing was a pleasant surprise for me the first time I discovered it. When you run a command or script through `npm run…`, your environment variables will automatically be augmented with a set of variables from npm.
+
+All environment variables are prefixed with `npm_` and can be grouped into two types:
+
+- anything starting with `npm_config_` is general npm configuration from your global npm config or from a project-specific `.npmrc` file.
+- anything starting with `npm_package_` is specific to your project
+
+If you are curious about all the values that are passed to scripts in your project, add the following entry to your scripts:
+
+```bash
+{
+    "scripts":{
+       "check-env": "node -e 'console.log(process.env)' | grep npm"
+    }
+}
+```
+
+Then run `npm run check-env` in your command-line and you should see a list of all the environment variables that npm has set for you. Some that stood out for me:
+
+- You can find every single entry of your `package.json` as an environment variable. The accessing is done similar to accessing a property in JSON except that it's all using `_` as separators. For example `npm_package_dependencies_twilio` will give you the version of `twilio` that is installed or `npm_package_author_email` would give you the email field of the `author` property. In order to access values inside an array you use the index value prefixed with an `_`, like `npm_package_keywords_0` to retrieve the first keyword.
+- You can get the `npm` version, `node` version, and operating system through the `npm_config_user_agent`. The format runs along the lines of `npm/6.10.0 node/v10.19.0 darwin x64` where `darwin` means macOS and `x64` is the processor architecture
+- You can get the git hash of the HEAD through `npm_package_gitHead`.
+
+There's a variety of different useful variables in here and I encourage you to check it out, especially if you are working on creating automation scripts.
+
+Check out my blog post if you want to [learn more about environment variables in Node.js in general](https://www.twilio.com/blog/working-with-environment-variables-in-node-js.html).
+
+## Argument passing and parsing
+
+So far we covered how to create scripts, which environment variables are set and how to call the scripts. However, sometimes you want to be able to pass arguments to your scripts so that they can be more dynamic. There are two different ways you can pass arguments to npm scripts.
+
+The first one way just passes the arguments directly to your actual command. For example:
+
+```bash
+npm run build -- --watch
+```
+
+Will be executed as:
+
+```bash
+tsc --watch
+```
+
+The important part here is the `--` followed by a space. Anything after that will be passed one to one into the actual command for the script. This is useful for examples like the one shown above where you expose a base command like `tsc` and just want to occasionally pass additional arguments to the command.
+
+The second option is to use npm's built-in argument parser. This is probably one of the lesser-known features of npm scripts and I was super excited when I learned about it. Essentially, npm will parse any argument you pass to the script unless it's passed after `--` followed by a space. After npm parses them, they'll be available under `npm_config_` in the environment variables.
+
+To test this, create a new `scripts` entry:
+
+```json
+{
+  "scripts": {
+    "demo": "echo \"Hello $npm_config_first $npm_config_last\""
+  }
+}
+```
+
+Then run:
+
+```bash
+npm run demo --last=Kundel --first=Dominik
+```
+
+It should output `Hello Dominik Kundel`. It's important to note that since we are not configuring this arguments parser, it is not very flexible in terms of argument syntax. For example, if we remove the `=` signs and run the same command again:
+
+```bash
+npm run demo --last Kundel --first Dominik
+```
+
+We'll get `Hello true true Kundel Dominik` instead because it will interpret `--last` and `--first` as boolean flags and set their value to `true` and will pass the rest of the arguments to the script as unparsed arguments resulting in `echo "Hello $npm_config_first $npm_config_last" "Kundel" "Dominik"` being called.
+
+But even with the argument parser being fairly strict, this is a super powerful tool if you are planning to create a few simple scripts and don't want to have to deal with the argument parsing.
+
+## Useful tools
+
+Now that we covered a few ways you can use npm scripts and unleash their power, I wanted to share a few of my favorite tools that might help you bring your npm scripts to the next level.
+
+- [rimraf](https://www.npmjs.com/package/rimraf) allows you to run `rm -rf` but is compatible with Windows
+- [ncp](https://npm.im/ncp) is a great cross-platform alternative to `cp`
+- [npm-run-all](https://www.npmjs.com/package/npm-run-all) exposes two useful commands with `run-s` and `run-p` to run various npm scripts in series or parallel (great if you want to [run a React application and an Express server at the same time](https://www.twilio.com/blog/react-app-with-node-js-server-proxy))
+- [cross-env](https://www.npmjs.com/package/cross-env) is a useful tool to work with environment variables in npm scripts across platforms
+
+These are just a few tools and I'm certain there are a lot more. If you have some that you think should be listed here, feel free to send me an email to [dkundel@twilio.com](mailto:dkundel@twilio.com) or send me a [DM on Twitter](https://twitter.com/dkundel) and I'm happy to add them here.
+
+## Conclusion
+
+npm scripts are a useful way to improve the development experience for you and everyone working on your project. They can enable you to create quick commands to re-run common tasks, abstract away internal implementations by creating a clear interface and can act as a quick scripting interface.
+
+I'd love to hear some of the scripts you built and other tricks you might have encountered while building your own npm scripts!
+
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- GitHub: [dkundel](https://github.com/dkundel)
+- [dkundel.com](https://dkundel.com/)

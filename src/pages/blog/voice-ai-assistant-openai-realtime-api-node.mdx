@@ -1,0 +1,378 @@
+---
+title: 'Build an AI Voice Assistant with Twilio Voice, OpenAI’s Realtime API, and Node.js'
+publishDate: '2024-10-01 09:00:00'
+image: '/blog-headers/external/bc04fc17b2a0a811571a665267980b3374c4a542cd50e5f1eb536cdbdcd64bfd.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how to build a conversational AI voice assistant with Twilio Voice and the OpenAI Realtime API using Node.js.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/voice-ai-assistant-openai-realtime-api-node'
+---
+
+# Build an AI Voice Assistant with Twilio Voice, OpenAI’s Realtime API, and Node.js
+
+![Cookie Preferences](voice-ai-assistant-openai-realtime-api-node/twilio2.png)
+
+**Time to read: 8 minutes**
+
+## Prerequisites
+
+To follow along with this tutorial, you will first need:
+
+- Node.js 18+ (I used 18.20.4 for this tutorial; you can download it from [here](https://nodejs.org/))
+- A Twilio account. If you don’t have one yet, you can sign up for a free trial [here](https://www.twilio.com/try-twilio).
+- A Twilio number with Voice capabilities. Here are instructions to [purchase a phone number](https://www.twilio.com/docs/voice/tutorials/how-to-use-your-free-trial-account).
+- An OpenAI account and an OpenAI API Key. You can sign up [here](https://beta.openai.com/signup/).
+- OpenAI Realtime API access. Check [here](https://beta.openai.com/docs/realtime-api) for more information.
+- (Optional) ngrok or another tunneling solution to expose your local server to the internet for testing. Download ngrok [here](https://ngrok.com/download).
+- A cell phone or landline that can make outgoing phone calls.
+
+And with that, you can start the build!
+
+## Set up the Realtime API speech-to-speech Node project
+
+In these next steps, I’ll walk you through setting up your project, installing dependencies, and writing the code you’ll need to proxy websocket connections between Twilio and OpenAI.
+
+Alternatively, you can find our repository [here](https://github.com/twilio-labs/speech-assistant-openai-realtime-api-node). We also have a video version of this tutorial you can find [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+
+### Step 1: Initialize the Project
+
+First, set up a new Node.js project:
+
+```bash
+mkdir speech-assistant-openai-realtime-api-node
+cd speech-assistant-openai-realtime-api-node
+npm init -y; npm pkg set type="module";
+```
+
+### Step 2: Install dependencies
+
+Next, install the required dependencies for the project. We’ll be using the web framework Fastify, and we’ll need websocket support. We’ll also be storing our sensitive environment variable in a `.env` file.
+
+```bash
+npm install fastify ws dotenv @fastify/formbody @fastify/websocket
+```
+
+### Step 3: Create the project files
+
+We will create a file named `index.js` for our main code. We’ll also have that `.env` file to store environment variables. You can find more information on this strategy [here](https://12factor.net/config).
+
+#### Step 3.1: Create the .env File
+
+First, create the `.env` file:
+
+```bash
+touch .env
+```
+
+Then – in your favorite text editor – add your `OPENAI_API_KEY` on the first line:
+
+```text
+OPENAI_API_KEY="your_openai_api_key_here"
+```
+
+#### Step 3.2: Create the index.js File
+
+Next, create a new file called `index.js` in your project directory:
+
+```bash
+touch index.js
+```
+
+### Step 4: Write the server code
+
+Great stuff – now we’re ready to get down to the tutorial. I’ll break down the `index.js` code into multiple steps and provide explanations for each part – but feel free to switch over to the Code Exchange app or the repo if you’d like to fast forward!
+
+#### Step 4.1: Import dependencies, load our Environment Variable, and initialize Fastify
+
+There’s nothing out of the ordinary here – we start by importing required modules, setting up the path resolution, and loading the environment variables from our `.env` file.
+
+Paste the following code in your `index.js`:
+
+```javascript
+import Fastify from 'fastify';
+import WebSocket from 'ws';
+import fs from 'fs';
+import dotenv from 'dotenv';
+import fastifyFormBody from '@fastify/formbody';
+import fastifyWs from '@fastify/websocket';
+
+// Load environment variables from .env file
+dotenv.config();
+
+// Retrieve the OpenAI API key from environment variables. You must have OpenAI Realtime API access.
+const { OPENAI_API_KEY } = process.env;
+if (!OPENAI_API_KEY) {
+  console.error('Missing OpenAI API key. Please set it in the .env file.');
+  process.exit(1);
+}
+
+// Initialize Fastify
+const fastify = Fastify();
+fastify.register(fastifyFormBody);
+fastify.register(fastifyWs);
+```
+
+#### Step 4.2: Define some constants
+
+Next, we define constants for the system message, voice, and server port. We’ll also choose the OpenAI events to log to the console.
+
+Here’s what you should paste next in your file:
+
+```javascript
+// Constants
+const SYSTEM_MESSAGE =
+  'You are a helpful and bubbly AI assistant who loves to chat about anything the user is interested about and is prepared to offer them facts. You have a penchant for dad jokes, owl jokes, and rickrolling – subtly. Always stay positive, but work in a joke when appropriate.';
+const VOICE = 'alloy';
+const PORT = process.env.PORT || 5050; // Allow dynamic port assignment
+
+// List of Event Types to log to the console. See OpenAI Realtime API Documentation. (session.updated is handled separately.)
+const LOG_EVENT_TYPES = [
+  'response.content.done',
+  'rate_limits.updated',
+  'response.done',
+  'input_audio_buffer.committed',
+  'input_audio_buffer.speech_stopped',
+  'input_audio_buffer.speech_started',
+  'session.created',
+];
+```
+
+#### Step 4.3: Define two routes
+
+Now, we get down to the heart of the code! We define a root route (primarily a health check…) and a route to handle incoming calls. The `/incoming-call` will return TwiML, Twilio’s Markup Language, to direct Twilio how to handle the call – more on that in a second.
+
+Paste this into `index.js` after we set the constant list for `LOG_EVENT_TYPES`:
+
+```javascript
+// Root Route
+fastify.get('/', async (request, reply) => {
+  reply.send({ message: 'Twilio Media Stream Server is running!' });
+});
+
+// Route for Twilio to handle incoming and outgoing calls
+// <Say> punctuation to improve text-to-speech translation
+fastify.all('/incoming-call', async (request, reply) => {
+  const twimlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+  <Response>
+    <Say>Please wait while we connect your call to the A. I. voice assistant, powered by Twilio and the Open-A.I. Realtime API</Say>
+    <Pause length="1"/>
+    <Say>O.K. you can start talking!</Say>
+    <Connect>
+      <Stream url="wss://${request.headers.host}/media-stream"/>
+    </Connect>
+  </Response>`;
+  reply.type('text/xml').send(twimlResponse);
+});
+```
+
+#### Step 4.4: Handle WebSocket connections
+
+Now we need to set up the WebSocket route for media streaming (the route we give Twilio in the above section), and set up websockets with Twilio and OpenAI. This code is a bit long, but I’ll explain what’s happening right after the code block.
+
+Paste this code below where we defined the routes:
+
+```javascript
+// WebSocket route for media-stream
+fastify.register(async fastify => {
+  fastify.get('/media-stream', { websocket: true }, (connection, req) => {
+    console.log('Client connected');
+
+    const openAiWs = new WebSocket(
+      'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01',
+      {
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          'OpenAI-Beta': 'realtime=v1',
+        },
+      }
+    );
+
+    let streamSid = null;
+
+    const sendSessionUpdate = () => {
+      const sessionUpdate = {
+        type: 'session.update',
+        session: {
+          turn_detection: { type: 'server_vad' },
+          input_audio_format: 'g711_ulaw',
+          output_audio_format: 'g711_ulaw',
+          voice: VOICE,
+          instructions: SYSTEM_MESSAGE,
+          modalities: ['text', 'audio'],
+          temperature: 0.8,
+        },
+      };
+      console.log('Sending session update:', JSON.stringify(sessionUpdate));
+      openAiWs.send(JSON.stringify(sessionUpdate));
+    };
+
+    // Open event for OpenAI WebSocket
+    openAiWs.on('open', () => {
+      console.log('Connected to the OpenAI Realtime API');
+      setTimeout(sendSessionUpdate, 250); // Ensure connection stability, send after .25 seconds
+    });
+
+    // Listen for messages from the OpenAI WebSocket (and send to Twilio if necessary)
+    openAiWs.on('message', data => {
+      try {
+        const response = JSON.parse(data);
+        if (LOG_EVENT_TYPES.includes(response.type)) {
+          console.log(`Received event: ${response.type}`, response);
+        }
+        if (response.type === 'session.updated') {
+          console.log('Session updated successfully:', response);
+        }
+        if (response.type === 'response.audio.delta' && response.delta) {
+          const audioDelta = {
+            event: 'media',
+            streamSid: streamSid,
+            media: {
+              payload: Buffer.from(response.delta, 'base64').toString('base64'),
+            },
+          };
+          connection.send(JSON.stringify(audioDelta));
+        }
+      } catch (error) {
+        console.error(
+          'Error processing OpenAI message:',
+          error,
+          'Raw message:',
+          data
+        );
+      }
+    });
+
+    // Handle incoming messages from Twilio
+    connection.on('message', message => {
+      try {
+        const data = JSON.parse(message);
+        switch (data.event) {
+          case 'media':
+            if (openAiWs.readyState === WebSocket.OPEN) {
+              const audioAppend = {
+                type: 'input_audio_buffer.append',
+                audio: data.media.payload,
+              };
+              openAiWs.send(JSON.stringify(audioAppend));
+            }
+            break;
+          case 'start':
+            streamSid = data.start.streamSid;
+            console.log('Incoming stream has started', streamSid);
+            break;
+          default:
+            console.log('Received non-media event:', data.event);
+            break;
+        }
+      } catch (error) {
+        console.error('Error parsing message:', error, 'Message:', message);
+      }
+    });
+
+    // Handle connection close
+    connection.on('close', () => {
+      if (openAiWs.readyState === WebSocket.OPEN) openAiWs.close();
+      console.log('Client disconnected.');
+    });
+
+    // Handle WebSocket close and errors
+    openAiWs.on('close', () => {
+      console.log('Disconnected from the OpenAI Realtime API');
+    });
+
+    openAiWs.on('error', error => {
+      console.error('Error in the OpenAI WebSocket:', error);
+    });
+  });
+});
+```
+
+#### Step 4.5: Prepare the server
+
+And finally, we start the Fastify server and bring it home (using the port we passed in or defined). Paste this below what you have, and we’re ready to roll!
+
+```javascript
+fastify.listen({ port: PORT }, err => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log(`Server is listening on port ${PORT}`);
+});
+```
+
+### Run the server
+
+Exit back out of the file.
+
+You can now run the server with the following command:
+
+```bash
+node index.js
+```
+
+If the server starts successfully, you should see the message `Server is listening on port 5050` (or the port you specified) in your terminal.
+
+## Finish your setup
+
+Now it’s time to provide instructions to Twilio and finish the wiring! We’ll cover using the reverse proxy ngrok to make your server public.
+
+### Step 5: Expose your server to Twilio using ngrok
+
+Now, you need to use ngrok or a similar service (or a virtual private server, etc.) to expose your local server to the public internet. Twilio requires a public URL to send requests to your server and receive instructions from you.
+
+Download and install ngrok if you still need to, then run the following command. If you have changed the port from `5050`, be sure to update it here:
+
+```bash
+ngrok http 5050
+```
+
+This will give you a public URL (e.g., `https://abc123.ngrok.io`) that you can use for testing. Here’s how it looked for me:
+
+![null](voice-ai-assistant-openai-realtime-api-node/compressed-original.webp)
+
+### Step 6: Configure Twilio
+
+We’re so close now, can you feel it?
+
+Go to the Twilio Console and select your Voice-enabled number.
+
+Under Voice & Fax, set the A CALL COMES IN webhook to your ngrok URL (in the Forwarding line, appending `/incoming-call`). For example, in my case, `https://ad745c4093d9.ngrok.app/incoming-call`.
+
+Save your changes - you’re at the final step!
+
+![null](voice-ai-assistant-openai-realtime-api-node/compressed-original.webp)
+
+## Test your setup!
+
+Make sure your ngrok session is still running and your server is up. If it is, it’s time – you can now make a call to your Twilio number using a cell phone or landline.
+
+The server should handle the call (providing your TwiML to Twilio), then proxy the OpenAI Realtime API and Twilio WebSockets together. Start talking – you should now hear the AI-based system message and be able to interact with it!
+
+> Session lengths are limited to 15 minutes during the OpenAI Realtime API beta.
+
+## Common Issues and Troubleshooting
+
+If your setup isn’t working (but your server is running), there are a few places to check first:
+
+- Is ngrok running? Is the URL properly set in the Voice Configuration -> A Call Comes In section?
+- Was there an error with Twilio, possibly in your TwiML? You can debug Twilio errors in a few ways - there’s more info in [this article](https://www.twilio.com/docs/voice/troubleshooting).
+- Is your code calling OpenAI correctly? See more information in their [documentation](https://beta.openai.com/docs/realtime-api).
+
+## Conclusion
+
+Isn’t that amazing? You’ve now successfully built an AI voice assistant using Twilio Voice and the OpenAI Realtime API. This setup allows for dynamic, low latency, interactive voice applications that can respond to user input in near real-time - and gives you a voice you can reliably call on, whenever you need.
+
+We can’t wait to talk to what you build.
+
+Next step:
+
+- Check out the [Twilio documentation](https://www.twilio.com/docs) and [OpenAI's Realtime API docs](https://beta.openai.com/docs/realtime-api) for more advanced features.
+- See OpenAI’s documentation on [concepts](https://beta.openai.com/docs/concepts).
+
+Paul Kamp is the Technical Editor-in-Chief of the Twilio Blog. You can reach him – or, possibly, his AI Assistant – at pkamp [at] twilio.com.
+
+Dominik leads Product for the Emerging Tech & Innovation organization at Twilio. His team builds next gen prototypes and iterates quickly to help craft the long term product vision and explore the impact of autonomous agents and AGI on customer engagement. Deeply passionate about the Developer Experience, he’s a JavaScript enthusiast who’s integrated it into everything from CLIs to coffee machines. Catch his tweets @dkundel and his side ventures in cocktails, food and photography.

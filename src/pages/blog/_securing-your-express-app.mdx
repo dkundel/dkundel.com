@@ -1,0 +1,148 @@
+---
+title: 'Putting the helmet on – Securing your Express app'
+publishDate: '2017-11-21 09:00:00'
+image: '/blog-headers/external/d4e5dc002435332114a78825516078fe938a0fd7741ca7e0977e970748e01651.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how you can improve the security of your Node.js & Express web application with a set of HTTP headers such as Content Security Policy.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/securing-your-express-app.html'
+---
+
+[Express](https://expressjs.com/) is a great way to build a web server using [Node.js](https://nodejs.org/). It’s easy to get started with and allows you to configure and extend it easily thanks to its concept of middleware. While there are a [variety of frameworks to create web applications](https://www.twilio.com/blog/how-to-receive-a-post-request-in-node-js.html) in Node.js, my first choice is always Express. However, out of the box Express doesn’t adhere to all security best practices. Let’s look at how we can use modules like [helmet](https://helmetjs.github.io/) to improve the security of an application.
+
+## Set Up
+
+Before we get started make sure you have Node.js and npm (or yarn) installed. You can find the [download and installation instructions on the Node.js website](https://nodejs.org/en/download/).
+
+We’ll work on a new project but you can also apply these features to your existing project.
+
+Start a new project in your command line by running:
+
+```javascript
+mkdir secure-express-demo
+cd secure-express-demo
+npm init -y
+```
+
+Install the Express module by running:
+
+```javascript
+npm install express --save
+```
+
+Create a new file called `index.js` in the `secure-express-demo` folder and add the following lines:
+
+```javascript
+const express = require('express');
+const PORT = process.env.PORT || 3000;
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send(`<h1>Hello World</h1>`);
+});
+
+app.listen(PORT, () => {
+  console.log(`Listening on http://localhost:${PORT}`);
+});
+```
+
+Save the file and let’s see if everything is working. Start the server by running:
+
+```javascript
+node index.js
+```
+
+Navigate to [http://localhost:3000](http://localhost:3000) and you should be greeted with `Hello World`.
+
+![hello-world.png](securing-your-express-app/iWq7mudUzwNSEw_IBcqBqZ9ah771qXS-SOzOng3EGIkBPVG6LoDhADeDKyCCFiF53KKrU0ZIDh.png)
+
+## Inspecting the Headers
+
+We’ll start by adding and removing a few HTTP headers that will help improve our security. To inspect these headers you can use a tool like `curl` by running:
+
+```javascript
+curl http://localhost:3000 --include
+```
+
+The `--include` flag makes sure to print out the HTTP headers of the response. If you don’t have `curl` installed you can also use your favorite browser developer tools and the networking pane.
+
+At the moment you should see the following HTTP headers being transmitted in the response:
+
+```javascript
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Content-Type: text/html; charset=utf-8
+Content-Length: 20
+ETag: W/"14-SsoazAISF4H46953FT6rSL7/tvU"
+Date: Wed, 01 Nov 2017 13:36:10 GMT
+Connection: keep-alive
+```
+
+One header that you should keep an eye on is `X-Powered-By`. Generally speaking headers that start with `X-` are non-standard headers. This one gives away which framework you are using. For an attacker, this cuts the attack space down for them as they can concentrate on the known vulnerabilities in that framework.
+
+![giphy.gif](securing-your-express-app/M4qx6F5BhzDuSPYBHPEx74-xorzQFM8qD-Zi7FPS4In-cPvifztKGkHsRKE7wInEw9w6717-_G.png)
+
+## Putting the helmet on
+
+Let’s see what happens if we start using `helmet`. Install `helmet` by running:
+
+```javascript
+npm install helmet --save
+```
+
+Now add the `helmet` middleware to your application. Modify the `index.js` accordingly:
+
+```javascript
+const express = require('express');
+const helmet = require('helmet');
+const PORT = process.env.PORT || 3000;
+const app = express();
+
+app.use(helmet());
+
+app.get('/', (req, res) => {
+  res.send(`<h1>Hello World</h1>`);
+});
+
+app.listen(PORT, () => {
+  console.log(`Listening on http://localhost:${PORT}`);
+});
+```
+
+This is using the default configuration of `helmet`. Let’s take a look at what it actually does. Restart the server and inspect the HTTP headers again by running:
+
+```javascript
+curl http://localhost:3000 --inspect
+```
+
+The new headers should look something like this:
+
+```javascript
+HTTP/1.1 200 OK
+X-DNS-Prefetch-Control: off
+X-Frame-Options: SAMEORIGIN
+Strict-Transport-Security: max-age=15552000; includeSubDomains
+X-Download-Options: noopen
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Content-Type: text/html; charset=utf-8
+Content-Length: 20
+ETag: W/"14-SsoazAISF4H46953FT6rSL7/tvU"
+Date: Wed, 01 Nov 2017 13:50:42 GMT
+Connection: keep-alive
+```
+
+The `X-Powered-By` header is gone, which is a good start, but now we have a bunch of new headers. What are they all doing?
+
+![giphy.gif](securing-your-express-app/24T5xMrL0RCEEObLniOCuiZ4f4p-w6QUJWDJb4UlbayqlUnzn51IvLbbWH04jjVi1GxRzUX12_.png)
+
+### X-DNS-Prefetch-Control
+
+This header isn’t much of an added security benefit as much as an added privacy benefit. By setting the value to `off` it turns off the DNS lookups that the browser does for URLs in the page. The DNS lookups are done for performance improvements and according to MDN they can [improve the performance of loading images by 5% or more](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control). However, this lookup can make it appear like the user visited things they never visited. The default for this is `off` but if you care about the added performance benefit you can enable it by passing `{ dnsPrefetchControl: { allow: true } }` to the `helmet()` call.
+
+### X-Frame-Options
+
+`X-Frame-Options` allows you to control whether the page can be loaded in a frame like...

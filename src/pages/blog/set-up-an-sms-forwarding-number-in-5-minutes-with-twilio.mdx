@@ -1,0 +1,68 @@
+---
+title: 'Set Up an SMS Forwarding Number in 5 Minutes with Twilio'
+publishDate: '2016-11-29 09:00:00'
+image: '/blog-headers/external/5d8ce1de394f4cb17823b200cf524de96b0d2e807e802f568b274c6b19178806.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'With TwiML Bin templates you can build in less than 5 minutes an app that forwards all incoming messages to any SMS-capable phone.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/set-up-an-sms-forwarding-number-in-5-minutes-with-twilio.html'
+---
+
+## Set Up an SMS Forwarding Number in 5 Minutes with Twilio
+
+![Title Image](set-up-an-sms-forwarding-number-in-5-minutes-with-twilio/0iTvAJC9jl4h-e-IM-HSg02knf6OxdCuLO0K33FcfAhdZOsXoIH3yyHYDyyrDlAPWm_JIMtXkJ.png)
+
+**Writing the TwiML Code**
+
+There is a variety of scenarios where you want to forward SMS from a Twilio number to your cell phone. It could be when you don’t want to give your real number in an online sale or to avoid losing access to your 2FA protected account if you lose your phone. With [TwiML Bin](https://www.twilio.com/blog/introducing-templates-for-twiml-bins.html) and its new [templating functionality](https://www.twilio.com/blog/introducing-templates-for-twiml-bins.html) you can build an app in less than 5 minutes that will forward all incoming messages to any SMS-capable phone.
+
+Before we get started, make sure you have a Twilio account (you can get one [here](https://www.twilio.com/try-twilio)) and that you are logged into the [Console](https://www.twilio.com/console).
+
+### Writing the TwiML Code
+
+Create a new TwiML Bin in your [developer console](https://www.twilio.com/console/dev-tools/twiml-bins).
+
+![Create TwiML Bin](set-up-an-sms-forwarding-number-in-5-minutes-with-twilio/w942tZ4hy_Rx_Qa2h03DtgNTojZin65ZXNtKRbqXnFQx8vyCp23cFr2Bzj03c93lsmoIP-Ctpa.png)
+
+![TwiML Basics](set-up-an-sms-forwarding-number-in-5-minutes-with-twilio/vu5vzax9RT5h1nZQLc-tLcmWBJHRpMSP3Os1UAZjzx7BbQ1ZWEW0yvFpK8fJeu2VkReAyd6bix.png)
+
+Give your TwiML bin a name like “SMS Forwarder” and paste the following code into it:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message to="+49111111111111">
+        {{From}}:{{Body}}
+    </Message>
+</Response>
+```
+
+Replace the `+49111111111111` with your own phone number including your country code in the [E.164 format](https://support.twilio.com/hc/en-us/articles/223183008-Formatting-International-Phone-Numbers) that you want to send the SMS to. Afterwards click “Create” to save your new TwiML Bin.
+
+### Configuring a Phone Number
+
+Buy a [new Twilio phone number](https://www.twilio.com/console/phone-numbers/search) or [configure an existing one](https://www.twilio.com/console/phone-numbers/incoming) to point to your TwiML Bin for incoming SMS.
+
+![TwiML Configuration](set-up-an-sms-forwarding-number-in-5-minutes-with-twilio/twiml-configuration-1024x252.png)
+
+Now when an SMS comes in, the TwiML Bin will be triggered and the `{{From}}` will be replaced with the sender’s phone number and the `{{Body}}` with the content of the SMS. The returned TwiML instructs Twilio to send a new SMS to your cell phone with the body of the received SMS and the sender’s phone number.
+
+Give it a spin and ask a friend to send you an SMS to your Twilio number and you should now receive SMS sent to that Twilio number on your own cell phone. And all in just 6 lines of XML.
+
+### Just the Beginning
+
+The power of TwiML is huge and the applications vast. If you want to learn more about TwiML you should check out:
+
+- [Set up a temporary “burner” phone number with TwiML Bins](https://www.twilio.com/blog/how-to-set-up-a-temporary-phone-number-in-less-than-five-minutes-with-twiml-bins.html)
+- [How to set up a conference line](https://www.twilio.com/blog/how-to-set-up-your-own-twilio-conference-line-with-twiml-bins.html)
+- [Introduction to TwiML Bin template](https://www.twilio.com/blog/introducing-templates-for-twiml-bins.html)
+- [The TwiML documentation](https://www.twilio.com/docs/api/twiml)
+
+I would love to hear and see what you built with it! So feel free to drop me a line:
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- GitHub: [dkundel](https://github.com/dkundel)

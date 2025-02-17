@@ -1,0 +1,383 @@
+---
+title: 'Conference Monitoring à la Iron Man'
+publishDate: '2016-05-20 09:00:00'
+image: '/blog-headers/external/ac14c80a7beeb7633750f76cb6d6c4e548ce7134009db75e0ec206f3edefc864.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'In this post I will show you how to add a conference monitoring dashboard to your Twilio conference using conference events.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/conference-call-monitoring-twilio.html'
+---
+
+Even in a place like the Marvel universe, communication is key in resolving conflicts and team performance. Get Tony Stark, Steve Rogers, and the other Avengers in a conference call, and who knows, the whole Civil War thing might have been avoided.
+
+With [conference events](https://www.twilio.com/blog/introducing-conference-events.html), we can build a dashboard how Iron Man would have probably built it for the Avengers to monitor their conference calls.
+
+_No worries, there will be no spoilers! ;)_
+
+## Mission Briefing
+
+![Avengers in a briefing room](conference-call-monitoring-twilio/BIXePVF-4J7Y2DLxArvvX4B1pM2evWQw1LRujdkxqvGnxQEzYaj0pC4tk1JkIbpEsGXZLgqkIp.png)
+
+There is no successful mission without a proper briefing. For this mission, we will be using the following tools:
+
+- Node.js and NPM which you can get here: [https://nodejs.org/en/](https://nodejs.org/en/)
+- A Twilio Account to get a Twilio Phone Number – [Sign up for free](https://www.twilio.com/try-twilio)!
+- [ngrok](https://ngrok.com/) – You can read more about ngrok [here](https://www.twilio.com/blog/test-your-webhooks-locally-with-ngrok.html).
+
+Additionally, our dashboard will be using [AngularJS](https://angularjs.org/). While this project doesn’t require any substantial AngularJS knowledge, you can brush up your AngularJS skills in this article: [Build a Video Chat using AngularJS](https://www.twilio.com/blog/build-video-chat-using-angularjs-1-x.html)
+
+Alright, we should be properly prepared to start coding. Ready? Let’s go!
+
+## Systems Setup
+
+![iron-man-setup-2.gif](conerence-call-monitoring-twilio/jo1DkBq3g5E8P5dZdHVF2kCyWyZYOX4pUnnmLGeeJT3WUg5ZLS5K5uX5SblAELxsHsCD5hxBRT.png)
+
+Our core mission is to add a dashboard to an existing conference call phone number. Start by cloning this project:
+
+```javascript
+git clone -b template git@github.com:dkundel/twilio-conference-dashboard.git
+cd twilio-conference-dashboard
+npm install
+```
+
+This will install all necessary dependencies for us and provide us with a basic server to work on.
+
+Copy the `.env.example` in the main directory to a new file called `.env` and add the credentials of your Twilio account from the [Console](https://www.twilio.com/console).
+
+Now we are ready to run the server. For this, we can either type `node index.js` from the main directory of the project or use the `npm run dev` script. The latter uses [nodemon](https://www.npmjs.com/package/nodemon) to make sure that the server is reloaded every time we do a code change.
+
+You can verify if everything works by opening [http://localhost:3000](http://localhost:3000) in your browser. You should see a screen that looks like this:
+
+![Screen Shot 2016-05-10 at 6.14.00 PM.png](conerence-call-monitoring-twilio/ZqvbdhkHHhL6ihsO33cY-PnXmXz3mnG2pDFTKXFUPHAbLu7XhtT2rGvtnipwHFcELI-oqq73wj.png)
+
+## Establishing Communications
+
+![screenshot-ngrok.png](conerence-call-monitoring-twilio/1qJF50IMrB5zk0q1cJMyFyHBGq79o1oYgJ8cqls31LyF-7Ufj9j5xzlwBN6vsyWPK1JJlw3D8s.png)
+
+Now that we have our application running, we need to connect a Twilio [phone number](https://www.twilio.com/console/phone-numbers/incoming) to it so we can dial into the conference. For this, we first need to expose our application to the internet via a public URL. This is where [ngrok](https://ngrok.com/) comes into play.
+
+```bash
+ngrok http 3000
+```
+
+Run this in a separate terminal and keep it running. You will get an ngrok URL that we will use with our Twilio phone number.
+
+Navigate to `http://<ngrok-url>/voice` and make sure that the TwiML returned looks like this:
+
+```xml
+<Response>
+    <Say>Welcome to the conference!</Say>
+    <Dial>
+        <Conference waitUrl="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient">myConference</Conference>
+    </Dial>
+</Response>
+```
+
+This TwiML instructs Twilio to first respond to every call with a voice saying “Welcome to the conference!” using the `<Say>` verb. Afterwards, it uses the `<Dial>` to direct the call into a `<Conference>`. The `waitUrl` attribute specifies which webhook Twilio should contact for instructions on what to do while the call is waiting for the conference to start. In our case, we use a [Twimlet](https://www.twilio.com/labs/twimlets/holdmusic) that plays a song for us.
+
+In the [Console](https://www.twilio.com/console/phone-numbers/incoming), locate one of your existing phone numbers or buy a new number and add the ngrok URL as the Webhook value.
+
+![screenshot-console.png](conerence-call-monitoring-twilio/E3muqw2WMsYCa-5SSeVf6BNps1kCzJXLKJMqY83LkNQA3zztzZqFcifd4iCqQIRsI6HA7BWciR.png)
+
+Call the phone number and you should be able to hear “Welcome to the conference” followed by some music. That’s awesome, however, we are not done yet.
+
+## Receiving Status Updates from HQ
+
+We want to receive updates whenever the status of the conference changes. For this, we need to add two new attributes `statusCallback` and `statusCallbackEvent` to the `<Conference>` element.
+
+Open `voice.js` in the `lib` folder and add the two new properties to the conference TwiML:
+
+```javascript
+//...
+node.conference('myConference', {
+  waitUrl: 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient',
+  statusCallback: '/status',
+  statusCallbackEvent: 'start end join leave mute',
+});
+//...
+```
+
+We’re telling Twilio that when the start, end, join, leave, and mute conference events happen, we want it to make an HTTP request to the `/status` route of our application.
+
+Reload `http://<ngrok-url>/voice` and you should be able to see the updated XML.
+
+```xml
+<Response>
+    <Say>Welcome to the conference!</Say>
+    <Dial>
+        <Conference waitUrl="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient" statusCallback="/status" statusCallbackEvent="start end join leave mute">myConference</Conference>
+    </Dial>
+</Response>
+```
+
+Now let's create that new `/status` route back in our Node application. Create a new file named `status.js` in the `lib` folder. Export a new request handler that for now just logs the request body:
+
+```javascript
+'use strict';
+
+function statusRouteHandler(req, res, next) {
+  console.log('Status Update:');
+  console.dir(req.body);
+  res.send('Ahoy!');
+}
+module.exports = statusRouteHandler;
+```
+
+Next, add the `/status` route to `index.js`:
+
+```javascript
+// configuring middleware
+// ...
+
+// configure routes
+app.post('/mute', require('./lib/mute'));
+app.all('/voice', require('./lib/voice'));
+app.post('/status', require('./lib/status'));
+
+// start server
+// ...
+```
+
+![screenshot-terminal.png](conerence-call-monitoring-twilio/n6hq6zAyypYy2AepujsqD4KXaQcmvgQu7frdFE_cHI_iEUfTG-11wkj4x3TiKKuv594oFqkz0_.png)
+
+That’s it! Give your number another ring and you should be able to see events being logged in the console. Make sure to wait until the music starts before you hang up in order to properly join the conference. The events you should see pop up in the console are `participant-join`, `participant-leave`, and `conference-end`. There is no `conference-start` event since the conference will only start once at least two participants are in.
+
+## Gathering Caller Intel
+
+If we have a close look at the data we receive in the statusCallback request, we get data about the conference like the callback event, conference friendly name, and the conference SID. We’ll store those in a variable named `data` for use in our dashboard. One thing we don’t get is much about the actual caller, like their phone number. To get that we can use the Twilio Node.js helper library and the `CallSid` to look up the Call resource.
+
+```javascript
+'use strict';
+
+const twilio = require('twilio');
+const client = twilio();
+
+function statusRouteHandler(req, res, next) {
+  const eventName = req.body.StatusCallbackEvent;
+  const callSid = req.body.CallSid;
+  let data = {
+    name: req.body.FriendlyName,
+    conference: req.body.ConferenceSid,
+  };
+
+  if (eventName.indexOf('participant-') !== 0) {
+    res.status(200).send();
+    return;
+  }
+
+  client.calls(callSid).get((err, call) => {
+    if (err) {
+      console.error('An error occurred!');
+      console.dir(err);
+      res.status(500).send('error!');
+      return;
+    }
+
+    console.dir(call);
+    res.status(200).send();
+    return;
+  });
+}
+
+module.exports = statusRouteHandler;
+```
+
+Dial the number again and you now have the phone number of the caller which you can use to locate even more information from a source like a local database. Say for example we wanted to find out which superhero was calling into the conference. You could use the handy database of superhero phone numbers that you keep, or you could just use the one I’ve included in the project.
+
+Use it by calling `PeopleService.get(callSid).then()` to retrieve a profile:
+
+```javascript
+'use strict';
+
+const twilio = require('twilio');
+const client = twilio();
+const PeopleService = require('./superheroService');
+
+function statusRouteHandler(req, res, next) {
+  // ... excluded for readability ...
+  client.calls(callSid).get((err, call) => {
+    if (err) {
+      console.error('An error occurred!');
+      console.dir(err);
+      res.status(500).send('error!');
+      return;
+    }
+    data.number = call.fromFormatted;
+    data.muted = req.body.Muted === 'true';
+    data.sid = callSid;
+    PeopleService.get(callSid).then(profile => {
+      data.profile = profile;
+      console.log('User info:');
+      console.dir(data);
+      res.status(200).send();
+    });
+  });
+}
+
+module.exports = statusRouteHandler;
+```
+
+## Connection Established. Waiting for data…
+
+![iron-man-interface.gif](conerence-call-monitoring-twilio/7vO3V_O21Ehtfy3bps3xpHd5zMyWZvjNNq5Hax0EDOmoQFKVkyx2a8nl0x7GOdtSFTz2hRlxi0.png)
+
+Now that we have all the caller data collected, we need to send it to our dashboard whenever there is a new conference event. To do this, we will use a [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) wrapper called [Socket.IO](http://socket.io/).
+
+Require the Socket.IO module in our `index.js` and pass it an HTTP server instance. We are returned an `io` instance that allows us to send messages and listen for events. Because we want to send those messages to the dashboard when Twilio requests the `/status` route, we’ll pass the instance of Socket.IO into that route handler.
+
+```javascript
+// configuring middleware
+// ...
+const io = require('socket.io')(server);
+
+// configure routes
+app.post('/mute', require('./lib/mute'));
+app.all('/voice', require('./lib/voice'));
+app.post('/status', require('./lib/status')(io));
+
+io.on('connection', socket => {
+  console.log('a user connected');
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+// start server
+// ...
+```
+
+Change the function export to accept the instance of Socket.IO and then use that instance to pass our dashboard client the conference event data. Additionally, change the route handler to return the caller data via a Socket.IO message instead of an HTTP response by using the emit method:
+
+```javascript
+'use strict';
+
+const twilio = require('twilio');
+const client = twilio();
+const PeopleService = require('./superheroService');
+
+let io;
+
+function statusRouteHandler(req, res, next) {
+  const eventName = req.body.StatusCallbackEvent;
+  const callSid = req.body.CallSid;
+  const accountSid = req.body.AccountSid;
+  let data = {
+    name: req.body.FriendlyName,
+    conference: req.body.ConferenceSid,
+  };
+
+  if (eventName.indexOf('participant-') !== 0) {
+    io.emit(eventName, data);
+    res.status(200).send();
+    return;
+  }
+
+  client.calls(callSid).get((err, call) => {
+    if (err) {
+      console.error('An error occurred!');
+      console.dir(err);
+      res.status(500).send('error!');
+      return;
+    }
+    data.number = call.fromFormatted;
+    data.muted = req.body.Muted === 'true';
+    data.sid = callSid;
+    PeopleService.get(callSid).then(profile => {
+      data.profile = profile;
+      console.log('User info:');
+      console.dir(data);
+
+      io.emit(eventName, data);
+      res.status(200).send('');
+    });
+  });
+}
+
+module.exports = function(ioInstance) {
+  io = ioInstance;
+  return statusRouteHandler;
+};
+```
+
+The last thing we need to do is to listen for the respective events in our dashboard. For this, we need to open the `conference.service.js` file in the `public` folder. I already made sure to include the Socket.IO client library in the `index.html` and added it to Angular’s dependency injection. So we are ready to use it and populate the `initialize` function of the service.
+
+Since we need to perform some basic actions for every event, we will maintain an array of all events we are listening on and loop over them. The events we are interested in are:
+
+```javascript
+var events = [
+  'conference-start',
+  'conference-end',
+  'participant-join',
+  'participant-leave',
+  'participant-mute',
+  'participant-unmute',
+];
+```
+
+For each of the events, we create a new `eventData` object that contains the event name, the data it sent, as well as a readable message that we generate with `getEventMessage(event, data)`. Additionally, we maintain an object containing all participants. This object has to be updated depending on the message.
+
+Once we have all necessary data, we broadcast it in order to inform components such as our controller that there has been an update. For this, we use the [$rootScope.$broadcast](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$broadcast) function of AngularJS.
+
+Stitching all of this code together, we end up with the following code in our `public/conference.service.js`:
+
+```javascript
+(function() {
+  // ... excluded for readability ...
+  function ConferenceService($http, io, $rootScope) {
+    var participants = {};
+    var socket = io();
+
+    var events = [
+      'conference-start',
+      'conference-end',
+      'participant-join',
+      'participant-leave',
+      'participant-mute',
+      'participant-unmute',
+    ];
+
+    initialize();
+
+    function initialize() {
+      events.forEach(function(event) {
+        socket.on(event, function(data) {
+          var eventData = {
+            event: event,
+            data: data,
+            message: getEventMessage(event, data),
+          };
+
+          if ('participant-join') {
+            data.joined = Date.now();
+          }
+
+          if (event === 'participant-leave') {
+            delete participants[data.sid];
+          } else if (event.indexOf('participant-') === 0) {
+            participants[data.sid] = data;
+          }
+
+          $rootScope.$broadcast('conferenceStatus.update', eventData);
+        });
+      });
+    }
+    // ... excluded for readability ...
+  }
+})();
+```
+
+That’s it. The connection is established, and the data is being piped through. If you navigate to your browser to [http://localhost:3000/](http://localhost:3000/) and start calling into the conference with a couple of phones, you should be able to see your dashboard being populated with the team and the respective log messages!
+
+![dashboard.gif](conerence-call-monitoring-twilio/KE_9u3TezN1jKO3dDolPLU7RvnCmUyigOJbEKQTw6SP3QE27N96sFQGgumPT2ABKkto8PK8_u6.png)
+
+## Comms and dashboard up and running. Time to save the world!
+
+![civil-war-clash.gif](conerence-call-monitoring-twilio/Ghiar6d1JfNnRjoQXG9sN1YloQoCXSF-Uxq08su7xF5ZLZLJ4ibzq4vc7UkJ8ZzP0j_rLVUQfm.png)
+
+We did it! We have not only a way to easily get everyone in the same conference call but a way to monitor status changes in the conference. Building a dashboard using these events is just the beginning, and I’m curious to hear what you build with it! Talk to me on Twitter [@dkundel](https://twitter.com/dkundel), via email at [SIGNAL](https://www.twilio.com/signal).
+
+If you didn’t register yet for SIGNAL, there is still time! Iron Man didn’t RSVP yet, but there will be certainly enough [bots](https://www.twilio.com/signal/bots), and you shouldn’t miss [\$bash](https://www.twilio.com/signal/$bash). Use DKUNDEL20 to get a 20% discount when registering. I’m looking forward to seeing you there!

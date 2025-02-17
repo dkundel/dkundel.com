@@ -1,0 +1,196 @@
+---
+title: 'New Major Serverless Toolkit Version'
+publishDate: '2021-05-19 09:00:00'
+image: '/blog-headers/external/2a41dd430c3f6f7c3aae8a5e34f44f6cca699b9ba92ce9287d33c17b0ba85cbf.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'The Serverless Toolkit is a collection of tools to improve development of Twilio Functions and Assets. Learn what features we added in the latest major version of the Serverless Toolkit and what things changed.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/new-major-serverless-toolkit-version'
+---
+
+The [Serverless Toolkit](https://www.twilio.com/docs/labs/serverless-toolkit/) is a collection of open-source CLI tooling to improve your development flows with [Twilio Functions and Assets](https://www.twilio.com/docs/runtime/functions) by providing local development, deployment, templates and other functionality. Today we are releasing the first major version bump since 2019 including a variety of bug fixes, new features and a few breaking changes. In this blog post we'll cover what's new as well as the breaking changes that come along with it.
+
+This blog post is primarily aimed at existing Serverless Toolkit users. If you've never used the Serverless Toolkit before, make sure to check out our [Getting Started guide](https://www.twilio.com/docs/labs/serverless-toolkit/getting-started).
+
+> The Serverless Toolkit is an open-source Twilio Labs project and is not covered by Twilio's regular SLAs. It includes both the Serverless plugin for the Twilio CLI (`@twilio-labs/plugin-serverless`) and the standalone `twilio-run` command. If you find bugs/issues or have feature requests, we welcome issues and contributions in our [GitHub repository](https://github.com/twilio-labs/serverless-toolkit).
+
+**New Features**
+
+- [Configuration](#Configuration)
+- [Improved Twilio CLI Support](#Improved-Twilio-CLI-Support)
+- [New Assets Plugin](#New-Assets-Plugin)
+- [New Guides](#New-Guides)
+
+**Breaking Changes**
+
+- [Removed `.twilio-functions` files](#No-more-twilio-functions-file)
+- [Credential Handling](#Changed-Credential-Handling-for-Twilio-CLI)
+- [Removed Node.js 10 Support](#No-More-Nodejs-Version-10-Support)
+- [Isolated Local Function Executions](#Isolated-Local-Function-Execution)
+
+## New Features
+
+### Configuration
+
+While the goal of the Serverless Toolkit is to follow a convention-over-configuration model, there are moments where you have to alter the out-of-the-box behavior. In previous versions, you'd primarily do this by passing additional arguments through command flags to the respective CLI command. With this new release of the Serverless Toolkit we are introducing first-class configuration support in the shape of a new `.twilioserverlessrc` file.
+
+The new `.twilioserverlessrc` configuration file supports almost all options that you can configure through flags, as well as the ability to scope those configuration values to specific Twilio projects, environments or commands.
+
+Additionally, you can author the configuration in [JSON5](https://json5.org/) (default), YAML, JavaScript or directly inside your `package.json` file.
+
+A common example would be to have a different `.env` file for each environment you are deploying to:
+
+```json
+{
+  "environments": {
+    "dev": { "env": ".env.dev" },
+    "stage": { "env": ".env.stage" },
+    "*": { "env": ".env.prod" }
+  }
+}
+```
+
+Now if you run `twilio serverless:deploy --production` it will use the `.env.prod` file, the `twilio serverless:deploy --environment stage` for `.env.stage` and `twilio serverless:deploy` for `.env.dev`.
+
+[Head over to the documentation to learn more.](https://www.twilio.com/docs/labs/serverless-toolkit/configuration)
+
+### Improved Twilio CLI Support
+
+Driven by our [design principles](https://github.com/twilio-labs/serverless-toolkit/blob/main/docs/DESIGN.md), we remain committed to ensuring that the Serverless Toolkit can continue to be used in an independent manner outside of the Twilio CLI. However, we know a lot of you (including us) use the Serverless Toolkit as part of the Twilio CLI. As part of this release we worked on further improving the experience for all of you.
+
+These changes included respecting the credentials from the Twilio CLI over what is in the `.env` file of your project during anything other than local development. This is a breaking change to the previous behavior. The credentials in the `.env` file will continue to be used for local development using `twilio serverless:start`.
+
+We also stopped populating the `.env` file with faulty `ACCOUNT_SID` and `AUTH_TOKEN` values when you create a new project using `twilio serverless:init`. Instead, we'll populate the field only if we have a valid `ACCOUNT_SID` and `AUTH_TOKEN`.
+
+Lastly, switching between multiple Twilio accounts and deploying should now be smoother than it was before.
+
+While these are the only changes in this major release, we are not done with this work. We'll continue by improving the compatibility in the future with machine readable output and more.
+
+### New Assets Plugin
+
+The last major feature is actually an entirely new Twilio CLI plugin! The existing Serverless Toolkit works great for Assets if they are part of a project containing Functions. But there are scenarios where you just want to host a couple of public static files on Twilio Assets. For example, hosting an MP3 file for a Studio flow.
+
+For these scenarios you can now install the [brand new @twilio-labs/plugin-assets Twilio CLI plugin](https://www.npmjs.com/package/@twilio-labs/plugin-assets) by running:
+
+```bash
+twilio plugins:install @twilio-labs/plugin-assets
+```
+
+From here, you'll have three new commands under the `twilio assets` namespace. The Assets plugin uses the concept of "buckets" to store your files. Essentially a bucket is a Functions/Assets service and you'll have to create one by running:
+
+```bash
+twilio assets:init
+```
+
+From there, you'll be able to deploy any file to your bucket by running:
+
+```bash
+twilio assets:upload NAME_OF_YOUR_FILE
+```
+
+Once the upload is done, you'll be presented with a publicly accessible URL to access your uploaded asset.
+
+If you want to learn more about this plugin, watch out for a dedicated blog post by [Phil Nash](https://www.twilio.com/blog/author/pnash) in the coming weeks. Any feature requests for the plugin? Make sure to [head over to our GitHub repository](https://github.com/twilio-labs/serverless-toolkit) to create an issue.
+
+### New Guides
+
+We wrote two brand new guides in our documentation to help you with two common scenarios:
+
+- [How to use the Serverless Toolkit in a CI/CD environment](https://www.twilio.com/docs/labs/serverless-toolkit/guides/continous-deployment)
+- [How to use the Serverless Toolkit with multiple Twilio accounts](https://www.twilio.com/docs/labs/serverless-toolkit/guides/multiple-twilio-projects)
+
+## Breaking Changes
+
+As part of this release, we had to make some changes that are not backwards compatible:
+
+### No more `.twilio-functions` file
+
+In the past, you probably noticed a `.twilio-functions` file that would always appear in your project after running any Serverless Toolkit command (even if you deleted the file). Chances are high that it might have even caused you trouble before. The problem was that this file was overloaded in responsibilities and had some additional design issues. It handled both configuration and storing metadata after deployments to make other commands more convenient. Additionally, supporting multiple Twilio accounts was very much added as an afterthought.
+
+As a result, we replaced the `.twilio-functions` file with two new files. One is the `.twilioserverlessrc` file that is meant for any configuration needs. If you need to share configuration details with your colleagues, this is the file you would use to do that. For example, if you are working with multiple people on the same Twilio Account and Functions Service, you should add those Service SIDs into the `.twilioserverlessrc` file. [Check out this guide on how to work with multiple Twilio people/accounts](https://www.twilio.com/docs/labs/serverless-toolkit/guides/multiple-twilio-projects). The `.twilioserverlesssrc` file should be added to your version control system.
+
+The other file is called `.twiliodeployinfo`. This file will change after each deployment and is in general not meant to be committed to your repository. Instead, it primarily provides convenient functionality, such as removing the need to specify a Service SID when running `twilio serverless:logs`.
+
+### Changed Credential Handling for Twilio CLI
+
+If you are using `twilio-run` instead of `twilio serverless` nothing changes for you and you can read on.
+
+If you are using `twilio serverless` we will no longer take the `.env` credentials for these commands:
+
+- `twilio serverless:deploy`
+- `twilio serverless:promote`
+- `twilio serverless:logs`
+- `twilio serverless:list`
+
+Instead, we'll use the same credentials that any other `twilio` command would use.
+
+### No More Node.js Version 10 Support
+
+As of May 1, 2021 Node.js 10 has officially been deprecated. Consequently, we no longer support the Serverless Toolkit on Node.js 10. While the Serverless Toolkit should work on Node.js 14 and 16, we only officially support Node.js 12 (at least 12.22.1) because this is the same version that we support in deployed Functions.
+
+Additionally, if you have not deployed your Functions to Node.js 12 yet, you'll have to deploy once using the `--runtime node12` flag to move your project to Node.js 12.
+
+```bash
+twilio serverless:deploy --runtime node12
+```
+
+### Isolated Local Function Execution
+
+When you use `twilio-run start` or `twilio serverless:start`, we do our best to emulate the environment that your Functions will be executed in when deployed.
+
+This change introduces a major behavior change to local development. In order to better emulate a "serverless" environment, we are executing every local Functions invocation in a separate process. This has two implications for you as developers:
+
+- Similar to deployed Functions, we will stop any execution after `callback(...)` has been called.
+- Contrary to deployed Functions, we do NOT support sharing memory/state between Function executions. While in theory Functions might share state between executions if the Function remains "hot", we don't encourage you to explicitly program for that behavior.
+
+If for some reason you cannot work with this behavior you can add the following code snippet to your `.twilioserverlessrc` file:
+
+```json
+{
+  "forkProcess": false
+}
+```
+
+## Installation & Upgrade
+
+### Installation if you are using the Twilio CLI
+
+```bash
+twilio plugins:remove @twilio-labs/plugin-serverless
+twilio plugins:install @twilio-labs/plugin-serverless@latest
+```
+
+Afterwards you should have version `2.0.0` or newer when running `twilio plugins`.
+
+### Installation if you are using twilio-run
+
+Inside your project run:
+
+```bash
+npm install --save-dev twilio-run@latest
+```
+
+You can verify that you successfully installed the new version by running:
+
+```bash
+npx twilio-run --version
+```
+
+The resulting version should be `3.0.0` or newer.
+
+### Upgrading existing projects
+
+If you have an existing project and you have an existing `.twilio-functions` file, you can use our migration script to upgrade:
+
+```bash
+npx -p twilio-run twilio-upgrade-config
+```
+
+## Questions? Feedback?
+
+We hope you are as excited about these changes as we are. If you have any questions, find bugs or have feature requests, we'd love to hear them. Please head over to [github.com/twilio-labs/serverless-toolkit](https://github.com/twilio-labs/serverless-toolkit) and open an issue. We welcome any contributions to the project.
+
+Dominik Kundel & Phil Nash

@@ -1,0 +1,95 @@
+---
+title: 'Send Images and Other Media via WhatsApp Using Node.js'
+publishDate: '2019-04-16 09:00:00'
+image: '/blog-headers/external/0587a271d3825720037c5a8a6abec023efe28e942cde942aaec9c5915accd726.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how to send images, PDFs and audio clips via WhatsApp in just a few minutes using Twilio and Node.js.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/send-images-whatsapp-node-js'
+---
+
+The [Twilio API for WhatsApp](https://www.twilio.com/en-us/messaging/channels/whatsapp) allows you to not only send text-based messages to WhatsApp numbers but also send and receive media messages. This allows you to send images (JPG, JPEG, PNG), audio files and even PDFs up to 5MB. Let's see how we can do this using Node.js.
+
+If you prefer watching a video tutorial instead, [check out this video on our YouTube channel](https://www.youtube.com/watch?v=DNXwDrBb4PY).
+
+## First Things First
+
+Before we get started, make sure you have:
+
+- A Twilio account ([sign up for free](https://www.twilio.com/try-twilio))
+- [Node.js](https://nodejs.org/) and a package manager like [npm](https://www.npmjs.com/) installed
+- The WhatsApp Sandbox Channel installed ([learn how to activate your WhatsApp sandbox](https://www.twilio.com/docs/sms/whatsapp/api))
+- [Set your Account SID and Auth Token as environment variables](https://www.twilio.com/blog/how-to-set-environment-variables.html)
+
+If you want to try this out make sure to set up a new project by running:
+
+```bash
+mkdir whatsapp-media-messages
+cd whatsapp-media-messages
+npm init -y
+```
+
+## Sending Your First Media Message
+
+Install the [twilio](https://npm.im/twilio) helper library by running:
+
+```bash
+npm install twilio
+```
+
+Create a new file called `index.js` and place the following code in it:
+
+```javascript
+const twilio = require('twilio');
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
+client.messages
+  .create({
+    from: 'whatsapp:+WHATSAPP_SANDBOX_NUMBER',
+    to: 'whatsapp:+YOUR_NUMBER',
+    body: 'Ahoy from Twilio',
+    mediaUrl: 'https://bit.ly/whatsapp-image-example',
+  })
+  .then(message => {
+    console.log(message.sid);
+  })
+  .catch(err => {
+    console.error(err);
+  });
+```
+
+This will initialize a Twilio Client using the [twilio](https://npm.im/twilio) helper library and then create a new message to your WhatsApp number. Make sure to change the `WHATSAPP_SANDBOX_NUMBER` and `YOUR_NUMBER` with the respective numbers and feel free to change the value of `mediaUrl` with a URL to any other image, sound snippet or PDF.
+
+Afterwards run your code:
+
+```bash
+node index.js
+```
+
+You should receive a message with your media and the text you sent.
+
+![image of twilio sandbox chat](send-images-whatsapp-node-js/j9oXpTyLmuOokowzkwiNfaZUW5_9W_KRxX31BoTth6E0Blp-sPafSO5Cj8DR0ZVywvGnr248SCntkx.jpeg)
+
+## What's Next?
+
+There are some differences between MMS and WhatsApp media messages. Media messages can only be sent to WhatsApp users if there is an active session established. Sessions are created when a user responds to a [template message](https://support.twilio.com/hc/en-us/articles/360017773294-Rules-and-Best-Practices-for-WhatsApp-Messaging-on-Twilio) or the user initiates the conversation by sending in a message. A session lasts for 24h since the last message from the user. WhatsApp media messages also do not support some of the file types that MMS does. For more information on file type support check out the [FAQs](https://support.twilio.com/hc/en-us/articles/360017961894-Sending-and-Receiving-Media-with-WhatsApp-Messaging-on-Twilio-Beta-?_ga=2.26372925.160784649.1550528777-2012981757.1532358595).
+
+If you want to check out other things that are possible with the Twilio for WhatsApp API, check out the following posts:
+
+- [How to Send a WhatsApp Message with JavaScript and Node.js](https://www.twilio.com/blog/how-to-send-a-whatsapp-message-with-javascript-and-node-js)
+- [Build WhatsApp Bots with Twilio Autopilot](https://www.twilio.com/blog/build-whatsapp-bots-twilio-autopilot)
+- [Twilio WhatsApp API and Flex](https://www.twilio.com/blog/whatsapp-and-flex-in-minutes.html)
+- [Building an npm search bot with WhatsApp and Twilio](https://www.twilio.com/blog/build-npm-search-bot-whatsapp-twilio.html)
+- [Emoji translations with the Twilio API for WhatsApp and Node.js](https://www.twilio.com/blog/emoji-translations-twilio-api-whatsapp-node-js.html)
+
+I would love to see what you build. Feel free to ping me and tell me about it or let me know if you have any questions:
+
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- GitHub: [dkundel](https://github.com/dkundel)
+- [dkundel.com](https://dkundel.com)

@@ -1,0 +1,352 @@
+---
+title: 'Get started with writing TypeScript today!'
+publishDate: '2016-08-12 09:00:00'
+image: '/blog-headers/external/d361d42e57040b6f6c11bbfc1a433d17b2d2060f63f09e1623adf3f8515fa6cf.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how to start writing TypeScript today, include it in existing Node.js project and transpile your project to older JavaScript standards.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/start-writing-typescript-today.html'
+---
+
+# Get started with writing TypeScript today!
+
+![TypeScript Image](start-writing-typescript-today/oKrss4qnyzBil_Oesq4XIZRdc1Xe6A4CoK0e67LJwmfNXp-XCjrSyiqCpXsz78vwrwkEGpwcIg.png)
+
+**Why TypeScript?**
+
+Tabs vs. spaces isn’t the only big discussion point in the world of programming. Another point of contention lies in statically-typed vs. dynamically-typed languages. [TypeScript](https://typescriptlang.org) is Microsoft’s attempt to add a stronger type system to JavaScript while making both camps happy. Instead of wading into the debate, let’s look at three aspects of TypeScript:
+
+- How to add TypeScript to an existing JavaScript project
+- Improving your development experience and tooling
+- Down-transpiling TypeScript and modern JavaScript to older standards
+
+### Why TypeScript?
+
+Here are some reasons you might want to write TypeScript:
+
+- TypeScript is a superset of JavaScript, so the learning curve is not that steep.
+- It’s ES2015 compliant and can transpile it down to ES3 or ES5. No more need for Babel in most cases.
+- Types are optional, so you can gradually introduce them.
+- A richer development experience including better auto-complete and project wide refactoring
+
+You can find a great list of reasons here: [When should I use TypeScript?](https://medium.com/@alexewerlof/when-should-i-use-typescript-311cb5fe801b)
+
+### Setup your environment
+
+There are plenty of [Getting Started with TypeScript](https://gist.github.com/dkundel/e2f0fe6ebc88b382506b362cef0020af) guides that focus on how to start from scratch. We will instead add TypeScript to an existing Node.js project.
+
+Before we get started make sure you have [Node.js installed](https://nodejs.org/en/download/) and that the version is newer than 6.0. You can check this by running:
+
+```javascript
+node --version
+```
+
+Then clone the project that we will be working on:
+
+```javascript
+git clone https://github.com/dkundel/basic-node-server.git -b typescript-boilerplate
+cd basic-node-server
+```
+
+Install all the necessary dependencies and start the server to test if it works:
+
+```javascript
+npm install
+npm start
+```
+
+Navigate in your browser to [http://localhost:3000/api/gifs](http://localhost:3000/api/gifs). If you see a bunch of Silicon Valley gifs, your Node.js project works correctly.
+
+![GIFs](start-writing-typescript-today/F0Fpa9QGxpTayd8ZKHfJ3wVhVUyN6tHdy6C6EY_iAGuDQpePacZHWgzluy_tcreSiod3Tx6dvB.png)
+
+Next, you need the TypeScript compiler. It’s recommended you install it locally to the project:
+
+```javascript
+npm install typescript --save
+```
+
+For the best TypeScript experience, you should either use [Visual Studio Code](http://code.visualstudio.com/), [Visual Studio](https://www.visualstudio.com/products/visual-studio-community-vs) or a [plug-in for your favorite text editor](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support). I’ll be using Visual Studio Code which is available for free for Mac, Windows, and Linux.
+
+Once you have your IDE set up you are all set to dive into the world of TypeScript.
+
+### Configuring the TypeScript project
+
+A TypeScript project is typically described by a `tsconfig.json` file that is located in the root directory of your project. It defines various properties for the compiler such as which files to compile or ignore, which ECMAScript version it should compile to, how to treat modules, and other options. It even provides support for handling JSX files named TSX and can compile them directly to React statements.
+
+Add the following `tsconfig.json` file to your project:
+
+```javascript
+{
+  "compilerOptions":{
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true
+  }
+}
+```
+
+Alternatively, you can use the TypeScript compiler (`tsc`) to create the `tsconfig.json` for you with all available settings. Just make sure you change the settings to have the same values as the ones above. Simply run:
+
+```javascript
+./node_modules/.bin/tsc --init
+```
+
+### Definitions first
+
+TypeScript is all about types. Most libraries, however, are not written in TypeScript. So how do we get type-information on all the libraries we want to use?
+
+The answer is [definition files](https://www.typescriptlang.org/docs/handbook/writing-declaration-files.html) which provide interfaces and type information for existing libraries. Since TypeScript version 2.0 the solution to manage these definition files is to install them using `npm` and the `@types` namespace.
+
+We need the definition files for `node`, `express`, and `body-parser`. To install them run:
+
+```javascript
+npm install @types/express @types/node @types/body-parser --save
+```
+
+Now that we have both the compiler and the definitions we need to modify our npm scripts entries to use the compiler. To do so, modify the `package.json` file in the root of the project:
+
+```javascript
+{
+  "name": "basic-node-server",
+  "version": "1.0.0",
+  "description": "A basic Node server that is running on Express.js. Used to show how to add TypeScript to a project",
+  "main": "index.js",
+  "scripts":{
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc",
+    "start": "npm run tsc && node ."
+  },
+  "repository":{
+    "type": "git",
+    "url": "git+https://github.com/dkundel/basic-node-server.git"
+  },
+  "author": "Dominik Kundel <dominik.kundel@gmail.com>",
+  "license": "MIT",
+  "bugs":{
+    "url": "https://github.com/dkundel/basic-node-server/issues"
+  },
+  "homepage": "https://github.com/dkundel/basic-node-server#readme",
+  "dependencies":{
+    "@types/body-parser": "^1.16.3",
+    "@types/express": "^4.0.35",
+    "@types/node": "^7.0.29",
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "typescript": "^2.3.4"
+  }
+}
+```
+
+### Our first TypeScript file
+
+You might have noticed a TypeScript file called `mockdb.ts` in the `api/` folder of the project you cloned. Create a file named `api/users.ts`. This file will consume `mockdb.ts` and implement a set of REST endpoints for users.
+
+Import the `Router` from the `express` library, create a new class `Users` with two `public` methods `get()` and `getUser()`, and export a new router:
+
+```javascript
+import { Router } from 'express';
+
+export class Users {
+  public get() {
+
+  }
+
+  public getUser() {
+
+  }
+}
+
+const users = new Users();
+
+export const UsersRouter = Router();
+UsersRouter.get('/', users.get);
+UsersRouter.get('/:id', users.getUser);
+```
+
+If you compare this file to the structure of the existing `gifs.js` you will notice three slight differences.
+
+- We don’t use the `module.exports`. Instead, we use the new ES2015 `export` keyword.
+- We replace `require(...)` with the new ES2015 `import ... from ...` syntax
+- We declare methods as public or private.
+
+So far we don’t have any type annotations and that’s fine. The type annotation in TypeScript is optional. But we want to learn how to do it! So let’s adjust the function signature of the two methods. They are both `express` request handlers.
+
+We need to import the [interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html) for `Request`, `Response`, and `NextFunction` since they are the three arguments that get passed. Afterwards, we can annotate the three arguments in each method with the types and declare `next` as optional by appending a `?` to the argument name:
+
+```javascript
+import { Router, Request, Response, NextFunction } from 'express';
+
+export class Users {
+  public get(req: Request, res: Response, next?: NextFunction) {
+
+  }
+
+  public getUser(req: Request, res: Response, next?: NextFunction) {
+
+  }
+}
+
+const users = new Users();
+
+export const UsersRouter = Router();
+UsersRouter.get('/', users.get);
+UsersRouter.get('/:id', users.getUser);
+```
+
+We now have typed arguments and a much better autocomplete in our IDE. For example, now you don’t have to look up the available methods on a response object on the project website.
+
+![VSCode Intellisense](start-writing-typescript-today/Ckoh0fclmhK-ctyxM4R574JSKVCqlcjYYsCIztls694TgNnFQUSbz47TbF_DmHgzseRvaRt1tt.png)
+
+### Hurray!
+
+Our routes don’t yet return anything. Let’s send `Hurray!` on the routes and include the `:id` passed to the URL:
+
+```javascript
+public get(req: Request, res: Response, next?: NextFunction) {
+  res.send('Hurray!');
+}
+
+public getUser(req: Request, res: Response, next?: Function) {
+  res.send(`Hurray ${req.params.id}`);
+}
+```
+
+We also need to consume our new file. Modify `api/index.js` to require the file:
+
+```javascript
+'use strict';
+
+const express = require('express');
+
+let router = express.Router();
+
+router.use((req, res, next) => {
+  console.log(`Access to API. Route: ${req.path}`);
+  next();
+});
+
+router.use('/users', require('./users').UsersRouter);
+router.use('/gifs', require('./gifs').GifsRouter);
+
+module.exports = { router };
+```
+
+![API Access](start-writing-typescript-today/CuMzfy-a01nOUR5wId7liRWklK5xvBF42_y6dQtbvkvYaWkpZYyxeIjd6Bs6vVCYkiLXmuAIiA.png)
+
+Re-run `npm start` and navigate to [http://localhost:3000/api/users](http://localhost:3000/api/users) and you will see `Hurray!` on the screen.
+
+We just wrote our first TypeScript and consumed it straight from our existing JavaScript. This is that easy because by default the compiled JavaScript is put in the same place as the TypeScript file. This means we actually execute the JavaScript but develop in the TypeScript file.
+
+### Advanced TypeScript features
+
+Now that we wrote some basic TypeScript let’s explore a couple of more features by looking more into the existing `mockdb.ts`.
+
+Import the necessary components from `mockdb.ts` inside our `users.ts` file and instantiate a database instance:
+
+```javascript
+import { Router, Request, Response, NextFunction } from 'express';
+import { MockDB, MOCK_USERS, User } from './mockdb';
+
+const db = new MockDB<User>(MOCK_USERS);
+
+export class Users {
+  public get(req: Request, res: Response, next?: NextFunction) {
+    res.send('Hurray!');
+  }
+
+  public getUser(req: Request, res: Response, next?: Function) {
+    res.send(`Hurray ${req.params.id}`);
+  }
+}
+
+const users = new Users();
+
+export const UsersRouter = Router();
+UsersRouter.get('/', users.get);
+UsersRouter.get('/:id', users.getUser);
+```
+
+You may notice that we pass `<User>` to our constructor. This is TypeScript’s support for [generics](https://www.typescriptlang.org/docs/handbook/generics.html). `MockDB` uses them to determine which type of data is stored. In our case, these are entries of the type `User`. The argument itself is the mock data we want to populate the database with.
+
+Now when we try to use the database in the request handlers we get more information about the types that are returned by the calls:
+
+![VSCode Intellisense 2](start-writing-typescript-today/sn9xc5djBcM_Hgnzs2d7tXozz49vziO0oPBX2E-PqZCo_43-KqlAgul6JjsmMsK1sEP3oyZf-o.png)
+
+Modify the `get()` and `getUser()` methods now to consume the database:
+
+```javascript
+public get(req: Request, res: Response, next?: NextFunction) {
+  let data = db.get();
+  res.send({ data });
+}
+
+public getUser(req: Request, res: Response, next?: Function) {
+  let id = parseInt(req.params.id, 10);
+  res.send(db.get(id));
+}
+```
+
+We are now consuming another TypeScript file and made use of the power of generics.
+
+To see more features of TypeScript you can check out the `mockdb.ts` file. You’ll find how to define and extend [interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html), how to create optional properties, and that [specific values can be types](https://www.typescriptlang.org/docs/handbook/advanced-types.html), too.
+
+### From ES2015 to ES5
+
+Right now our codebase is a mixture of TypeScript and ES2015 JavaScript. This works well together because the TypeScript is compiled in place, so we are executing normal JavaScript.
+
+By [adding three lines](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) in our `tsconfig.json` we can not only output the result of our TypeScript into a different folder but also convert our ES2015 JavaScript to be ES5 compliant:
+
+```javascript
+{
+  "compilerOptions":{
+    "allowJs": true,
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "out"
+  }
+}
+```
+
+Re-run `npm run tsc`. We have now a new folder `out` that contains our compiled TypeScript but also our ES2015 JavaScript converted to ES5. And we did all of that without the usage of Babel! If you run `node out/index.js` you will be running an ES5 version of the program. So now you can run this also with older versions of Node.
+
+### Conclusion
+
+As we’ve seen it’s super easy to move your JavaScript project to TypeScript since any JavaScript is valid TypeScript. In most cases, we don’t even need a transpiler like Babel anymore. If we add type annotations we get type-safety during compile time and better tooling for our code editor.
+
+We just looked at a small set of things TypeScript is useful for. You can find more features on [the project page.](https://typescriptlang.org)
+
+![Conclusion Image](start-writing-typescript-today/uLHaU8gz5zNDYftwug299nc9K3sv97v88LfX7mMOj0suedBlp8O2OsZiwhKRbPhMa-NY4B5pbN.png)
+
+You are now well prepared to move your projects to TypeScript or even start your next project in TypeScript.
+
+I personally love TypeScript but I’d love to hear how your experience will be. Please reach out and let me know. We can’t wait to see what you build!
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Twitch (streaming live code): [dkundel](https://twitch.tv/dkundel)
+
+---
+
+**Related Posts**
+
+- [What's New in PHP 8.4?](https://www.twilio.com/en-us/blog/whats-new-php84) - Matthew Setter
+- [How to Check your Twilio Account Balance in PHP](https://www.twilio.com/en-us/blog/check-twilio-account-balance-with-php) - Matthew Setter
+- [How to Create a Customer Satisfaction Survey using Twilio Programmable Voice and PHP](https://www.twilio.com/en-us/blog/create-customer-satisfaction-survey-using-twilio-programmable-voice-php) - Godwin Agedah
+
+**Related Resources**
+
+- [Twilio Docs](https://www.twilio.com/docs) - From APIs to SDKs to sample apps
+  - API reference documentation, SDKs, helper libraries, quickstarts, and tutorials for your language and platform.
+- [Resource Center](https://www.twilio.com/en-us/resource-center) - The latest ebooks, industry reports, and webinars
+  - Learn from customer engagement experts to improve your own communication.
+- [Ahoy](https://www.twilio.com/en-us/ahoy) - Twilio's developer community hub
+  - Best practices, code samples, and inspiration to build communications and digital engagement experiences.
+
+---
+
+**We can't wait to see what you build.**

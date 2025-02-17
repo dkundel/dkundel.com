@@ -1,0 +1,206 @@
+---
+title: 'How To Set Environment Variables'
+publishDate: '2017-01-25 09:00:00'
+image: '/blog-headers/external/d3edea75a38bf8730b31349099409f89dab228ae16bad13d42c2ea0204352469.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'This tutorial will teach you how to  describe your environment by setting up environment variables in Linux, Windows, macOS, and other systems. Learn more with Twilio. '
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/how-to-set-environment-variables.html'
+---
+
+There are some things we just shouldn’t share with our code. These are often configuration values that depend on the environment such as debugging flags or access tokens for APIs like [Twilio](https://www.twilio.com/docs). Environment variables are a good solution and they are easy to consume in most programming languages.
+
+## Environment Variables????
+
+Environment variables, as the name suggests, are variables in your system that describe your environment. The most well-known environment variable is probably `PATH` which contains the paths to all folders that might contain executables. With `PATH`, you can write just the name of an executable rather than the full path to it in your terminal since the shell will check the local directory as well as all directories specified in the `PATH` variable for this executable.
+
+Aside from ‘built-in’ variables you also have the opportunity to define our own environment variables. Since they are bound to our environment they are great for things such as API access tokens. You could have a variable set to one value on your development machine and another in your production environment without having `if`-statements or special config files.
+
+[Twilio’s helper libraries](https://www.twilio.com/docs/libraries), for example, look for the `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` environment variables if you instantiate a client without the two values. This way you don’t have to worry about accidentally pushing sensitive credentials to a place such as GitHub.
+
+## Set Environment Variables on macOS and Linux Distributions
+
+![macOS and Linux](how-to-set-environment-variables/CP66owhMZeayfuKH2GO2bPS_oOhngyGdAI323rP9xVWDwm-iRQI7XDiucQ5b4ReImcq346dkAX.png)
+
+In order to set environment variables on macOS or any UNIX based operating system you first have to figure out which shell you are running. You can do that by running in your terminal the command:
+
+```bash
+echo $SHELL
+```
+
+The end of the output should indicate which shell you are running. The typical shell is the [bash](<https://en.wikipedia.org/wiki/Bash_(Unix_shell)>) shell which you will be using in this example. But the steps are similar for other shells like [zsh](https://en.wikipedia.org/wiki/Z_shell) or [fish](https://fishshell.com/).
+
+In order to set an environment variable, you need to use the [export command](https://www.javatpoint.com/linux-export-command) in the following format:
+
+```bash
+export KEY=value
+```
+
+Since this would only set this for the current session you need to add this command into a file that is executed for every session. For this, open the `.bashrc` file in your home directory with your favorite code editor. Then, add the following line somewhere in the file:
+
+```bash
+export TWILIO_ACCOUNT_SID=<YOUR_ACCOUNT_SID>
+```
+
+Replace `<YOUR_ACCOUNT_SID>` with your actual Account SID from your [Twilio Console](https://www.twilio.com/console). Save the file and open a new terminal instance to test if it worked by running:
+
+```bash
+echo $TWILIO_ACCOUNT_SID
+```
+
+You should see the value that you stored in it.
+
+![Terminal](how-to-set-environment-variables/nfoA2UgpiGT7TA4SA-kJBFLuHJ5ROe7UTW80UQDgrd7LCiLqBYvfGbqGnqlj1KntzxIa38ivfn.png)
+
+## Windows Environment Variables
+
+If you're using a Windows machine, you have a couple of ways to set environment variables. The most common methods are to use PowerShell, CMD, or the Graphical User Interface (GUI).
+
+There are three different locations you can store environment variables:
+
+- **In the current process.** The current process is most commonly the shell you are running, like PowerShell, CMD, Bash, etc. However, the current process could also be other applications including yours. Any child process started from the current process inherits that process' environment variables. The environment variables are removed when the process ends. This means you need to reconfigure the environment variables whenever you open a new shell.
+
+- **In the user registry.** The environment variable is available to all processes started by the user, and no other users can access those environment variables (without elevated privileges).
+
+- **In the machine registry.** The environment variables are available to all users and processes, and setting environment variables for the machine requires elevated privileges.
+
+Changes made to user and machine environment variables aren't available to processes that are already running. For the change to apply, restart your program or shell, or set the environment variable for both the process and the user or machine.
+
+### Set Environment Variables using PowerShell
+
+![PowerShell](how-to-set-environment-variables/eUhKcrlT5uO9dmeQk4EuAZQKrehhEikH5QwTnv-S9JTgzbGhPF8FyK6YLnEAd7gd2mdR1lPTSR.png)
+
+While PowerShell is also supported on macOS and Linux distributions through [PowerShell Core](https://github.com/PowerShell/PowerShell), Windows PowerShell is preinstalled on Windows and is the recommended shell for the Windows platform. The following [cmdlets](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/cmdlet-overview?view=powershell-7.2) for configuring environment variables will work on Windows, macOS, and Linux.
+
+The most common and easiest way to set environment variables in PowerShell is to use the `$Env` variable, like this:
+
+```powershell
+$Env:TWILIO_ACCOUNT_SID = '<YOUR_ACCOUNT_SID>'
+```
+
+After `$Env`, add a colon, followed by the environment variable's name, followed by the equals sign, followed by the value you want to use. This will set the environment variable for the current process, and will be inherited by any child process you start from this shell.
+
+The following two alternatives have the same result, but are less common:
+
+```powershell
+New-Item -Path Env:\TWILIO_ACCOUNT_SID -Value '<YOUR_ACCOUNT_SID>'
+[Environment]::SetEnvironmentVariable('TWILIO_ACCOUNT_SID', '<YOUR_ACCOUNT_SID>')
+[Environment]::SetEnvironmentVariable('TWILIO_ACCOUNT_SID', '<YOUR_ACCOUNT_SID>', 'Process')
+```
+
+To persist environment variables across shell instances, you can [save the cmdlets into your profile script](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-7.2#saving-environment-variables-in-your-profile), or on Windows, you can save them in the user registry or machine registry like this:
+
+```powershell
+[Environment]::SetEnvironmentVariable('TWILIO_ACCOUNT_SID')
+```
+
+Setting environment variables in the user and/or machine registry will not immediately update the environment variables for processes that are currently running. To see the effects of the update environment variables, you'll need to restart those processes, such as your PowerShell shell.
+
+The two commands above result in a [no-op](<https://en.wikipedia.org/wiki/NOP_(code)>) on macOS and Linux because there's no concept of User or Machine environment variables, only process environment variables. Consult the [Microsoft documentation on PowerShell environment variables](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables) for more details.
+
+### Set Environment Variables from CMD
+
+Cmd, otherwise known as cmd.exe and the Command Prompt also comes with all installations of Windows. You should probably use PowerShell, but if you can't, here's how you can set environment variables from cmd and [batch files](https://en.wikipedia.org/wiki/Batch_file).
+
+To set an environment variable you can use the `set` command, like this:
+
+```text
+set TWILIO_ACCOUNT_SID=<YOUR_ACCOUNT_SID>
+```
+
+This command will set the environment variable for the current process, and child processes will inherit the environment variables. However, when you close cmd the environment variables will be lost.
+
+To persist the environment variables across processes, you can store them in the user and/or machine registry using the `setx` command.
+
+```text
+# sets environment variable in the user registry
+setx TWILIO_ACCOUNT_SID <YOUR_ACCOUNT_SID>
+# sets environment variable in the machine registry
+setx TWILIO_ACCOUNT_SID <YOUR_ACCOUNT_SID> /m
+```
+
+Setting environment variables in the user and/or machine registry will not immediately update the environment variables for processes that are currently running. To see the effects of the update environment variables, you'll need to restart those processes, like your PowerShell shell.
+
+These commands have more capabilities which you can dig into by reading the [set command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/set_1) and [setx command docs](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/setx).
+
+### Set Environment Variables using the Graphical User Interface
+
+![Run Dialog](how-to-set-environment-variables/OObV7x5BG9ocXwjO70IbNnsIu6t1J4OdvauLPJPnL1orAisPi2zliv4LwGFpJuH-qez_xKonzg.png)
+
+Setting environment variables in Windows using the GUI is hidden behind several layers of settings dialogs. To open the respective interface you first have to open the Windows Run prompt. Do so by pressing the `Windows` and `R` keys on your keyboard at the same time. Then, type `sysdm.cpl` into the input field and hit `Enter` or press Ok.
+
+![Advanced Dialog](how-to-set-environment-variables/6s5RUPP0Oy_rlW_eBFBej7RaFjE9Ya2Hmf2qJsdPlilfEqAYKpozi4mRtwQU2Vab9BhzHs2blI.png)
+
+In the new window that opens, click on the Advanced tab and afterwards on the Environment Variables button in the bottom right of the window.
+
+![Environment Variables Dialog](how-to-set-environment-variables/AqsRGon0Ywv2SAxmA-qERzFVwZKXuefu08WPDw0Tw7ffusxLSxL91RoPJWgHNsX-qgB1n6-3Xq.png)
+
+The window has two different sections. One is the list of environment variables that are specific to your user. This means they aren’t available to the other users. The other section contains the system-wide variables that are shared across all users.
+
+Create a user-specific variable by clicking the New button below the user-specific section. In the prompt you can now specify the name of your variable as well the value. Create a new variable with the name `TWILIO_ACCOUNT_SID` and copy your Twilio Account SID from the [Console](https://www.twilio.com/console). Press Ok in the prompt to create the variable, followed by Ok on the Environment Variables window. You are all set now.
+
+![New Dialog](how-to-set-environment-variables/gs7vw65K27tHdDlA5cVCJSC9MxkZj6eUOfRNwcASDXeFBX8kaptGTBHv5gEO_00B2J8bXjZSix.png)
+
+To test if it worked open the Command Prompt by pressing `Windows + R` and typing `cmd.exe`. If you have the Command Prompt open already, make sure to restart it to ensure your changes are applied. Inside the Command Prompt execute the following command:
+
+```text
+echo %TWILIO_ACCOUNT_SID%
+```
+
+This should print the value that you saved in the environment variable.
+
+![Windows CMD Dialog](how-to-set-environment-variables/8M5bnf2gCUL5xSetk8WuB5wMfpSxf8ywvxsCidJ6QwDrrI-m42FsHBMwhFlsgO9aYwP13I3fP9.png)
+
+## Use .env files
+
+In some situations you only need an environment variable set for only a single project. In that case .env files are a great solution. They're files inside your project in which you specify environment variables and afterwards you use a library for your respective programming language to load the file which will dynamically define these variables.
+
+There are libraries for most programming languages to load these files. Here are a few:
+
+- [Ruby](https://github.com/bkeepers/dotenv)
+- [Node.js](https://www.npmjs.com/package/dotenv)
+- [Python](https://github.com/theskumar/python-dotenv)
+- C#, F#, VB.NET ([dotnet-env](https://github.com/tonerdo/dotnet-env) or [dotenv.net](https://github.com/bolorundurowb/dotenv.net))
+- [Java](https://github.com/cdimascio/dotenv-java) ([tutorial](https://www.twilio.com/blog/working-with-environment-variables-in-java))
+- PHP
+
+Create a .env file in your project folder (typically at the root) and place the key value pairs in there. This can look like this:
+
+```bash
+TWILIO_ACCOUNT_SID=<YOUR_ACCOUNT_SID>
+```
+
+Now all you need to do is consume the respective library and then you can use the environment variable. In Node.js, for example, the respective code would look like this:
+
+```javascript
+require('dotenv').config();
+console.log(
+  'Your environment variable TWILIO_ACCOUNT_SID has the value: ',
+  process.env.TWILIO_ACCOUNT_SID
+);
+```
+
+Since you most likely don’t want to commit your environment variables to a repository, make sure to add the .env file to your .gitignore to avoid accidentally pushing it.
+
+## Cloud Providers
+
+Setting environment variables on your local development machine or in a VM is only half the work. What if you are hosting your application in a cloud environment such as Heroku, Azure, or AWS, or you've wrapped it in a Docker container? Luckily, all of these providers support ways to define environment variables.
+
+- [Heroku](https://devcenter.heroku.com/articles/config-vars)
+- Azure ([App Service](https://docs.microsoft.com/en-us/azure/app-service/configure-common?tabs=portal#configure-app-settings), [Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-how-to-use-azure-function-app-settings?tabs=portal), [Container Instances](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-environment-variables))
+- [AWS](http://docs.aws.amazon.com/lambda/latest/dg/env_variables.html)
+- [Dockerfile](https://docs.docker.com/engine/reference/builder/#/env)
+- [Docker Run](https://docs.docker.com/engine/reference/run/#/env-environment-variables)
+
+If you can’t find your cloud host among this list it doesn’t necessarily mean there is no way to configure environment variables. Make sure to check their documentation for more on it.
+
+## Summary
+
+That’s it! Now you can set environment variables which means that you can take all of your environment-based configuration values out of your code and make your code more flexible and safe!
+
+Be mindful that these values are still stored in plain text. If you are planning to store very sensitive values you should look into something like a secret storage solution such as [Vault](https://www.hashicorp.com/vault.html).
+
+If you have any questions or would like to show me the awesome thing you are currently building, feel free to send me an email to: [dkundel@twilio.com](mailto:dkundel@twilio.com) or contact me on Twitter [@dkundel](https://twitter.com/dkundel). I can’t wait to see what you build.

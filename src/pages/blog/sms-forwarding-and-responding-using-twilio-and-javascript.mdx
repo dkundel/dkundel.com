@@ -1,0 +1,120 @@
+---
+title: 'SMS Forwarding and Responding Using Twilio and JavaScript'
+publishDate: '2019-03-08 09:00:00'
+image: '/blog-headers/external/7c6cda754f78918b11dd7556144302ebed0765bbb9f4d84d2f9e6760f0217b1c.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how you can set up a phone number to forward incoming SMS to your actual number and how to reply using JavaScript and Twilio Functions'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/sms-forwarding-and-responding-using-twilio-and-javascript'
+---
+
+## SMS Forwarding and Responding Using Twilio and JavaScript
+
+![SMS Forwarding and Responding Using Twilio and JavaScript](sms-forwarding-and-responding-using-twilio-and-javascript/WQYMYFAg9558AJMa_xQENKB7Zr6UuQVlw4ABsN9882jjATPJBRI39lv9fjpcrt_Aid547rgTfEYhfb.png)
+
+**Creating a Twilio Function**
+
+Before we get started, make sure you have a Twilio account. Sign up here for free: [www.twilio.com/try-twilio](https://www.twilio.com/try-twilio)
+
+Once you are logged in, head to the [Functions section](https://www.twilio.com/console/runtime/functions/manage) of the Runtime part of the [Twilio Console](https://www.twilio.com/console/runtime/functions/manage). Create a new Twilio Function and choose the "Hello SMS" template.
+
+![Twilio Console](sms-forwarding-and-responding-using-twilio-and-javascript/D7AfdHsSmoJ_FAxu1YJVET4OKtqdHe328GnRKNrURT7jB_Px6F_u5lPRWFNWSuyhSo90PPeAkToNsJ.png)
+
+![Twilio Function](sms-forwarding-and-responding-using-twilio-and-javascript/oOCOOTJbt2EdvsgCH7Dmxf1JJtI-S-uANATB7PpKyU8IdM0y8OzIrdyaLBADAYEC0auFcThiKhNZFC.png)
+
+Change the name of the Twilio Function to something that gives you a hint on what it does. I'll name mine "My SMS Forwarder" and give it the path `/forward-sms`.
+
+![Function Path](sms-forwarding-and-responding-using-twilio-and-javascript/mKUKLx3oj0Nk4Mfu677oO2mkxoiHCE7hkVPVY61ep2UL9qKxXYmPljXNlL785IyY59uJdv1OCXnG1J.png)
+
+Right now our Function is just an auto-responder returning "Hello World". In order to actually forward SMS similar to our previous blog post, update the code the following way:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  const MY_NUMBER = 'YOUR_NUMBER_HERE';
+
+  let twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message({ to: MY_NUMBER }, `${event.From}: ${event.Body}`);
+  callback(null, twiml);
+};
+```
+
+Make sure to replace `YOUR_NUMBER_HERE` with the phone number you want the incoming SMS forwarded to. In Twilio Functions we can access webhook data such as the `From` number or the message `Body` using `event`. The new `twiml.message` line will now return the TwiML needed to forward an SMS to the specified number, containing the number of the person who sent it and the original message body.
+
+Save the code by clicking the "Save" button. Head to the [Phone Numbers section in the Twilio Console](https://www.twilio.com/console/phone-numbers/incoming) and pick the number that you want to use for SMS forwarding or buy a new one.
+
+Once you are in the configuration screen, scroll to the bottom of the page, and under 'A message comes in' select the value "Function", and then the name of your Function. In my case that's "My SMS Forwarder".
+
+![Phone Number Configuration](sms-forwarding-and-responding-using-twilio-and-javascript/j85CydNoaP664NQ3_0AkcxFApBps6nOe-iVE6IN8jYqEHQChwbZ0S9f51DpvFsJu3z5gaGj2dVkOtP.png)
+
+Afterwards click "Save" and grab your phone to text any message to it. You should see a reply with your phone number and the message you sent:
+
+![SMS Reply](sms-forwarding-and-responding-using-twilio-and-javascript/ewrJdtyy9UnwlQZZKGv4FSnvH6AgYkQMYXicdNs6bk1AxKLSU1eoB8403SGz0alR1mX1ddBslHGu7H.png)
+
+If you want to see if it properly works, ask a friend or colleague to text your Twilio number and you should see their message. Alternatively get a second Twilio number and use the [API Explorer's "Message Create" functionality](https://www.twilio.com/console/runtime/api-explorer/sms/messages/create) to send an SMS to your forwarding number.
+
+![API Explorer](sms-forwarding-and-responding-using-twilio-and-javascript/pjn4dO8oHpKWbKIeLhnTPv93_YyDhZR0tK8j8UnRbrCRy6BeqdWhROk5XIGKJOZ_utP64af4svltMz.png)
+
+![SMS Forwarding](sms-forwarding-and-responding-using-twilio-and-javascript/8V8C4I-MryInn4P5OJ-zOg7rRSRJIEmlnnlMiXj99Hbf-y5xoewSxOGPzLLBgOcOLVi2fwkGjHvKHm.png)
+
+**Responding to Messages**
+
+Now that we have the message forwarding solved, how do we reply to those messages? If you want to respond with your actual number, that's easy, copy the number from the SMS and write them from your phone. If you want to keep on using your masked number it's not quite that easy.
+
+Right now if you reply to any SMS it will trigger the same SMS webhook and basically just echo to you. We'll modify this behavior by adding the following logic to this:
+
+- Check if the message came from our own number:
+  - Came from someone else -> Forward the SMS like we previously did
+  - Message is from us -> Parse message to receive intended recipient and forward the message
+
+In order to find out the intended recipient, we'll establish a certain pattern that all of our responses have to follow. It will be the same way that we are currently forwarding messages: `RECIPIENT_NUMBER: MESSAGE_BODY`.
+
+Update your Twilio Function code to apply this logic:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  const MY_NUMBER = 'YOUR_NUMBER_HERE';
+
+  let twiml = new Twilio.twiml.MessagingResponse();
+  if (event.From === MY_NUMBER) {
+    const separatorPosition = event.Body.indexOf(':');
+    if (separatorPosition < 1) {
+      twiml.message(
+        'You need to specify a recipient number and a ":" before the message.'
+      );
+    } else {
+      const recipientNumber = event.Body.substr(0, separatorPosition).trim();
+      const messageBody = event.Body.substr(separatorPosition + 1).trim();
+      twiml.message({ to: recipientNumber }, messageBody);
+    }
+  } else {
+    twiml.message({ to: MY_NUMBER }, `${event.From}: ${event.Body}`);
+  }
+  callback(null, twiml);
+};
+```
+
+Click save and wait until the updated Function is deployed (there will be a green box saying the deployment was successful).
+
+Grab your phone and try to send an SMS to a friend or your other Twilio number. The SMS has to be in the format `+RECEIPIENT_NUMBER: message`.
+
+![SMS Format](sms-forwarding-and-responding-using-twilio-and-javascript/avrBABDY2vzPM-vXHPyJ-PwiYxoHrrC9xvFg_M5JMQC2r1ZlGW8BQGWSikzvvNqNs-2eT9sgIFNOyA.png)
+
+The other person should receive only the text you sent. If you sent it to another Twilio number, [check your messaging logs](https://www.twilio.com/console/sms/logs) instead.
+
+You can also try sending a text that doesn't fit the format and you should receive a reply that the message is not appropriately formatted.
+
+![Incorrect Format](sms-forwarding-and-responding-using-twilio-and-javascript/Bls-Ek3S-PMS1FascYyTe3xRuCN1nxAQBPOm8C5bTSBg2SNZQvYvZWNW7SHiQ-A7ey9gLO02xt4reW.png)
+
+**Congratulations!**
+
+That's it. You are all set up with an SMS forwarding number that you can use whenever you don't want to give out your normal phone number. But this is really just the start. With [Twilio Functions](https://www.twilio.com/functions) you have access to the npm ecosystem. So why not hook up a [Google Spreadsheet](https://www.twilio.com/blog/google-spreadsheets-and-javascriptnode-js.html) or the API of your preferred contacts host to look up names instead of having to write down the phone number to respond. Or create a list of blocked phone numbers. Or maybe you have a completely different idea, I would love to hear what you come up with.
+
+Feel free to reach out to me:
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Web: [dkundel.com](https://dkundel.com/)

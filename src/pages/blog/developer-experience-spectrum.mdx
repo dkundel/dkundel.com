@@ -1,0 +1,200 @@
+---
+title: "Let's talk about Developer Experience: The Spectrum of DX"
+publishDate: '2024-07-23 09:00:00'
+image: '/blog-headers/external/a8d3ce3b64d8172e70f9723b7e8e15cc7e81a5fc17091ca237a13d0632dd70b5.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'See our Developer Experience Spectrum, a framework which Twilio uses to better communicate, evaluate, and plan DX improvements.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/en-us/blog/developer-experience-spectrum'
+---
+
+Developer Experience has been increasing in importance both for developer-focused companies and for companies looking to level up the experience for their in-house developers. However, when we talk about developer experience of a particular tool or company, we typically reduce it to a binary good or bad developer experience.
+
+The problem: a simple binary doesn't give us much information. Why is a developer experience good? Why is it bad? How can it be better? What makes a given developer experience feel magical?
+
+In this article we'll discuss a framework that has helped us inside Twilio to better communicate, evaluate, and plan DX improvements. We'll also discuss what makes something feel magical - a space that Twilio strives to exist within across our products - and how it can apply to your developer experience.
+
+### What is Developer Experience?
+
+Developer Experience (DX) at its core is anything that shapes the experience developers have with a tool, product or project. The concept of DX can span a large surface area depending on your project as it covers the entire developer's journey. In his article ["The Radiating Circles of DX Architecture"](https://dx.tips/circles), Shawn "swyx" Wang covers a list of more concrete parts of the end-to-end developer experience.
+
+At a high level, Shawn says Developer Experience includes:
+
+- **Product** (everything from signup over your dashboards and UIs to APIs and error messages)
+- **Docs** (tutorials and reference docs to the docs platform itself)
+- **Content** (blog posts, webinars, and videos)
+- **Community** (all of the touch points between you and your developer community, including social media channels or forums)
+
+In this article, we'll primarily focus on the Product and Docs layers of the stack, but you can apply the same concepts to other parts of the developer experience stack.
+
+### Introducing the Spectrum of Developer Experience
+
+To help us internally break down and talk about the developer experience of products and individual experiences we ended up creating the following framework.
+
+![Good Developer Experience (and betteR) on the Twilio DX Spectrum](developer-experience-spectrum/compressed-original.webp)
+
+We believe that rather than talking about good or bad developer experience, developer experience falls on a spectrum with blurry lines between some general patterns of experiences:
+
+- **Broken Experiences**: An experience that, in the eyes of the developer, is perceived as broken. It often results in a negative emotional payoff, and might cause developers to turn away from your product permanently.
+
+  - **Example**: A developer perceives an API to be broken because they fail to make a successful API request even after reading the documentation. Even if the API might be functionally working it's experienced as broken.
+
+- **Working Experiences**: An experience that works once you read the documentation and follow it step by step. It typically results in no emotional payoff at all.
+
+  - **Example**: A developer had to sign up for a one hour step-by-step workshop to get an initial prototype of your APIs working on their own machine.
+
+- **Predictable Experiences**: This experience matches the expectation of the developer once they understand the overall pattern among your products.
+
+  - **Example**: A developer is able to start using a new offering from their preferred cloud hosting vendor without having to go through setting up a whole new toolchain or constantly referring to the reference documentation.
+
+- **Seamless Experiences**: With this experience, even a developer who has never heard of or used your product can pick it up – ideally without even going through an onboarding guide.
+
+  - **Example**: Your React SDK is easily discoverable via [npm](https://www.npmjs.com/), uses common framework conventions such as hooks that start with use and leverages component props for configuration.
+
+- **Magical Experiences**: With this experience, something truly defies the expectations of the developer.
+  - **Example**: The first LLM APIs were magical for many non-ML developers as it enabled them to generate AI-powered responses with one API request without having to learn how to train models or how to run a model on GPUs.
+
+Both products in their entirety as well as individual features can fall on this spectrum. An organization might have a magical onboarding experience, but a broken experience when it comes to scaling with its solutions. In general we try to fall with as much of the user journey as possible on the right side of the spectrum.
+
+### Why did we create a DX framework?
+
+Over the years we learned that not all experiences are created equal. You can't just create a copy of a REST API structure that feels magical for one API and use it for your new API because that API is going to address a different problem or even a different audience.
+
+Ultimately a great developer experience is about the feeling they create. Therefore, it's important to understand the expectations of the developers who will use your solution and no developer is the same. An iOS developer, for example, might have a drastically different perspective and expectation around data storage solutions than a backend Java developer, and therefore require different experiences in everything – from the tools you provide to the educational content you create.
+
+As a result we couldn't just create a checklist of what makes a magical experience. Instead, we needed a framework that introduces a common set of vocabulary that helps teams to self-evaluate their experiences, acknowledge where they are and plots a path to improve the experience.
+
+This framework lets us take a step back, think through the expectations of our audience, assess where aspects of our experience fall, and decide what it takes to move the needle.
+
+### Patterns of experiences in depth
+
+As already mentioned, developer experience isn’t a checklist. But let's dive a bit more into the different high-level patterns, and some general characteristics and examples.
+
+#### Broken Experiences
+
+This pattern might be the most understood one. Nobody wants to engage with something that's broken, and while it would be easy to ignore this type of experience, it's important, because brokenness is not just functionally not working but also perceived brokenness.
+
+You might be inclined to say "we don't ship anything broken" because you have testing, monitoring, and quality assurance in place. However, even when your code is correct and performs according to the spec you wrote, your customers can perceive your solution as broken. Whether it's because two parts of your solution are fundamentally incompatible with each other, or because your documentation is out of sync with your solution, in the eyes of customers your solution is broken because they can't solve their problem.
+
+In the best case scenario, a customer that encounters a broken experience will be persistent enough to find a way to unblock themselves with your solution in spite of the experience. In the worst case scenario, they'll have such a negative emotional connection to your offering that they'll warn everyone who will listen, creating a break in trust between you and the developer that's typically extremely hard to fix.
+
+Some characteristics to identify broken experiences:
+
+- Valid API requests fail –making your solution unpredictable to customers
+- APIs behave inconsistently – compared to other APIs that you offer, or compared to what customers are used to or are expecting
+- Documentation is not aligned with actual product – for example, because the docs and product are separately maintained and the behavior was altered in the product but not inside the documentation
+- Unmaintained APIs/Tools – while you don't have to build for the sake of building, customers will quickly move on if you desert a solution, especially if there are no paths for them to unblock themselves on issues
+
+#### Working Experiences
+
+When we talk about “Working experiences” we mean that if customers read your documentation or follow your quickstarts to the letter, their solution will eventually work. This will typically require some effort by the developer to get the solution to work, typically by them reading a lot of documentation. From here, a working solution barely meets the expectations of customers, creating an emotional reaction of indifference.
+
+Tools that are “working” help developers get the job done, but the next time they have a similar problem, chances are low that they’ll jump to the same solution. Instead, developers will use what's most convenient. Developers may factor in the sunk cost of learning your tool, but aren't particularly excited about using it.
+
+A lot of people might consider “working” the target for an MVP ( Minimum Viable Product ), or the baseline that has to be achieved to send something out to customers to get feedback. While that might be okay in some cases, it can also be a slippery slope if you are not intentional about addressing the issues you are intentionally ignoring.
+
+Some characteristics to identify working experiences are:
+
+- Valid API requests work but creating valid API requests takes effort – you can sometimes even observe this in your metrics. For example: how often do you see malformed API requests?
+- Product requires extensive reading of documentation or self-exploration – your customers are ultimately successful, but if you take away the documentation, it takes significantly longer (if it’s even possible!) for them to be successful
+
+#### Predictable Experiences
+
+We are now hitting the milestone we think teams should aim at when creating developer experiences. Predictability is all about consistency within your own ecosystem. For new companies and products, this might be an experience that's fairly easy to reach, but it takes effort from day 1 to make sure you stay there.
+
+Predictability comes into play in every part of your offering: from a consistent API format, to logical and uniform error messages, to usable tooling such as SDKs and CLIs that supports your various solutions, to a coherent user interface. The goal is to create an experience where a developer that's used one of your offerings can easily switch to another one without much cognitive overhead.
+
+Over time, a predictable experience creates a strong bond to your tools as developers perceive them as reliable. Ultimately, "Predictable" experiences should not be the end of your journey, though. While a predictable experience makes it easy for existing customers to adopt new solutions, without additional care to push to an even better experience you can alienate new customers.
+
+Characteristics of a predictable experience include:
+
+- Consistent API structure across products – the code developers have to write seems familiar
+- Integrates with existing tooling – there is no need for customers to change tools to debug your products or handle errors differently
+- Seasoned customers can adopt solutions with minimal effort – there's no need to pick up your documentation and study it for hours. If developers know one solution, they know them all
+- Documentation consistent with other products – just like with the API, developers immediately feel at home in the documentation. Developers know where to look when they have problems, and they how to work with your documentation
+
+#### Seamless Experiences
+
+While a lot of the other experience milestones can be achieved with rigorous standardization and internal tooling, we are now reaching the part of the spectrum that requires more intention and a deep understanding of your customers’ expectations.
+
+When an experience is seamless, a developer does not have to think about how they are using your solution – it feels natural to them. Your solution feels just like any other solution in their toolbelt and is easy to adopt.
+
+One example is alternative package manager solutions to npm, the default package manager in the JavaScript ecosystem. While there are some functional differences between tools like yarn, pnpm, and npm, there are similarities in core experiences that make it easy to adopt either of them. For example, they all rely on the same package.json file at the core. This helps to create a more seamless experience for people who try to adopt yarn or pnpm.
+
+The challenge with the ‘seamless’ milestone is understanding the expectations of your audience. Especially if you are building a solution for many different types of developers, you'll quickly see an increase in complexity. Not all developers are the same, and they'll often differ in a variety of ways, including – but not limited to – their experience and choice of tools.
+
+Few solutions ever make it to ‘seamless’, especially if they try to reach multiple types of developers at the same time, and as a result it makes seamless products and solutions stand out to developers who try to use them. Developers will feel a positive connection with your solution over other ones.
+
+Some examples of characteristics of seamless experiences:
+
+- Don't require a change of mindset – especially if your solution doesn't require signing up for an account, adopting your solution shouldn't require a developer to break out of their flow. For example if a developer wants to use your npm package it should be easily findable via npm and contain TypeScript types that provide clear autocomplete to the user to reduce the need to visit and read your documentation.
+- No need to reference quickstarts to get started – developers might look at a quick example, but they don't need to follow a step by step guide, as your solution lines up with the behavior they expect from other solutions
+- Behaves consistently with other tools in the target audience's toolbelt – for example, your SDK installs the same way as any other SDK they use, uses the same style of API interface and conventions as other solutions in the same language, etc.
+
+#### Magical Experiences
+
+Lastly, the ultimate developer experience people strive for: a magical experience.
+
+When we talk about magical developer experiences, we often talk about examples because it's hard to define what magical actually means: what makes something magical? Inside Twilio, we often talked about wanting to create magical experiences, but we were lacking a definition.
+
+Ultimately, we ended up working with a developer (and actual magician) in our community to break down a ‘magical’ experience to the following formulation:
+
+> I think it all boils down to expectations and that behind the scenes, something is happening that goes beyond comprehension but somehow works in a very impressive manner.
+>
+> Simplicity is also key. It has to break a traditional belief of what is possible [...] expanding people’s ideas about what is possible
+>
+> - Doug McKenzie Developer & Actual Magician
+
+Now here's the bad news: few of us will ever create a product that feels magical from start to finish. If creating a magical experience is all about defying expectations, then you need to understand your target audience's expectations, but also continue to defy them as their expectations adapt.
+
+Creating magical experiences throughout your user's journey is what will make your product stand out from the rest. It creates a strong bond that makes users want to tell their friends, colleagues, and sometimes even the world. As a magical experience expands people's ideas of what's possible, it also re-defines expectations – not only of what you deliver, but also those of alternative offerings.
+
+Some things to consider as you are striving to create magical experiences are:
+
+- Does your solution defy expectations of what's possible – you have to deeply understand your audience's expectations in order to create magical experiences for them. Keep in mind that expectations evolve over time.
+- Does it create an emotional payoff – an emotional payoff can come in a variety of different ways. One example would be relief when realizing that all the work a developer was dreading was taken care of by your solution.
+- Still predictable under the hood – contrary to a magic trick that eventually ends, a developer's journey with you will continue even after their magical experience. As a result it is important that the rest of their development journey is at least a "predictable" experience.
+
+### Putting the framework into practice
+
+Whether you are planning to evaluate your existing developer experience or are planning to build a new solution and are designing a brand new developer experience, you have to start by learning more about the developers you are building the experience for. For this there are some general questions you should ask yourself and your team:
+
+- Who are the developers we are trying to target? Be as specific as possible. Are they iOS developers? Web developers who have prior experience using LLMs? Backend developers that are primarily using serverless infrastructure?
+- What problems are they trying to solve? Examples: are they trying to send large volumes of emails reliably? Are they trying to reduce the operating cost of their current infrastructure?
+- If you already have users, what are the most common documentation pages customers visit? This can help you understand where they might need more hand holding and what problems they are trying to solve.
+- What are we doing to keep documentation and product in sync? One option could be to do documentation driven design of your features.
+- Do we have standards across all APIs? If not, what is keeping us from having a set of standardized API patterns?
+
+Once you have a better understanding of those questions it's time to talk to your target developers. Some example questions you can ask to better understand their expectations:
+
+- What tools do you use on a daily basis? Understand their code editor as well as other libraries and products they are using. This will help you understand what the ecosystem looks like that you have to fit into.
+- What channels are you using to learn? This can help you target the type of educational resources you are creating.
+- How would you solve today? Do they already have an answer in mind? How long would it take them?
+- What challenges do you have when? What are the issues they are facing when using other solutions? If they are issues that are top of mind for them and you solve them, you have higher chances of providing a magical experience.
+
+These are just some examples to get you started. If you don't have a large developer community yet, you can also look at survey data (for example the [annual State of JavaScript survey](https://stateofjs.com/en-US) ) and/or ask the developers on your team if they fit the target audience.
+
+The important thing to remember is that expectations will shift over time. In an ideal case you are driving the shift in expectations. In other cases you will have to adapt. For example, prior to 2023 there was no widespread API pattern to engage with LLMs. Today multiple companies promote ["OpenAI compatible"](https://www.twilio.com/en-us/blog/integrate-openai-chatgpt-twilio-programmable-voice-functions) APIs. Either way you will have to continue to learn about your developer community and their expectations.
+
+### What now?
+
+Some key takeaways to keep in mind when designing and evaluating developer experiences are:
+
+- Ultimately designing developer experiences is about the emotions they invoke.
+- There is more to developer experience than "good DX" and "bad DX" and reducing your vocabulary to only "good" and "bad" can result in your team feeling lost or demotivated.
+- Not all developers are the same, and understanding their expectations and tooling is crucial for you to be able to meet or even defy their expectations.
+- The experience of an individual feature can break or level up the experience of the entire solution.
+- Magical experiences can have a profound impact on a developer but you will rarely be able to achieve it as it requires you to defy your developers' expectations while they continuously evolve. Instead you should ensure to have a solid foundation and continuously evaluate where magical experiences can be sprinkled in.
+
+At Twilio, we are continuously trying to understand our developers' expectations to improve our products and help us explore the future of developer experience through [Twilio Alpha](https://twilioalpha.com/). If you want to help us [please fill out this survey](https://surveys.twilio.com/jfe/form/SV_eWq42p0NHyWEijA).
+
+If you have any questions or thoughts about how AI and other emerging technologies will change the next generation of developer experience, feel free to reach out to us at twilioalpha@twilio.com.
+
+![Summary of the Twilio Developer Experience Spectrum and Framework](developer-experience-spectrum/compressed-original.webp)
+
+---
+
+**Dominik leads Product and Design for the Emerging Tech & Innovation organization at Twilio. His team builds next gen prototypes and iterates quickly to help craft the long term product vision and explore the impact of autonomous agents & AGI on customer engagement. Deeply passionate about the Developer Experience, he’s a JavaScript enthusiast who’s integrated it into everything from CLIs to [coffee machines](https://dkundel.com/blog/how-we-hacked-our-coffee-machine-with-javascript/). Catch his tweets [@dkundel](https://twitter.com/dkundel) and his side ventures in [cocktails, food and photography](https://instagram.com/cocktail.and.code).**

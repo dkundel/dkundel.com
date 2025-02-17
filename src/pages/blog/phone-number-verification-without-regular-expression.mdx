@@ -1,0 +1,274 @@
+---
+title: 'Phone Number Verification without Regular Expression'
+publishDate: '2017-03-07 09:00:00'
+image: '/blog-headers/external/8c1a7ea65048b54c515078d938af794937277f97aca9ea0076a6d9f54b3dd36e.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Having invalid phone numbers in your database is a nightmare. Learn how to write a form that checks for real phone numbers without regular expressions.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/phone-number-verification-without-regular-expression.html'
+---
+
+Having invalid data in your database can be a nightmare. Especially if you are intending to use the data to do things like [sending important SMS](https://www.twilio.com/docs/api/rest/sending-messages) to your users. A typical solution is to use `/Regular Expressions/gi` to make sure the value at least looks like a phone number, but that still doesn’t prevent someone from entering a fake number and supporting international numbers makes it even harder. What if I told you that you can test for valid phone numbers using [Twilio Lookup](https://www.twilio.com/docs/api/lookups)!
+
+Before I show you how, we need to make sure we are all set for this adventure. Check that you have the following things:
+
+- A Twilio account — You can sign up [here](https://www.twilio.com/try-twilio)
+- [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/)
+
+### The Basics
+
+Let’s start by creating a new Node.js project by running the following on our command line:
+
+```javascript
+mkdir phone-verification
+cd phone-verification
+npm init -y
+```
+
+For our project, we need a front-end with an input field as well as an HTTP endpoint that the front-end can request to verify the number. We will host both on a Node.js web server that we will create with the [express](http://expressjs.com/) library. Install the package by running:
+
+```javascript
+npm install express --save
+```
+
+Afterwards, create a new file named `index.js` and place the following code into it:
+
+```javascript
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.static(`${__dirname}/public`));
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+```
+
+This code sets up the basic web server and will serve the contents that are placed into the `public` folder inside our project.
+
+To serve a basic HTML page, create the `public` folder and an `index.html` file inside the folder. Then enter the following code into it:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Phone Verification</title>
+  </head>
+  <body>
+    <h1>Ahoy!</h1>
+    <p>Please enter your phone number below</p>
+    <form>
+      <label for="myPhoneNumber">Your Phone Number</label>
+      <input id="myPhoneNumber" name="myPhoneNumber" />
+    </form>
+  </body>
+</html>
+```
+
+This HTML shows the user a small greeting and a form asking for their phone number. Let’s check out how this looks like by starting our server using:
+
+```javascript
+node .
+```
+
+Once the server starts, open [http://localhost:3000/](http://localhost:3000/) in your browser and you should see the following:
+
+![Screen Shot 2017-03-06 at 5.28.08 PM](phone-number-verification-without-regular-expression/V2fSsj1_4h-wqcZk7tN58FHtRDsfD9FzaLMt08x0imTOIgRNO-UUGtVynYjiwm31Bp0yu93-CR.png)
+
+### Tweaking the HTML
+
+So far we have a plain input field on our page. Let’s begin making that field better by adding some features that are baked right into HTML.
+
+Our `<input>` tag currently doesn’t have a `type` attribute specified. By specifying the `type="tel"` property we can tell the browser that this input should be a phone number. This is useful on mobile since it tells the operating system to pop open the phone-number-specific keyboard.
+
+Next, specify `autocomplete="tel"`. The browser can now suggest previous phone numbers entered by the user before which means they are less likely to enter their number with a typo.
+
+Finally, add the attribute `required` to make sure that the user has to enter some valid input before submitting the form.
+
+```html
+<h1>Ahoy!</h1>
+<p>Please enter your phone number below</p>
+<form>
+  <label for="myPhoneNumber">Your Phone Number</label>
+  <input
+    id="myPhoneNumber"
+    name="myPhoneNumber"
+    type="tel"
+    autocomplete="tel"
+    required
+  />
+</form>
+```
+
+Save the file and reload the page in your browser.
+
+If you try to use the input and you submitted somewhere in the past your phone number in another form that had `autocomplete="tel"` set, you should be getting auto complete already.
+
+![screenshot-mobile-page](phone-number-verification-without-regular-expression/P_eWmugEa1n6Tl6aaRMckY3QIDNeVRSr8s4CF7J9eeOmUP5FRF1OZjoEGEb0r13e-N9ROQW3qS.png)
+
+### Is This Number Real?
+
+The [Lookup API](https://www.twilio.com/docs/api/lookups) is useful for a variety of things such as determining the country of a phone number, the local formatting of the number, the carrier associated with the number, or in some cases even the caller name.
+
+In our case however, we’re going to leverage the fact that Lookup API will respond with a HTTP `404` response code in cases where it determines that a number does not exist.
+
+Start by installing the `twilio` helper library by running:
+
+```javascript
+npm install twilio --save
+```
+
+Consume the library by adding the following lines to the top of your `index.js` file:
+
+```javascript
+const twilio = require('twilio');
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+).lookups.v1;
+const express = require('express');
+```
+
+This code requires the Twilio helper library and creates a new instance of the `LookupsClient` with your credentials. Make sure your credentials are stored as environment variables. Alternatively, you can pass the two credentials directly as arguments into the constructor.
+
+Next, declare a function that takes a phone number as an argument and returns a Promise telling us whether it’s a valid number or not. If you want to [learn more about Promises check out this post](https://www.twilio.com/blog/guide-to-javascript-promises.html). Place the following lines at the bottom of your `index.js` file:
+
+```javascript
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+
+function verify(phoneNumber) {
+  return client
+    .phoneNumbers(phoneNumber)
+    .fetch()
+    .then(numberData => true, err => false);
+}
+```
+
+In order to call this function from our front-end, we need to create a new route and call the function.
+
+```javascript
+app.get('/', (req, res, next) => {
+  res.sendFile(`${__dirname}/index.html`);
+});
+
+app.get('/check/:number', (req, res) => {
+  verify(req.params.number)
+    .then(valid => {
+      res.send({ valid });
+    })
+    .catch(err => {
+      console.error(err.message);
+      res.status(500).send('An unexpected error occurred');
+    });
+});
+
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+```
+
+Restart your server and navigate to [http://localhost:3000/check/14157012311](http://localhost:3000/check/+14157012311) and you should see `{ valid: true }` and when you navigate to [http://localhost:3000/check/1111111111111](http://localhost:3000/check/+1111111111111) you should see `{ valid: false }`.
+
+![Verification Result](phone-number-verification-without-regular-expression/nKPymO_-DR9f7rwg2Fj7S2ulPjEWhoRkUvMJeCa7TZr_pBA9OCWXPM4tLhIolHxdP50A_TV2OI.png)
+
+We can now verify phone numbers without using regular expressions!
+
+### Consuming the Verification Route
+
+Now that we have a way to verify a phone number on our server, we need to connect it to our input field and verify the number while the user is entering it. We do this with an Ajax request using the `fetch` function. Since this is a [fairly new addition to browsers](http://caniuse.com/#search=fetch), you might have to “polyfill” or [“ponyfill”](https://ponyfill.com/) this function in other browsers. You can use [this polyfill by GitHub](https://github.github.io/fetch/) to do the job and you can check the browsers that currently support `fetch` [on the caniuse.com](http://caniuse.com/#search=fetch) [page](http://caniuse.com/#search=fetch).
+
+In `index.html`, add the following lines below your form:
+
+```html
+</form>
+<script>
+var phoneNumberInput = document.getElementById('myPhoneNumber');
+
+function verifyNumber() {
+  var currentNumber = phoneNumberInput.value;
+  fetch('/check/' + encodeURIComponent(currentNumber))
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error('Received failed status code');
+      }
+      return response.json();
+    })
+    .then(function(data) {
+      if (data.valid) {
+        phoneNumberInput.setCustomValidity('');
+      } else {
+        phoneNumberInput.setCustomValidity('Invalid phone number');
+      }
+    })
+    .catch(function(err) {
+      console.error(err.message);
+    });
+}
+</script>
+```
+
+This is a lot of code so let’s break this down a bit. First of all, you might have realized that we switched from using `const` to `var` and from `() => {}` notations to `function() {}` when creating functions. We did this because older browsers might not support these new features yet. If you are only intending to support modern browsers, feel free to stick with `const` and arrow functions. Using `document.getElementById()` we grab the element from the document to be able to read the current value of the input field.
+
+Next, we define the function `verifyNumber` that reads the current value of the input field and performs an HTTP GET request to our server to verify the number. We then parse the result as JSON and check if the `valid` property is set to `true` or `false`, use the `phoneNumberInput.setCustomValidity()` method from the HTML5 form validation API to tell the browser that the form is currently invalid or valid. This way the browser can act accordingly and avoid submitting the form or show an error message.
+
+Finally, we need to call this function after every change of the input field. We do this by listening on the `keyup` event on the input field. In order to avoid spamming the API, we will use `setTimeout` to only call the API when there wasn’t an input for 1 second.
+
+Add the following lines in the bottom of your `index.html`:
+
+```html
+var lastTimeout = undefined;
+phoneNumberInput.addEventListener('keyup', function() {
+  if (lastTimeout) {
+    clearTimeout(lastTimeout);
+  }
+
+  if (phoneNumberInput.value.length > 4) {
+    lastTimeout = setTimeout(verifyNumber, 600);
+  }
+});
+</script>
+```
+
+Reload the browser and it should start checking your phone number as you type in a number. However, there is no visual feedback in some browsers for the user if this is a valid or invalid number unless you submit the form by pressing the return key.
+
+Since we are using `setCustomValidity()` we can style the input using CSS and the pseudo-class `:invalid`.
+
+Let’s do this by adding some styles in the section at the top of your `index.html`:
+
+```html
+<style>
+#myPhoneNumber {
+  color: green;
+}
+
+#myPhoneNumber:invalid {
+  color: red;
+}
+</style>
+</head>
+```
+
+This will show the text of the input in green if it’s a valid number or in red if it’s an invalid number. Reload your browser window and you should see the changes in effect.
+
+Awesome, we are done! You just built a form that only accepts valid phone numbers without having to deal with a single regular expression, making your life and the life of your users better!
+
+### What’s Next?
+
+The [Twilio lookup](https://www.twilio.com/docs/api/lookups) [API](https://www.twilio.com/docs/api/lookups) can provide you with much more information such as which country the number is from, which carrier this number belongs to, or what type of number it is. You can use all of that information to further restrict the phone number input or display useful information to your users like in the example below:
+
+You can check out the full code for this in this [GitHub repository](https://github.com/dkundel/phone-verification-form) and more details in the [Lookup API documentation](https://www.twilio.com/docs/api/lookups). If you want to verify that this is not only a real phone number, but in fact the user’s phone number, take a look at the [Authy Phone Verification API documentation](https://www.twilio.com/docs/api/authy/authy-phone-verification-api).
+
+If you have any questions or if you want to show me something awesome you built, feel free to contact me:
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- GitHub: [dkundel](https://github.com/dkundel)

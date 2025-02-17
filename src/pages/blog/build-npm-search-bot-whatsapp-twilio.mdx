@@ -1,0 +1,167 @@
+---
+title: 'Building an npm search bot with WhatsApp and Twilio'
+publishDate: '2018-08-02 09:00:00'
+image: '/blog-headers/external/3d828a960d3c57a5274130514c0679481faf32c647dfdab3ace92bfbf7bb9d0d.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Learn how to build a bot with WhatsApp and Twilio that queries the npm registry using Node.js and Twilio Functions.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/build-npm-search-bot-whatsapp-twilio.html'
+---
+
+The npm ecosystem is vast by now with almost 750k packages published. Naturally, you’ll find yourself often trying to look up a package you don’t remember. The [npm search](https://www.npmjs.com/) is great for that but what if you just want to quickly look up a package on the go? Let’s build a bot that can look up the packages for us using Twilio’s API for WhatsApp integration.
+
+## Requirements
+
+The npm ecosystem is vast by now with almost 750k packages published. Naturally, you’ll find yourself often trying to look up a package you don’t remember. The [npm search](https://www.npmjs.com/) is great for that but what if you just want to quickly look up a package on the go? Let’s build a bot that can look up the packages for us using Twilio’s API for WhatsApp integration.
+
+### Requirements
+
+Just like with [Twilio Programmable SMS](https://www.twilio.com/sms) we’ll need a webhook that will respond to incoming HTTP requests with every message sent to our WhatsApp bot. The webhook then has to reply with [TwiML](https://www.twilio.com/docs/sms/twiml) to reply to these messages.
+
+We’ll build our webhook using [Twilio Functions](https://www.twilio.com/functions). This allows us to write Node.js code and host it in a serverless function directly on Twilio.
+
+To get started make sure you have:
+
+- A Twilio account ([sign up for a free Twilio account here](https://www.twilio.com/try-twilio))
+- The WhatsApp Sandbox Channel. Follow [these instructions to install the WhatsApp Sandbox Channel in your account](https://www.twilio.com/docs/sms/whatsapp/api#twilio-sandbox-for-whatsapp). You will also need to [connect your own WhatsApp account with the sandbox](https://www.twilio.com/docs/sms/whatsapp/api#joining-a-sandbox).
+
+## Creating a Twilio Function
+
+Our app will use two external dependencies from [npm](https://www.npmjs.com/) that we have to install before we can use them. Go to the [Twilio Functions Configuration](https://www.twilio.com/console/runtime/functions/configure) section and add [axios](https://npm.im/axios) and [common-tags](https://www.npmjs.com/package/common-tags) as dependencies. You can set the version as `*` to grab the latest version.
+
+![Image](build-npm-search-bot-whatsapp-twilio/3O_Il3q-ynBJW0ig5FT34cgMXuQtE6TXRtsTwBuE3QOND3C5r0InjTRVizZyS7FIUd73bq4sCS.png)
+
+Create a new Twilio Function by going into the Manage section, press the `+` button to create a new Function and choose the Hello SMS as the template. Our WhatsApp integration works just like the SMS channel and therefore we’ll be able to use the same template here.
+
+![Image](build-npm-search-bot-whatsapp-twilio/kExqmHTpyqTDKEca4USvzfAhNfspDWvg2ahLPDnf4xUrLXjKuVik4pk0oTMGWGqz-v8X0JbhCQ.png)
+
+You should be greeted with a screen showing a code editor as well as a few input fields. Update the function name field to any name of your liking. This helps you to find your function more easily at a later point. Afterwards, update the path. We’ll use this URL to configure our webhook later. Pick something like `/npm-search`.
+
+![Image](build-npm-search-bot-whatsapp-twilio/c_NVQeL9tQDWtctGZ3anoo4XUkPNZFYi33UUdM7An4Id_V_RXwbGBwpQZAixI8cAUrnndaavaA.png)
+
+Save your changes and copy the path to your function.
+
+## Connecting your Twilio Function to WhatsApp
+
+Go back to your [WhatsApp Sandbox in the Twilio Console](https://www.twilio.com/console/sms/whatsapp/sandbox) and paste the URL of your Twilio Function into the A Message Comes In field. Save the changes afterwards and open WhatsApp to text your Sandbox. You should be greeted with a friendly `Hello World`.
+
+![Image](build-npm-search-bot-whatsapp-twilio/QDTdZsPMVv5QurYw7QLUkUFARhg7YQbfUODXu_STQkRaiu800t9Rvtx-OYfrmYFBDFRWnUMPGo.png)
+
+## Searching npm
+
+Your Twilio Function should look something like this at the moment:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  let twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message('Hello World');
+  callback(null, twiml);
+};
+```
+
+To query the npm database, we’ll be making an HTTP GET request to their registry. They expose a search endpoint that we can use. If you are interested about its capability, [check out the documentation on GitHub](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search). We’ll be using the [axios](https://npm.im/axios) package to do the request. Since we installed it earlier, we can directly require it at the top of our function. While we are at it, we’ll be also requiring the `stripIndent` function from [common-tags](https://www.npmjs.com/package/common-tags) and the `escape` function from the built-in [querystring](https://nodejs.org/docs/latest/api/querystring.html) library. Update your Twilio Function accordingly:
+
+```javascript
+const axios = require('axios');
+const { stripIndent } = require('common-tags');
+const { escape } = require('querystring');
+
+exports.handler = function(context, event, callback) {
+  const twiml = new Twilio.twiml.MessagingResponse();
+  const query = escape(event.Body);
+  const npmSearchApiUrl = `https://registry.npmjs.com/-/v1/search?text=${query}&fields=name,author,description,rating&sort=rating:desc`;
+
+  axios
+    .get(npmSearchApiUrl)
+    .then(({ data }) => {
+      const { objects } = data;
+      let responseText = objects[0].package.name;
+      return responseText;
+    })
+    .catch(err => {
+      console.error(err);
+      return 'Failed to search npm';
+    })
+    .then(response => {
+      twiml.message(response);
+      callback(null, twiml);
+    });
+};
+```
+
+Save your function, wait until it is successfully deployed and send a message like `twilio` or `author:dkundel` to search the npm registry. You should get the name of the first package found returned.
+
+![Image](build-npm-search-bot-whatsapp-twilio/EU8C4M4_xUAGqTSykeFuR9SepfEk3rmtE-flLebIymyvBpO2c0gY7mQCN9bOUiTmn9ftqKKnwL.png)
+
+Now that we have access to the results lets mark this up more nicely. WhatsApp allows some [basic Markdown-like formatting options](https://faq.whatsapp.com/en/android/26000002/). And we’ve always got emojis 🌈💖✨🥑.
+
+Let’s write a separate function to do our formatting. We’ll be using the `stripIndent` tagged template function from the `common-tags` package to enable us to write our response more neatly. It will basically strip away any whitespace before or after our text and remove the basic indentation. Afterwards, we’ll use the function to map it over the first three results returned and join them to a new string.
+
+Place the following code into your Twilio Function to achieve this:
+
+```javascript
+const axios = require('axios');
+const { stripIndent } = require('common-tags');
+const { escape } = require('querystring');
+
+function formatEntry({ package, score }) {
+  const { quality } = score.detail;
+  const { name, version, description, publisher } = package;
+  const stars = '⭐️'.repeat(Math.round(quality * 5));
+  return stripIndent`
+        *${name}* (${stars})
+        💖 by ${publisher.username}
+        🔖 ${version}
+        \`${description}\`
+        📦 https://npm.im/${name}
+    `;
+}
+
+exports.handler = function(context, event, callback) {
+  const twiml = new Twilio.twiml.MessagingResponse();
+  const query = escape(event.Body);
+  const npmSearchApiUrl = `https://registry.npmjs.com/-/v1/search?text=${query}&fields=name,author,description,rating&sort=rating:desc`;
+
+  axios
+    .get(npmSearchApiUrl)
+    .then(({ data }) => {
+      const { objects } = data;
+      let responseText = objects
+        .slice(0, 3)
+        .map(formatEntry)
+        .join('\n---\n');
+      responseText += `\n\n\n🌈 More at: https://www.npmjs.com/search?q=${query}`;
+      return responseText;
+    })
+    .catch(err => {
+      console.error(err);
+      return 'Failed to search npm';
+    })
+    .then(response => {
+      twiml.message(response);
+      callback(null, twiml);
+    });
+};
+```
+
+Deploy your Twilio Function once more and text in the name of your favorite package or author. [You can find additional search queries in the documentation of the registry](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search). The result should be something that looks like this:
+
+![Image](build-npm-search-bot-whatsapp-twilio/rlZlWmbaxCeHARTtfmvEQwi23mWrfGFiWAsuPR3ctZxKf6DQgofm_Hsn6cAHeIgsn5_wfcQciK.png)
+
+## Whats(App) next?
+
+The neat thing with using WhatsApp with Twilio is that we can use the bot that we just built to now deploy it to other channels, like SMS, without doing any code changes. Take the URL of your Twilio Function, get a Twilio phone number and configure the Incoming Messaging webhook to the same URL. Save your changes and try to text your phone number. The result should be the same (minus the special formatting).
+
+If you want to learn more about Twilio & WhatsApp check out the following resources:
+
+- [Learn how to send a message to WhatsApp in the Docs](https://www.twilio.com/docs/sms/whatsapp/quickstart)
+- [Building an emoji translation bot with WhatsApp](https://www.twilio.com/blog/emoji-translations-twilio-api-whatsapp-node-js.html)
+
+There is so much more you can do with Twilio & WhatsApp. If you come up with a cool idea or if you have any questions feel free to reach out to me:
+
+- Mail: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- GitHub: [dkundel](https://github.com/dkundel)

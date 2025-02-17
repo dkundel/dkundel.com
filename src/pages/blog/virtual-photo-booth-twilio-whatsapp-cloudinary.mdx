@@ -1,0 +1,182 @@
+---
+title: 'Creating a Virtual Photo Booth Using Twilio, WhatsApp & Cloudinary'
+publishDate: '2019-07-16 09:00:00'
+image: '/blog-headers/external/2601fe896882ef1d1bc2b3ffa7e94c9d7df0855b5af1ba5693e1f31aacd144f3.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "In this tutorial you'll learn how you can use Twilio for WhatsApp to receive pictures, use Cloudinary to perform image manipulation on them and then respond with the result. All running in a serverless environment using Twilio Functions and Node.js."
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/virtual-photo-booth-twilio-whatsapp-cloudinary'
+---
+
+# Creating a Virtual Photo Booth Using Twilio, WhatsApp & Cloudinary
+
+![Virtual Photo Booth](virtual-photo-booth-twilio-whatsapp-cloudinary/ueiPKYUnYGNhEDFMWyk3KgruLhuc2iu1GEA5JD3lUxeZL84E1GmuH5w4UOejAXzZdj7NK7_owncknk.png)
+
+If you've ever been to Berlin, chances are high that you've seen multiple photo booths in bars and on the street. Berlin and photo booths just belong together. This year for [JSConf EU](https://2019.jsconf.eu/) we wanted to build our own virtual photo booth, powered by [Twilio for WhatsApp](https://www.twilio.com/en-us/messaging/channels/whatsapp). In this post, we'll look at how we built the digital part of the photo booth using Twilio and [Cloudinary](https://cloudinary.com/).
+
+Let's build a purely digital version of this photo booth where when a person sends in an image, we'll perform some manipulations on that picture and send it back.
+
+## Prerequisites
+
+Before we get started, make sure you have the following:
+
+- A Twilio account ([sign up for free](https://www.twilio.com/try-twilio))
+- The WhatsApp Sandbox Channel installed ([learn how to activate your WhatsApp sandbox](https://www.twilio.com/docs/whatsapp/sandbox))
+- [A free Cloudinary account](https://cloudinary.com/signup)
+
+If you prefer to view the next steps as a video to follow along, make sure to check out this video on [YouTube](https://www.youtube.com/watch?v=Rjh_b7MsB4Q):
+
+## Setting up Your WhatsApp Number
+
+When a person sends a picture to our WhatsApp number (or Sandbox for that matter), Twilio will trigger a [webhook request](https://www.youtube.com/watch?v=aLjSNfoJCYc) that we'll have to receive. We could use any HTTP server for this, but in our case we'll use a [Twilio Function](https://www.twilio.com/functions). This allows us to host a serverless HTTP endpoint using Node.js.
+
+Inside the [Twilio Console](https://www.twilio.com/console/runtime/functions/manage), head to the [Functions section](https://www.twilio.com/console/runtime/functions/manage) and create a new Twilio Function with the "Hello SMS" template.
+
+![Screenshot of Twilio Functions "new" dialog](virtual-photo-booth-twilio-whatsapp-cloudinary/f0R0eYtrR0gO9TzL_Zmur8UgLr3fQ7yFkWf31JfjF5nRc5D2yJ_-0rd5-o0ya-BhlQFNyma3mAmBdV.png)
+
+Once you created your new Function, give it a name like "WhatsApp Photobooth" and a path such as `/photo`. Make sure to save the changes and copy the path to your Twilio Function.
+
+![Screenshot of the UI of a Function indicating to give the function a name and a path, save and copy the path](virtual-photo-booth-twilio-whatsapp-cloudinary/dQGLYaSbdPhMySFGWlrkj8fCxDAqPotzAM1ryebBtWdi5cl4cxYPxszsvRG6YDfGGF7xg6125oMvhz.png)
+
+In a new tab, head over to the [WhatsApp sandbox configuration screen](https://www.twilio.com/console/sms/whatsapp/sandbox) and set the URL for "When a message comes in" to the path of your Twilio Function. Scroll all the way to the bottom to save the changes.
+
+![Screenshot of the Twilio WhatsApp sandbox indicating to paste your Functions URL into the webhook field](virtual-photo-booth-twilio-whatsapp-cloudinary/3Z8cjgqvwU0uM_FIZ5Lz6LCFw5wvgLpYs0ddBMJTsImCHkbSrWOgQ_TxxkrRTzpRXxSzzQbSPoRGn4.png)
+
+You can test if everything is properly set up by texting any message to your WhatsApp sandbox. The response should always be "Hello World".
+
+## Receiving the Picture
+
+Now that we have our Twilio Function wired up, let's see how we can retrieve an image when we sent one.
+
+When Twilio makes the HTTP request to your webhook, it will send a set of info around your message as part of that request. In Twilio Functions we can access these via the `event` object that is passed to our Function. Specifically in our case the `event.MediaUrl0` is of interest because it will contain the URL of our image if one has been sent with the message. We might also have `event.MediaUrl1` to `event.MediaUrl9` available if more images have been sent but in our case we'll focus on the first one.
+
+For now, we'll just log the URL, modify your Twilio Function accordingly and hit save:
+
+```javascript
+exports.handler = function(context, event, callback) {
+  console.log(event.MediaUrl0);
+  let twiml = new Twilio.twiml.MessagingResponse();
+  twiml.message('Hello World');
+  callback(null, twiml);
+};
+```
+
+Afterwards, send in a picture to the sandbox and check the logs at the bottom of your Function. You should see a URL logged. Press the "copy" button to copy the URL and open it in another tab and you can see the image you've sent.
+
+![Screenshot of the Function logs pointing at the URL of the image](virtual-photo-booth-twilio-whatsapp-cloudinary/JVi-Id6B3LNazMWgGZWDIj6yuDvIKAhoCDf8JHiVKXlpnlEP6xmabrGYBzCg9mymn8V1h8EXjY0Eny.png)
+
+## Manipulating the Picture
+
+Cloudinary is a platform for image management and manipulation. It's great for our use case because we'll want to do some image manipulation on our picture. We'll also need a URL that we can give Twilio to send the resulting image. Cloudinary combines both of these in one platform.
+
+Start by installing the [cloudinary](https://npm.im/cloudinary) SDK as a dependency and setting your Cloudinary credentials. Go to the Configure page of your Twilio Functions and in the Environment Variables section, add your `CLOUDINARY_URL` from the [Cloudinary Dashboard](https://cloudinary.com/console).
+
+![Screenshot of the Cloudinary dashboard highlighting the URL starting with cloudinary://](virtual-photo-booth-twilio-whatsapp-cloudinary/NfrB7Cn78OL6SH3al86EtiB5royRgauMt95-zSHWo8ZD-QYRvD-1wrADt7FSiHiApnwOFjZsbc9-sB.png)
+
+![Screenshot of the environment variables in Twilio Functions to indicate pasting your Cloudinary URL](virtual-photo-booth-twilio-whatsapp-cloudinary/OL5hSEsHB9WepXT-mh7BqNABur8Sy6saapXqDlnGBK6Zj-AbmtRBxmr3q9zZ9wK5Cjf2DJuTxBxJ5J.png)
+
+Afterwards, scroll to the Dependencies section and add `cloudinary` with the version `*` to install the latest version.
+
+![Screenshot of the Dependencies section of Twilio Functions with cloudinary installed with version *](virtual-photo-booth-twilio-whatsapp-cloudinary/DQYD0RK0NcfJg_39R4vLxZtD5LCf5LiZfllq70v5CVgKmVEo184rEiCQG8q7t_7e7hlLrdYpxtNNdz.png)
+
+When you are done with both, hit save to apply the changes.
+
+Now that we have the Cloudinary SDK all set-up, it's time to work on the image manipulation. In our case we'll want to do the following to the picture:
+
+- Change the aspect ratio to a 3x4 picture.
+- Adjust the height to 1600px
+- Apply an overlay on top. In our case, it's going to be [this overlay](https://i.imgur.com/cS1zGMO.png)
+
+![Picture of the image overlay we'll use with a drop shadow to highlight the white parts of the picture better](virtual-photo-booth-twilio-whatsapp-cloudinary/jZMCGeg4IrrPAV5Kl3PFMRsu9mlaKxRX1dLNDZmhfjyTNi3D_ZnjrzQ4qGAtnCjRj4nbRWMhLYO7jy.png)
+
+Before we can start with the image manipulation, you'll have to upload the overlay to your Cloudinary media library. You can either use your own in the size 1200px width by 1600px height or [download one here](https://i.imgur.com/cS1zGMO.png). Upload it to the Cloudinary Media library and give it a name of `overlay-photo`.
+
+![Screenshot of the Cloudinary Media Library to show where to rename the picture](virtual-photo-booth-twilio-whatsapp-cloudinary/nt7PrcYmIRlz-v2F2JxqdbPsW7SUSQMp2TTPXqEMQ9wlh-FXbCQvzPnrlbmGvw5Oppge3PTL6pHU3J.png)
+
+Cloudinary uses the concept of [transformations](https://cloudinary.com/documentation/image_transformations) to manipulate an image and comes with a wide variety of options. It also supports eager transforms. That means we can pass a set of transformations to it during image upload to tell it which transformations it should have readily cached. You can learn about the various [available transforms in the Cloudinary docs](https://cloudinary.com/documentation/image_transformations).
+
+In our situation the transformations convert to the following in JavaScript:
+
+```javascript
+const cloudinaryTransforms = {
+  transformation: [
+    { aspect_ratio: 0.75, crop: 'crop' },
+    { height: 1600, crop: 'scale' },
+    {
+      overlay: 'overlay-photo',
+      flags: 'relative',
+      height: '1.0',
+      width: '1.0',
+    },
+  ],
+};
+```
+
+Since the Cloudinary API is callback based, we'll use the built-in `promisify` method to enable the use of async/await with this API.
+
+During the upload, we'll also have to assign the photo a public ID which acts as a name. We'll use the ID of your sent message (`MessageSid`) for this one as it's a good unique identifier.
+
+As a result of the upload, we'll be able to retrieve the URL of the `eager` transform. We can then use that to set the [media](https://www.twilio.com/docs/sms/twiml/message?code-sample=code-sending-of-an-message-with-media-mms-3&code-language=Node.js&code-sdk-version=3.x) on our response Messaging TwiML.
+
+Update your Twilio Function to contain the following:
+
+```javascript
+const cloudinary = require('cloudinary').v2;
+const { promisify } = require('util');
+const uploadImage = promisify(cloudinary.uploader.upload);
+const cloudinaryTransforms = {
+  transformation: [
+    { aspect_ratio: 0.75, crop: 'crop' },
+    { height: 1600, crop: 'scale' },
+    {
+      overlay: 'overlay-photo',
+      flags: 'relative',
+      height: '1.0',
+      width: '1.0',
+    },
+  ],
+};
+
+exports.handler = async function(context, event, callback) {
+  let twiml = new Twilio.twiml.MessagingResponse();
+
+  if (!event.MediaUrl0) {
+    twiml.message('Please send an image');
+    callback(null, twiml);
+    return;
+  }
+
+  const res = await uploadImage(event.MediaUrl0, {
+    public_id: event.MessageSid,
+    eager: [cloudinaryTransforms],
+  });
+  const url = res.eager[0].secure_url;
+
+  twiml.message('Thanks').media(url);
+  callback(null, twiml);
+};
+```
+
+Press Save to deploy your changes.
+
+Now that you have the changes deployed, text a picture into your WhatsApp sandbox number and you should get as a response with the transformed picture.
+
+![animated GIF showing the response in WhatsApp and clicking on the image to enlarge it](virtual-photo-booth-twilio-whatsapp-cloudinary/Qb5UdYA7N3VHeku8Uyjx4AskrcwPb1VDrC81gjsrkdToSnS3yrQeZlOFJ_hzFdXCWGjHTWeE2v57g9.gif)
+
+## What's Next?
+
+Congratulations, you've built your own digital photo booth powered by Twilio, WhatsApp, and Cloudinary. But your journey with Twilio doesn't have to be over. Why don't you check out:
+
+- [Learn how you can use Twilio Autopilot to build WhatsApp bots](https://www.twilio.com/blog/build-whatsapp-bots-twilio-autopilot)
+- [How to build an npm search bot with Twilio and WhatsApp](https://www.twilio.com/blog/build-npm-search-bot-whatsapp-twilio.html)
+- [Jump into your own TwilioQuest adventure and learn in an interactive game how to use Twilio's APIs](https://www.twilio.com/quest/)
+
+And if you have any questions or want to show me what you built, feel free to contact me:
+
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- GitHub: [dkundel](https://github.com/dkundel)
+- [dkundel.com](https://dkundel.com/)

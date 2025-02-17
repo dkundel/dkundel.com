@@ -1,0 +1,128 @@
+---
+title: 'ASTs - What are they and how to use them'
+publishDate: '2020-06-11 09:00:00'
+image: '/blog-headers/external/74d17ba97d18e20fa148dc11f5eca815e72fa431f49270513efcfa1ba2a6b054.png'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: "Abstract Syntax Trees (ASTs) power a wide variety of tools developers use on a regular basis. In this post we'll cover what they actually are and how they can be useful in your development toolbox."
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/abstract-syntax-trees'
+---
+
+## What is AST?
+
+Abstract Syntax Trees or ASTs are tree representations of code. They are a fundamental part of the way a compiler works. When a compiler transforms some code there are fundamentally the following steps:
+
+- [Lexical Analysis](https://www.twilio.com/en-us/blog/abstract-syntax-trees#Lexical-Analysis-aka-Tokenization)
+- [Syntax Analysis](https://www.twilio.com/en-us/blog/abstract-syntax-trees#Syntax-Analysis-aka-Parsing)
+- [Code Generation](https://www.twilio.com/en-us/blog/abstract-syntax-trees#Code-Generation)
+
+![Diagram showing how input is transformed into tokens via Lexical Analysis and then into an AST through Syntax Analysis. Lastly it's transformed into output using Code Generation.](abstract-syntax-trees/-vnpXSyzxyPpPK3TqYdV1pedY3MnsEnyyGUH1WlTd0O29Cl_CWtWzxvLw0jtkLWW6M5ESa9EmCYW-b.png)
+
+### Lexical Analysis aka Tokenization
+
+During this step, code that you wrote is going to be converted into a set of tokens describing the different parts of your code. This is fundamentally the same method that basic syntax highlighting is using. Tokens don't understand how things fit together and purely focuses on components of a file. You can imagine it as a list or array of different types of tokens.
+
+![Animation converting code into a list of tokens.](abstract-syntax-trees/4Q1Fa-SX8smqvRKZYupkUeodmma76QViKAZASsyP4wLlap2YAyRr9Oz3mOaYGYL7VERPmhmgk0flsS.gif)
+
+### Syntax Analysis aka Parsing
+
+This is the step where we turn our list of tokens into an Abstract Syntax Tree. It converts our tokens into a tree that represents the actual structure of the code. Where previously in the tokens we only had a pair of `()`, we now have an idea of whether it's a function call, a function definition, a grouping, or something else.
+
+![Animation transitioning from a list of tokens into an AST](abstract-syntax-trees/QRjqUpCw9t8dOD1VfI4OrZnRZLmtsbXpn5bUZKRlpc2o6-nAOx-8IFtABbxyxV1ncZaMz8EGF75C-H.gif)
+
+```json
+{
+  "type": "Program",
+  "start": 0,
+  "end": 14,
+  "body": [
+    {
+      "type": "ExpressionStatement",
+      "start": 0,
+      "end": 14,
+      "expression": {
+        "type": "CallExpression",
+        "start": 0,
+        "end": 13,
+        "callee": {
+          "type": "Identifier",
+          "start": 0,
+          "end": 7,
+          "name": "isPanda"
+        },
+        "arguments": [
+          {
+            "type": "Literal",
+            "start": 8,
+            "end": 12,
+            "value": "🐼",
+            "raw": "'🐼'"
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "module"
+}
+```
+
+### Code Generation
+
+This step can be multiple steps by itself. Once we have an Abstract Syntax Tree, we can both manipulate it as well as "print" it into a different type of code. Using ASTs to manipulate code is safer than doing those operations directly on the code as text or on a list of tokens.
+
+![Animation transforming an AST by replacing nodes](abstract-syntax-trees/upwCkqTNYmuXRxKifsICQkJxclDHCtIjLqiKAGUdOuKpjVKAFb4iBq5u16XgGVKoQgAsQnsyrapCFy.gif)
+
+## What to do with ASTs?
+
+With the theory covered, what are actually some real-life use cases for ASTs? We talked about compilers, but we are not all building compilers all day.
+
+The use cases for ASTs are wide and can generally be split into three overarching actions: reading, modifying, and printing. They are sort of additive, meaning if you are printing ASTs, chances are high that you previously also read an AST and modified it. But we'll cover examples for each of these that primarily focuses on one use case.
+
+### Reading/Traversing ASTs
+
+Traversing an AST means visiting the different nodes of the tree to gain insights or perform actions.
+
+One of the most common use cases for this is linting. [ESLint](https://eslint.org/) for example uses [espree](https://www.npmjs.com/package/espree) to generate an AST, and if you want to write any custom rules, you'll write those based on the different AST nodes.
+
+![Animation showing how Code Coverage tools insert additional code](https://www.twilio.com/content/dam/twilio-com/global/en/blog/legacy/2020/abstract-syntax-trees/TMo6yXjh362EqYtQgcFbK9kJ6KBmbjoSxrrlExYMk7Zl6.width-1000.png)
+
+```javascript
+let numberOfClasses = 0;
+export default function(context) {
+  return {
+    ClassDeclaration(node) {
+      numberOfClasses = numberOfClasses + 1;
+      if (numberOfClasses > 1) {
+        context.report({
+          node,
+          message: "You shouldn't use more than one class",
+        });
+      }
+    },
+  };
+}
+```
+
+### Modifying/Transforming ASTs
+
+As previously covered, having an AST makes modifying said tree easier and safer than modifying the code as tokens or a raw string. There's a wide variety of reasons why you might want to modify some code using ASTs.
+
+[Babel](https://babeljs.io/) for example modifies ASTs to down-transpile newer features or to turn JSX into function calls. Which is what happens when you compile your React or Preact code, for example.
+
+![Animation showing how Code Coverage tools insert additional code](abstract-syntax-trees/IJUXoTUPAikHXSaoqUGWfEFzqWyzgKr4FmuGVn_KgxBj_boXbqMfnxCwydNs-DtpkbDed_ogTFPFfn.gif)
+
+### Printing ASTs
+
+In most cases, printing and modifying ASTs go hand in hand since you'll have to output the AST you just modified. But while some libraries like [recast](https://github.com/benjamn/recast) explicitly focus on printing the AST in the same code style as the original, there's also a variety of use cases where you want to explicitly print your AST differently.
+
+**What's next?**
+
+We barely scratched the surface of awesome things you can build with ASTs. While ASTs might be things most developers don't work with on a daily basis, I believe they are a useful tool to have in your toolbelt. What are some use cases of ASTs that you have seen that are not covered here? I'd love to hear about them!
+
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- GitHub: [dkundel](https://github.com/dkundel)
+- Web: [dkundel.com](https://dkundel.com)

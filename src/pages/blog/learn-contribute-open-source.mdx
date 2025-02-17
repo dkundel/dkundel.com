@@ -1,0 +1,79 @@
+---
+title: 'Learn How to Contribute to Open Source'
+publishDate: '2019-10-01 09:00:00'
+image: '/blog-headers/external/b4c6433e1a30660c55cedde6b68e9d77c88432f19425c29bdbd7f1ab903cbb02.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'Contributing to open-source projects can be intimidating. Learn more on how Twilio created the Open Pixel Art project and a special TwilioQuest mission to help you on your journey into the world of open source.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/learn-contribute-open-source'
+---
+
+Contributing to an open-source project can often be intimidating. Especially if it is your first contribution. At one point we've all been there. But contributing to open source can also be fun and rewarding once you get through it. We decided to try and help you with your first steps into the world of open source and hopefully make it less intimidating and more fun!
+
+As a result, we are launching today two new projects! The Open Pixel Art project and a brand new [TwilioQuest](https://twil.io/hacktoberfest-quest) mission focused on taking you step-by-step through your quest into the world of open source.
+
+## Open Pixel Art - A Collaborative Art Project
+
+![Logo with colorful pixels and a pixelated text reading "Open Pixel Art by Twilio"](learn-contribute-open-source/n2x_U3HEj_ejPlsI8qZVGoTfjAneTYBClJh5BPOUdeAXGUXYfW3GjwZkxiyu31fjU2RfoMx08Ky4Tc.png)
+
+One problem doing your first contribution to open source is finding the right project to get started. While there are some great projects that welcome new contributors, we wanted to create something that makes it easy to identify what to contribute.
+
+We often talk at Twilio about how Code is Creative. And we love pixel art. In fact, at SIGNAL 2017 we created a giant wall of pixels for people to be creative and [eventually hack](https://www.twilio.com/blog/drawing-pixel-art-text-messages-signal-video-wall.html). Inspired by our love for pixel art, we created the [Open Pixel Art](https://open-pixel-art.com) project with the aim to teach people how to contribute to open source while collaborating on an art project.
+
+The project is based on a few basic principles:
+
+- Every user on GitHub can contribute exactly one pixel with a color of their choice.
+- Pixels can never be removed.
+- Pixels can be layered. (Your pixel will live on in the project even if it might be layered on the canvas. Who knows, maybe we go 3D at one point?)
+
+To contribute a pixel to the project, you'll have to create a pull request where you add your pixel with its coordinates to the [\_data/pixels.json file](https://github.com/twilio-labs/open-pixel-art/blob/master/_data/pixels.json) of the project.
+
+```json
+{
+  "data": [
+    {"y": 1, "x": 3, "color": "#F22F46", "username": "twilio-labs"},
+    {"y": 1, "x": 4, "color": "#FFFF00", "username": "dkundel"},
+    {"y": 2, "x": 9, "color": "#F22F46", "username": "twilio"},
+    ...
+  ]
+}
+```
+
+![screenshot of a merged pull request on GitHub.com](learn-contribute-open-source/jihmfeHl9UnxcbGWnnf7pc3JjQO6uh-NAnve90j132c_OrRe9DVDWe_xMwm_lodZPMWPkHiL4W5qfx.png)
+
+Once you create your pull request for the [project on GitHub](https://github.com/twilio-labs/open-pixel-art), a few bots will kick off to validate your pull request. We wanted to make the experience of creating a pull request as gratifying for you as possible. That means if you only contributed a pixel change and all your checks passed, a bot will automatically merge your pull request.
+
+After your pull request has been merged by the Mergify bot, Netlify will automatically deploy the changes and you should be able to see your contributions a few minutes later on [open-pixel-art.com](https://open-pixel-art.com).
+
+If you want to learn more about the project and how to contribute, make sure to head over to the [project on GitHub](https://github.com/twilio-labs/open-pixel-art) and check out the [contributing guide](https://github.com/twilio-labs/open-pixel-art/blob/master/CONTRIBUTING.md)! But if you want to be guided step-by-step through your journey into open source, don't worry! We created a special [TwilioQuest](https://twil.io/hacktoberfest-quest) mission just for you!
+
+![animated gif with pixelated confetti flying around the screen](learn-contribute-open-source/fv3eNkmIjn6GpwRDM6jISsEgT8IraldP9CzGXNUROQqdrPabNOV3mJ4HFTdxtRaQlBUOc0a0V1Jj_n.gif)
+
+## Embark on Your Personal Open Source Quest
+
+![screenshot of flame of open source mission](learn-contribute-open-source/Screen_Shot_2019-10-18_at_12.17.41.png)
+
+The Open Pixel Art project might take away the burden of finding the right project to contribute to. But if you've never contributed to an open-source project or are new to things like [git](https://git-scm.com/) and [GitHub](https://www.github.com/), it might still be intimidating to you.
+
+For that reason, we created a special mission in [TwilioQuest](https://twil.io/hacktoberfest-quest), our game aiming to teach you various Twilio and coding-related concepts in a fun and engaging way. The mission will guide you through contributing to the Open Pixel Art project from signing up to GitHub, over what a fork or pull request is, all the way to getting your pull request merged.
+
+![Screenshot of TwilioQuest mission with a maze the character walking through a maze](learn-contribute-open-source/hnEqUIn6_9V7Yb18D-uRLQCcM8HOFdtCgC62I9keDZNlpmSt3A6eRyipDOISGyNuRT3_HfaOw_D4qc.png)
+
+Throughout your quest, we'll make sure to help you to have your development environment set up, validate that your fork is working, award you experience points, and you can equip your TwilioQuest character!
+
+And after your mission, you'll hopefully be equipped to explore the wide world of open source and contribute to more projects.
+
+## We Can't Wait to See What You Contribute!
+
+![animated gif of two people giving each other a high five](learn-contribute-open-source/-3Qs_VvxLMC92RNrGshA8kX3u-Oxx9eu_tAH7aqtwu4MSpVQFgH8MwG7Ak16LAc2AzK9MaFRGlpeL0.gif)
+
+Whether this is your first or hundredth open-source contribution, we are excited to be part of your journey. And remember, a contribution doesn't always have to be about code, some of the most valuable contributions to a project are often not code-related.
+
+If you have any questions about the Open Pixel Art project or as you embark on your open-source quest, feel free to create a [GitHub issue](https://github.com/twilio-labs/open-pixel-art/issues) or reach out to me directly.
+
+- Twitter: [@dkundel](https://twitter.com/dkundel)
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- GitHub: [dkundel](https://github.com/dkundel)

@@ -1,0 +1,232 @@
+---
+title: 'Sending SMS from GitHub Actions'
+publishDate: '2019-11-26 09:00:00'
+image: '/blog-headers/external/5193a476040b1b7e001a53e55935171e08b44a66672fc741e5c71974a0a4168a.jpg'
+imageAlt: ''
+imageWidth: 1200
+imageHeight: 632
+excerpt: 'GitHub Actions lets you run your continuous integration tests and continuous delivery directly on their platform. Learn how you can integrate sending SMS directly from your GitHub Actions workflows using Twilio.'
+layout: '@layouts/BlogLayout.astro'
+tags: []
+canonical_url: 'https://www.twilio.com/blog/sending-sms-github-actions'
+---
+
+At GitHub Universe 2019, GitHub announced that [Actions](https://github.com/features/actions) have been moved into General Availability. We are very excited about this launch and as part of it have launched the [Twilio SMS for GitHub Action](https://github.com/marketplace/actions/twilio-sms). In this blog post we'll look at how you can get started with that and some use cases for it.
+
+## Getting Started
+
+You can [find the Twilio SMS Action in the GitHub Marketplace](https://github.com/marketplace/actions/twilio-sms). Before using it, you'll need a Twilio account. [Sign up for free](https://www.twilio.com/try-twilio) to get your account details.
+
+Once you have an account, we'll need two additional things.
+
+### Get a phone number
+
+If you haven't gotten a phone number yet, head over to the [Phone Numbers section of the Twilio Console](https://www.twilio.com/console/phone-numbers/search) and select your preferred phone number. Make sure it has SMS capabilities enabled.
+
+![screenshot of Twilio Console with arrow pointing at SMS capability checkbox in Phone Numbers screen](sending-sms-github-actions/DxT1LuHpZ5rKqgSSpKHSKY0yAJgQVuxuA9Nj3VCIfnUBAWsyWlTrF1j-eJy8-pJMPjiBpTuNSFBJH2.png)
+
+Once you have that phone number, make sure to note it down somewhere. We'll need it later when we configure the Action.
+
+### Retrieve your account credentials
+
+You can have two types of account credentials with Twilio. By default you get a paired Account SID and Auth Token. The Account SID is your account identifier and the Auth Token is basically your master key. These always work with the API but if they get compromised you'll have to recycle them for every app.
+
+You can find those two credentials in the [home section of the Twilio Console](https://www.twilio.com/console). Make sure to note down the Account SID as we'll need that one later.
+
+A better approach is to use an API Key and API Secret pair. You can generate multiples of these credentials for different use cases, and if a pair gets compromised not every use case of your account is compromised.
+
+Create an API Key and Secret by going to your [account settings in the Twilio Console and choose the API Keys section](https://www.twilio.com/console/project/api-keys). Fill out the form to create a new pair and make sure to pick "Standard" for the type. This way your key & secret won't be able to control of your account or create new keys.
+
+![screenshot of Twilio Console highlighting the API key creation screen](sending-sms-github-actions/f1cw78v6bvxwcagG-7tQxZLGxHUqqdhJGRraWLa0UCyzNhCMM2a22E1m3PtKwABarn38Gz_oIL2jDG.png)
+
+After creating the new key/secret pair, make sure to securely store those somewhere, because once you close this dialog, you won't be able to retrieve the secret again.
+
+![screenshot of twilio console highlighting api key and secret](sending-sms-github-actions/vPW5Ji_gy4tpo6tdgQqwoU37D2aoysIGvl8ycwrZHTRgn0PdJ6T1lDOiuudJpUxZdRAZPO3qHKmUW7.png)
+
+**Configuring the Twilio SMS Action**
+
+The Twilio SMS Action can be used like any other GitHub Action by adding an entry to the [YAML configuration file of an Actions workflow](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/configuring-a-workflow). If you haven't created one before, GitHub offers you a selection of helpful templates based on the programming language of your project.
+
+![screenshot of github actions template selection screen](sending-sms-github-actions/CsbjHdiSWSoWDyIhs_c7j2VE6HIY27BVFVFZSfOU5bic8z5Icd6ZAn3rRrlPC6AJTYS94YnqM586BL.png)
+
+For this blog post we'll work off a template repository that represents a barebones Node.js module with an existing GitHub Actions workflow which publishes the package to the GitHub package registry whenever a release has been created.
+
+If you already have your own GitHub Actions workflow that you want to add Twilio SMS to, feel free to skip this step.
+
+Head over to [https://github.com/dkundel/sms-action-demo](https://github.com/dkundel/sms-action-demo) and click the "Use this template" button to create a copy of this for your own account.
+
+![screenshot of GitHub repository screen highlighting the template button](sending-sms-github-actions/fLn1KJe9s00KnOKL4M1gX5WyRvvQpFsQGD9JqlB82ZHRjcrtCurC_isckIlLFZhElCGId1FPwm_3KN.png)
+
+Now that you have a copy of the project it's time to add Twilio SMS to a workflow. All GitHub Actions workflows are based in the `.github/workflows` directory of a project. In our case we'll be adding the Action to the `npmpublish.yml` workflow.
+
+Open the file either by [cloning the repository](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) to your local environment or by [editing it in the GitHub UI](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-your-repository).
+
+![screenshot of GitHub view of the workflow file with an arrow pointing to the edit button](sending-sms-github-actions/CPcFBu-J_dNOSTRFWtSsfRrpeX1IhfcUu_X3PscHLgn-UpnNJCjzXgR8OYVwoMu21WrOUJtA5BlUKX.png)
+
+The code to use the Twilio SMS Action is always roughly the same and will look like this:
+
+```yaml
+- name: 'Sending SMS Notification'
+  uses: twilio-labs/actions-sms@v1
+  with:
+    fromPhoneNumber: ${{ secrets.TWILIO_PHONE_NUMBER }}
+    toPhoneNumber: ${{ secrets.MY_PHONE_NUMBER }}
+    message: 'Hello from Twilio'
+  env:
+    TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+    TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+    TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+```
+
+The place where you add this code depends on when in your workflow you want to trigger this Action.
+
+In our case let's trigger this as soon as a new package version has been published. To do so, modify the `npmpublish.yml` to look the following way:
+
+```yaml
+name: Node.js Package
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - run: npm test
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://npm.pkg.github.com/
+          scope: '@dkundel'
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Sending SMS Notification'
+        uses: twilio-labs/actions-sms@v1
+        with:
+          fromPhoneNumber: ${{ secrets.TWILIO_PHONE_NUMBER }}
+          toPhoneNumber: ${{ secrets.MY_PHONE_NUMBER }}
+          message: 'The latest version of your package has been shipped 🎉'
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+          TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+```
+
+Make sure to change `scope: '@dkundel'` to whatever the GitHub username is that you want the package to be published to.
+
+Once you change the file, make sure to commit and push the changes.
+
+![screenshot of GitHub highlighting the "Start Commit" button](sending-sms-github-actions/Jg5lPQImi1vedrIaBO98U6Dcyzhr6jCkTc7bbLqktRndihboLmKwzu2-5N2J-4aYPd6NvezCVMLoqf.png)
+
+Additionally you'll need to make sure to change the username in the `package.json` file in the `name` and `repo` fields to match your username:
+
+```json
+{
+  "name": "@dkundel/sms-action-demo",
+  "version": "1.0.0",
+  "description": "A basic Node.js application to demonstrate how to add the Twilio SMS action to it",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dkundel/sms-action-demo.git"
+  },
+  "keywords": [],
+  "author": "Dominik Kundel <hi@dominik.dev> (https://dkundel.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dkundel/sms-action-demo/issues"
+  },
+  "homepage": "https://github.com/dkundel/sms-action-demo#readme",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}
+```
+
+In the YAML file we are using a couple of interpolations for secrets like `${{ secrets.TWILIO_ACCOUNT_SID }}`. This is powered by GitHub's built-in secret store. In order to finish the configuration of our Action, we'll have to set up those secrets.
+
+**Defining Secrets**
+
+To keep your secrets safe, you don't want to store them directly in your YAML file. The YAML file will be available to everyone if it's a public repository, and your secrets could easily be compromised. Instead, head over to the settings of your repository and click on Secrets in the left navigation bar.
+
+![screenshot of GitHub project settings screen showing the Secrets section](sending-sms-github-actions/oM8oObKq-CNMgJogWjrmCYXdVNa5X0k_Sxl1FW4LUsSNcerO541ypivDQ9LsnxILMiW-44uushJ8Eo.png)
+
+In this section you'll be able to add secrets that are specific to your project; therefore, you don't have to worry about others having access to them. Additionally, once you set them up, you cannot read them anymore in the UI.
+
+For our flow we'll have to create the following secrets:
+
+- `TWILIO_ACCOUNT_SID`: this is the unique identifier of your Twilio Account that you got from [twilio.com/console](https://twilio.com/console)
+- `TWILIO_API_KEY`: this is the key part of the key/secret pair you created earlier
+- `TWILIO_API_SECRET`: this is the secret part of the key/secret pair you created earlier
+- `TWILIO_PHONE_NUMBER`: enter the phone number that you got from Twilio that should be used to send the SMS. Make sure to include the country code. For example: `+1 415 111 2222`
+- `MY_PHONE_NUMBER`: this is your personal phone number that should be used to receive the SMS. Make sure to include the country code. For example: `+1 415 111 2222`
+
+![screenshot of GitHub's create secret screen](sending-sms-github-actions/J1OIEEVoHUXA8rWLznW6vL3EXWb55PVjviRy3OHXKMsbdzclXjE1g9TfoiJsgN3PtiSUuvf3d7kK2V.png)
+
+You might have noticed that there is another secret used in the flow. The `GITHUB_TOKEN` used to publish the package to the GitHub package registry. GitHub will generate this token automatically for you and insert it into your flow. It is scoped to your respective project and only has limited capabilities.
+
+After submitting all of the secrets you should see five listed secrets in your settings.
+
+![screenshot of GitHub secrets screen with all secrets created](sending-sms-github-actions/7DvsDdrey5UXqE0qzah_lWTZrsKm1GixOvy5ebKAUfYMF4iBi0ZqLxj7go1e3QIHzcfr_9RYLLMTSf.png)
+
+Now that we are all set up, it's time to test our Actions flow.
+
+**Sending your first SMS**
+
+Our flow has been set-up to trigger on every release. That means we need to create a release. From the home page of your GitHub repository, click on the releases tab and click the "Draft a new release" button.
+
+![screenshot of GitHub UI highlighting the releases tab](sending-sms-github-actions/iD2FeQbOqw2qZmuThp1KDs_LChaLYrfTCpLYd5FMJ_WxqTsYVZCWn8YsonsYViUhIa78bY0ANPh5vu.png)
+
+Fill out the release notes with anything you'd like (since this is just a test) and specify a version. I chose "v1.0.0".
+
+![Screenshot indicating the fields of creating a release](sending-sms-github-actions/wF6QN6fNFXO_s8dAXJfE6hJeriX_w5VPKpI0Vn2YHFBHYpytWfmdZL1NvkDmtFtByM5sVUSKlTPADy.png)
+
+After you created your release, head over to the Actions tab of your repository and you should see an active workflow under the title "Node.js Package". It will first work on the build job before moving on to the publish-gpr job if the build job was successful. This might take a few seconds so feel free to grab a drink or check your favorite social media platform.
+
+You will slowly see one task after another turn green and be checked off. Shortly after the "Sending SMS Notification" turns green, you should receive an SMS to your number.
+
+![screenshot of a successful GitHub actions run with the SMS confirmation highlighted](sending-sms-github-actions/AQJgWEOLNORq4Dx4qlLQUw_gTHfncKZUlmh1pFQrhS6J0HeUwr_FE1GsH-Q4Q1M717cvbjvb1_e3aX.png)
+
+Congratulations, you sent your first SMS from GitHub Actions using Twilio!
+
+**What's Next?**
+
+GitHub Actions is incredibly powerful and can handle a lot of your continuous delivery and integration tasks. We made sure that our Twilio SMS Action fits well into your workflows. Whether you want to send an SMS after you failed to deploy your app using one of the [various deploy Actions](https://github.com/marketplace?category=deployment&type=actions) or to notify you when your tests fail on master. All it takes is a few lines in your Actions workflow and you'll be ready to go:
+
+```yaml
+- name: 'Sending SMS Notification'
+  uses: twilio-labs/actions-sms@v1
+  with:
+    fromPhoneNumber: ${{ secrets.TWILIO_PHONE_NUMBER }}
+    toPhoneNumber: ${{ secrets.MY_PHONE_NUMBER }}
+    message: 'Ahoy from Twilio!'
+  env:
+    TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+    TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+    TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+```
+
+Our Twilio SMS Action is open-source at [github.com/twilio-labs/actions-sms](https://github.com/twilio-labs/actions-sms) and we would love to hear your feedback and any issues you might stumble upon!
+
+If you have any questions, or want to share your favorite GitHub Actions or workflows, feel free to send me a message!
+
+- Email: [dkundel@twilio.com](mailto:dkundel@twilio.com)
+- Twitter: [@dkundel](https://twitter.com/dkundel?lang=en)
+- GitHub: [dkundel](https://github.com/dkundel)
+- [https://dkundel.com](https://dkundel.com)
