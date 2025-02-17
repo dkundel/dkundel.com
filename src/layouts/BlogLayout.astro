@@ -40,8 +40,8 @@ const { frontmatter } = Astro.props;
         </div>
       </div>
     </div>
-
     <div class="mx-auto prose prose-slate prose-base dark:prose-invert max-w-[80ch] inline-code-prose prose-img:max-h-[500px] prose-img:mx-auto prose-a:text-primaryPurple dark:prose-a:text-white dark:prose-a:no-underline dark:prose-a:border-b dark:prose-a:border-secondaryGreen-500 dark:hover:prose-a:border-b-2 dark:focus:prose-a:border-b-2 mt-6 prose-figcaption:text-center prose-figcaption:italic prose-figcaption:text-xs">
+      {frontmatter?.canonical_url && <p class="p-4 border-l-4 border-solid border-primaryPurple">This post was originally published on <a href={frontmatter.canonical_url} target="_blank" rel="noopener noreferrer">{new URL(frontmatter?.canonical_url).hostname}</a>. This version is a copy that was partially downloaded using AI and might contain inaccuracies over the original.</p>}
       <slot />
     </div>
     <div class="text-center mt-8">

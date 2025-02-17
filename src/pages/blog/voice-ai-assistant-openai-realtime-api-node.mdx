@@ -11,11 +11,17 @@ tags: []
 canonical_url: 'https://www.twilio.com/en-us/blog/voice-ai-assistant-openai-realtime-api-node'
 ---
 
-# Build an AI Voice Assistant with Twilio Voice, OpenAI’s Realtime API, and Node.js
+We're so excited for our friends at OpenAI, who [launched their Realtime API](https://openai.com/index/introducing-the-realtime-api/) today. The API opens up Speech to Speech (S2S) capabilities for their [GPT-4o multimodal model](https://openai.com/index/hello-gpt-4o/), which supports direct audio input and output – avoiding translating back and forth from text with a speech-to-text (SST) or text-to-speech (TTS) step.
 
-![Cookie Preferences](voice-ai-assistant-openai-realtime-api-node/twilio2.png)
+_What does that mean for you?_ S2S models improve latency – OpenAI's Realtime API unlocks fluid conversations that feel like real human dialog... as I'm sure you'll agree. That's why we're thrilled to provide this [launch integration in collaboration with OpenAI](https://www.twilio.com/en-us/blog/twilio-openai-realtime-api-launch-integration).
 
-**Time to read: 8 minutes**
+In this tutorial, I’ll show you how to build an AI voice assistant using [Twilio Voice](https://www.twilio.com/en-us/voice) and the [OpenAI Realtime API](https://platform.openai.com/docs/overview), powered by Node.js. Once you build the tool, you’ll be able to talk to your assistant just as you would a human, and ask it for facts (or jokes!). Together, we’ll set up a [Twilio Media Stream](https://www.twilio.com/docs/voice/media-streams) server to receive audio from a phone call, process it using the OpenAI Realtime API, and pass the AI’s response back to Twilio to keep the conversation going.
+
+Buckle up – let's get started!
+
+> This app is also available as a prebuilt application on Code Exchange. [You can find it here](https://www.twilio.com/code-exchange/ai-voice-assistant-openai-realtime-api).
+>
+> I demonstrate [outbound calling to a Voice AI Assistant in Node.js here](https://www.twilio.com/en-us/blog/outbound-calls-node-openai-realtime-api-voice).
 
 ## Prerequisites
 
@@ -35,7 +41,8 @@ And with that, you can start the build!
 
 In these next steps, I’ll walk you through setting up your project, installing dependencies, and writing the code you’ll need to proxy websocket connections between Twilio and OpenAI.
 
-Alternatively, you can find our repository [here](https://github.com/twilio-labs/speech-assistant-openai-realtime-api-node). We also have a video version of this tutorial you can find [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+Alternatively, you can find our repository [here](https://github.com/twilio-labs/speech-assistant-openai-realtime-api-node).
+We also have a video version of this tutorial you can find [here](https://www.youtube.com/watch?v=csoe8Gc4_RQ).
 
 ### Step 1: Initialize the Project
 
@@ -290,6 +297,32 @@ fastify.register(async fastify => {
 });
 ```
 
+As you can see, first we set up a WebSocket route (`/media-stream`) to handle media streaming between Twilio and OpenAI. This is the route we referenced in our TwiML, above. The next two areas require more explanation.
+
+#### Set up the OpenAI Realtime API Session and Conversation
+
+Next, we set up our Session configuration with OpenAI. This configuration is sent to the OpenAI WebSocket as a JSON object after the connection opens, after a slight delay. We use the sendSessionUpdate() function to define how the AI interacts and responds. You can read more about the options I chose in the [OpenAI Realtime API documentation](https://platform.openai.com/docs/guides/realtime).
+
+The `sendSessionUpdate` function also configures the OpenAI session attributes:
+
+- `turn_detection`: Enables server-side Voice Activity Detection (VAD).
+- `input_audio_format` / output_audio_format: Specifies audio formats, which we changed to g711_ulaw due to Twilio requirements.
+- `voice`: Sets the AI voice to 'alloy' (or however you set the constant).
+- `instructions`: Influences AI interaction using SYSTEM_MESSAGE.
+- `modalities`: Enables both text and audio communication.
+- `temperature`: Controls randomness in AI responses.
+
+#### Proxy between the Twilio and OpenAI WebSockets
+
+The following lines proxy audio data (using Twilio-supported G.711 u-law format) between the Twilio Media Stream and OpenAI Realtime AI WebSocket connections. When the call starts, this is where the caller's voice is processed, and the AI-generated audio is streamed back.
+
+Here's a detailed walkthrough of how we are proxying between OpenAI Realtime and Twilio:
+
+- `start` event: Captures the stream's unique ID (`streamSid`).
+- `media` event: Processes and forwards audio data payloads from the ongoing call to OpenAI.
+- `response.audio.delta`: Handles AI-generated audio data from OpenAI, re-encodes it, and sends it to Twilio.
+- Twilio WebSocket `close` event: Handles client disconnection and closes streams.
+
 #### Step 4.5: Prepare the server
 
 And finally, we start the Fastify server and bring it home (using the port we passed in or defined). Paste this below what you have, and we’re ready to roll!
@@ -338,13 +371,13 @@ This will give you a public URL (e.g., `https://abc123.ngrok.io`) that you can u
 
 We’re so close now, can you feel it?
 
-Go to the Twilio Console and select your Voice-enabled number.
+Go to the [Twilio Console](https://www.twilio.com/console/) and select your Voice-enabled number.
 
-Under Voice & Fax, set the A CALL COMES IN webhook to your ngrok URL (in the Forwarding line, appending `/incoming-call`). For example, in my case, `https://ad745c4093d9.ngrok.app/incoming-call`.
+Under **Voice & Fax**, set the **A CALL COMES IN** webhook to your ngrok URL (in the **Forwarding** line, appending `/incoming-call`). For example, in my case, `https://ad745c4093d9.ngrok.app/incoming-call`.
 
 Save your changes - you’re at the final step!
 
-![null](voice-ai-assistant-openai-realtime-api-node/compressed-original.webp)
+![null](voice-ai-assistant-openai-realtime-api-node/number-config.webp)
 
 ## Test your setup!
 
@@ -373,6 +406,8 @@ Next step:
 - Check out the [Twilio documentation](https://www.twilio.com/docs) and [OpenAI's Realtime API docs](https://beta.openai.com/docs/realtime-api) for more advanced features.
 - See OpenAI’s documentation on [concepts](https://beta.openai.com/docs/concepts).
 
-Paul Kamp is the Technical Editor-in-Chief of the Twilio Blog. You can reach him – or, possibly, his AI Assistant – at pkamp [at] twilio.com.
+---
 
-Dominik leads Product for the Emerging Tech & Innovation organization at Twilio. His team builds next gen prototypes and iterates quickly to help craft the long term product vision and explore the impact of autonomous agents and AGI on customer engagement. Deeply passionate about the Developer Experience, he’s a JavaScript enthusiast who’s integrated it into everything from CLIs to coffee machines. Catch his tweets @dkundel and his side ventures in cocktails, food and photography.
+_Paul Kamp is the Technical Editor-in-Chief of the Twilio Blog. You can reach him – or, possibly, his AI Assistant – at pkamp [at] twilio.com._
+
+_Dominik leads Product for the Emerging Tech & Innovation organization at Twilio. His team builds next gen prototypes and iterates quickly to help craft the long term product vision and explore the impact of autonomous agents and AGI on customer engagement. Deeply passionate about the Developer Experience, he’s a JavaScript enthusiast who’s integrated it into everything from CLIs to coffee machines. Catch his tweets @dkundel and his side ventures in cocktails, food and photography._
