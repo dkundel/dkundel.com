@@ -1,6 +1,5 @@
 import React from 'react';
-import data from '../../../data/about/dkundel.json';
-import styled from '../../utils/styled';
+import { cn } from '../../utils/cn';
 import Html from '../Html';
 
 const linkRegEx = /<a .*<\/a>/;
@@ -15,17 +14,15 @@ function parseSocialChannels(channel) {
   };
 }
 
-const SocialListContainer = styled('ul', 'social-list')
-
-function SocialList({channels}) {
+function SocialList({channels, className, ...props}) {
   const socialChannels = channels.map(parseSocialChannels);
-  return <SocialListContainer>
+  return <ul className={cn('social-list', className)} {...props}>
     {socialChannels.map(channel => {
       return <Html as="li" key={channel.link.substr(8)}>
         {channel.linkWithEmoji}
       </Html>
     })}
-  </SocialListContainer>
+  </ul>
 }
 
 export default SocialList;

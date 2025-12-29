@@ -1,12 +1,10 @@
 import { lightGray, secondaryGreenShades } from 'anker-colors';
 import React from 'react';
-import styled from '../utils/styled';
-
-const StyledSvg = styled('svg', 'speaking-icon')
 
 const SpeakingIcon = props => {
   return (
-    <StyledSvg
+    <svg
+      className="speaking-icon"
       id="Duotone"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 112"
@@ -213,7 +211,7 @@ const SpeakingIcon = props => {
           <rect className="cls-4" x="50.34" y="68" width="25" height="2" />
         </g>
       </g>
-    </StyledSvg>
+    </svg>
   );
 };
 

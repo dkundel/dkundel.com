@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from '../../utils/styled';
 import TalkList from './TalkList';
 
 function ToggleButton({children, onClick}) {
@@ -8,25 +7,25 @@ function ToggleButton({children, onClick}) {
   </button>
 }
 
-const TalkYearContainer = styled('div', '');
-const TalkListContainer = styled('div', 'border-l pl-8 py-2 ml-6 mb-2 border-purple-300 border-dashed');
-const ListContainer = styled('div', '');
-const TalkYear = styled('h3', 'mb-2 rounded-full bg-purple-300 inline-block mr-2 text-sm font-light px-3 py-1 text-white tracking-wide');
+const classes = {
+  list: 'border-l pl-8 py-2 ml-6 mb-2 border-purple-300 border-dashed',
+  year: 'mb-2 rounded-full bg-purple-300 inline-block mr-2 text-sm font-light px-3 py-1 text-white tracking-wide',
+};
 
 function TalksByYear({year, list, showDefault}) {
   const [collapsed, setCollapsed] = React.useState(typeof showDefault === 'undefined' ? true : showDefault);
   const toggle = () => { setCollapsed(!collapsed) };
 
-  return <ListContainer>
-    <TalkYearContainer>
-      <TalkYear>{year}</TalkYear>
+  return <div>
+    <div>
+      <h3 className={classes.year}>{year}</h3>
       {!collapsed && <ToggleButton onClick={toggle}>Hide talks</ToggleButton>}
-    </TalkYearContainer>
-    <TalkListContainer>
+    </div>
+    <div className={classes.list}>
       <TalkList talks={list} collapsed={collapsed} />
       {collapsed && <ToggleButton onClick={toggle}>Show {year} talks</ToggleButton>}
-    </TalkListContainer>
-  </ListContainer>
+    </div>
+  </div>
 }
 
 export default TalksByYear;

@@ -1,23 +1,38 @@
 import React from 'react';
-import styled from '../utils/styled';
+import { cn } from '../utils/cn';
 import { smallAllCaps } from '../utils/tailwind-helpers';
 import Html from './Html';
 
-const ArticleListContainer = styled('div', 'grid article-list-container justify-items-center justify-around lg:justify-start');
+const classes = {
+  list: 'grid article-list-container justify-items-center justify-around lg:justify-start',
+  info: 'flex flex-col flex-1 px-3 py-2 justify-between min-h-[100px] max-h-[120px]',
+  title: 'text-base font-bold pb-4 mb-0 text-purple-300 dark:text-gray-300 dark:hover:text-white',
+  meta: `normal-case ${smallAllCaps} text-gray-500 dark:text-gray-300 `,
+  date: 'uppercase',
+  platform: 'text-purple-300 dark:text-pink-400',
+  imageContainer: 'mb-1',
+  image: 'max-h-[150px] object-cover bg-white dark:bg-slate-800 w-full',
+};
 
 function ArticleWrapper({ hasImage, children, ...props }) {
-  const imageClasses = hasImage ? 'min-h-[14rem] max-w-full' : 'min-h-0';
-  return <div className={`bg-white dark:bg-slate-800  dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 w-[300px] mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0 flex justify-between flex-col cursor-pointer hover:no-underline hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform hover:shadow-xl focus:shadow-xl focus-within:shadow-xl ${imageClasses}`} {...props}>{children}</div>
+  return (
+    <div
+      className={cn(
+        'bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 w-[300px] mx-2 max-w-xs shadow-md rounded-lg overflow-hidden mb-6 p-0 flex justify-between flex-col cursor-pointer hover:no-underline hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform hover:shadow-xl focus:shadow-xl focus-within:shadow-xl',
+        hasImage ? 'min-h-[14rem] max-w-full' : 'min-h-0'
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
 }
 
-const ArticleInfo = styled('div', 'flex flex-col flex-1 px-3 py-2 justify-between min-h-[100px] max-h-[120px]')
-const ArticleLanguage = styled('span', '');
-const ArticleTitle = styled('h3', "text-base font-bold pb-4 mb-0 text-purple-300 dark:text-gray-300 dark:hover:text-white")
-const ArticleMeta = styled('p', `normal-case ${smallAllCaps} text-gray-500 dark:text-gray-300 `)
-const ArticleDate = styled('span', 'uppercase')
-const ArticlePlatform = styled('a', 'text-purple-300 dark:text-pink-400');
-const ArticleImageContainer = styled('div', 'mb-1');
-const ArticleImage = styled('img', 'max-h-[150px] object-cover bg-white dark:bg-slate-800 w-full');
+const ArticleTitle = ({ children, ...props }) => (
+  <h3 className={classes.title} {...props}>
+    {children}
+  </h3>
+);
 
 const Article = ({ language, link, date, url, onWebsite, image }) => {
   return (
@@ -27,18 +42,24 @@ const Article = ({ language, link, date, url, onWebsite, image }) => {
       rel="noopener noreferrer"
     >
       {image ? (
-        <ArticleImageContainer><ArticleImage src={image} alt="decorative header image of blog post" /></ArticleImageContainer>
+        <div className={classes.imageContainer}>
+          <img
+            className={classes.image}
+            src={image}
+            alt="decorative header image of blog post"
+          />
+        </div>
       ) : null}
-      <ArticleInfo>
+      <div className={classes.info}>
         <Html as={ArticleTitle}>{link}</Html>
-        <ArticleMeta>
-          <ArticleLanguage>{language}</ArticleLanguage>{' '}
-          <ArticleDate>{date}</ArticleDate> on{' '}
-          <ArticlePlatform href={`https://${onWebsite}`} target="_blank">
+        <p className={classes.meta}>
+          <span>{language}</span>{' '}
+          <span className={classes.date}>{date}</span> on{' '}
+          <a className={classes.platform} href={`https://${onWebsite}`} target="_blank">
             {onWebsite}
-          </ArticlePlatform>
-        </ArticleMeta>
-      </ArticleInfo>
+          </a>
+        </p>
+      </div>
     </ArticleWrapper>
   );
 };
@@ -49,7 +70,7 @@ const ArticleList = ({ list, reverseOrder = false }) => {
     entries = entries.reverse();
   }
   return (
-    <ArticleListContainer>
+    <div className={classes.list}>
       {entries.map(({ language, link, date, url, onWebsite, image }) => (
         <Article
           key={url}
@@ -61,7 +82,7 @@ const ArticleList = ({ list, reverseOrder = false }) => {
           image={image}
         />
       ))}
-    </ArticleListContainer>
+    </div>
   );
 };
 
