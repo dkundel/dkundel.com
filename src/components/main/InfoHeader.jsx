@@ -1,12 +1,6 @@
-import { darkBlue, secondaryGreen } from 'anker-colors';
 import React from 'react';
-import styled from '../../utils/styled';
 import Heading from '../Heading';
 import headshotImage from '../../images/me-decorative.png';
-import Html, { allowImages } from '../Html';
-
-const Container = styled('div', 'info-container');
-const IntroHeading = styled('p', '');
 
 const InfoHeader = ({ headerInfo }) => {
   headerInfo = headerInfo.replace(/align="center"/g, '');

@@ -1,17 +1,16 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 import Html from '../Html';
-import styled from '../../utils/styled';
-
-const TopicListContainer = styled('ul', 'topic-list');
 
 function TopicList({talks, ...props}) {
-  return <TopicListContainer {...props}>
+  const { className, ...rest } = props;
+  return <ul className={cn('topic-list', className)} {...rest}>
     {talks.map(talk => (
       <Html as="li" key={talk.substr(4)}>
         {talk}
       </Html>
     ))}
-  </TopicListContainer>
+  </ul>
 }
 
 export default TopicList

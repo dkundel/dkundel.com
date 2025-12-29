@@ -1,12 +1,8 @@
 import React from 'react';
-import { AcademicCapIcon } from '@heroicons/react/24/outline'
 import { GitHubIcon, LinkedInIcon, TwitterIcon, InstagramIcon } from '../icons/Socialicons';
 import siteMetaData from '../../data/siteMetadata.json';
 
-import styled from '@utils/styled';
 import DarkModeToggle from './DarkModeToggle';
-
-const SocialChannelsWrapper = styled('div', 'flex flex-col -mt-[36px] sm:mt-0 sm:flex-row gap-1 sm:gap-3');
 
 const socialChannels = {
   github: {
@@ -28,7 +24,7 @@ const socialChannels = {
 }
 
 export const SocialChannels = () => {
-  return <SocialChannelsWrapper>
+  return <div className="flex flex-col -mt-[36px] sm:mt-0 sm:flex-row gap-1 sm:gap-3">
     {Object.entries(siteMetaData.socials).map(([channel, href]) => {
       let socialChannel = socialChannels[channel];
       if (socialChannel) {
@@ -38,7 +34,7 @@ export const SocialChannels = () => {
       }
     })}
     <DarkModeToggle className="hidden sm:inline-block"/>
-  </SocialChannelsWrapper>
+  </div>
 }
 
 export default SocialChannels;

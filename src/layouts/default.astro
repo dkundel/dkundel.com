@@ -1,12 +1,7 @@
 ---
-import styled from '../utils/styled.js';
 import Footer from '../components/Footer.jsx';
 import Header from '../components/Header.jsx';
 import siteMetaData from '../../data/siteMetadata.json';
-
-const Container = styled('div', 'bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]');
-
-const Main = styled('div', 'flex-1 max-w-[1000px] w-full p-[20px]');
 
 const {title, fullTitle, canonical_url, image, description} = Astro.props;
 const siteTitle = fullTitle ? fullTitle : title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
@@ -58,11 +53,11 @@ const pageDescription = description || siteMetaData.description;
     @import "../styles/global.css";
     @tailwind base;
 	</style>
-  <Container>
+  <div class="bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]">
     <Header name={siteMetaData.name} path={Astro.url.pathname} client:load />
-    <Main role="main"><slot/></Main>
+    <div class="flex-1 max-w-[1000px] w-full p-[20px]" role="main"><slot/></div>
     <Footer client:load />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
-  </Container>
+  </div>
 </body>
 </html>

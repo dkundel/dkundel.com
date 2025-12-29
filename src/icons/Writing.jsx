@@ -1,12 +1,10 @@
 import { lightGray, secondaryGreenShades } from 'anker-colors';
 import React from 'react';
-import styled from '../utils/styled.js';
-
-const StyledSvg = styled('svg', 'writing-icon')
 
 const WritingIcon = props => {
   return (
-    <StyledSvg
+    <svg
+      className="writing-icon"
       id="Duotone"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 112"
@@ -99,7 +97,7 @@ const WritingIcon = props => {
           />
         </g>
       </g>
-    </StyledSvg>
+    </svg>
   );
 };
 
