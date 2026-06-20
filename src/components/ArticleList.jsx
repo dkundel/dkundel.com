@@ -10,8 +10,8 @@ const classes = {
   meta: `normal-case ${smallAllCaps} text-gray-500 dark:text-gray-300 `,
   date: 'uppercase',
   platform: 'text-purple-300 dark:text-pink-400',
-  imageContainer: 'mb-1',
-  image: 'max-h-[150px] object-cover bg-white dark:bg-slate-800 w-full',
+  imageContainer: 'mb-1 h-[150px] overflow-hidden bg-white dark:bg-slate-800',
+  image: 'h-full w-full object-cover object-center',
 };
 
 function ArticleWrapper({ hasImage, children, ...props }) {
