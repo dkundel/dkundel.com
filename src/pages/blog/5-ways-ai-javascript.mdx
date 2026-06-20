@@ -10,7 +10,7 @@ layout: '@layouts/BlogLayout.astro'
 tags: [javascript, generative-ai, llm]
 ---
 
-Machine Learning and AI development is traditionally dominated by Python and because of that the ecosystem of tutorials, libraries, and examples is primarily dominated by Python. However, with the rise of the [AI Engineer](https://www.latent.space/p/ai-engineer) concept, we are seeing more full-stack web developers begin to work on AI, and with it the demand for JavaScript/Typescript compatible tooling rises. In fact in February 2024, [Jared Palmer](https://x.com/jaredpalmer) from Vercel even claimed that "The AI engineer of the future is a TypeScript engineer". 
+Machine Learning and AI development is traditionally dominated by Python and because of that the ecosystem of tutorials, libraries, and examples is primarily dominated by Python. However, with the rise of the [AI Engineer](https://www.latent.space/p/ai-engineer) concept, we are seeing more full-stack web developers begin to work on AI, and with it the demand for JavaScript/Typescript compatible tooling rises. In fact in February 2024, [Jared Palmer](https://x.com/jaredpalmer) from Vercel even claimed that "The AI engineer of the future is a TypeScript engineer".
 
 ![Jared Palmer standing in front of a black slide with white text reading "The AI engineer of the future is a TypeScript engineer"](/blog/5-ways-ai-javascript/vercel-quote.jpg)
 
@@ -63,7 +63,7 @@ While Cloud APIs are great to get started, sometimes you don't want to rely on a
 
 Some projects provide for that reason [Docker](https://www.docker.com) container that will expose an HTTP API when run. For example, you can start the [Unstructured API](https://github.com/Unstructured-IO/unstructured-api) Docker container by running:
 ```bash
-docker run -p 8000:8000 -d --rm --name unstructured-api downloads.unstructured.io/unstructured-io/unstructured-api:latest 
+docker run -p 8000:8000 -d --rm --name unstructured-api downloads.unstructured.io/unstructured-io/unstructured-api:latest
 --port 8000 --host 0.0.0.0
 ```
 
@@ -81,7 +81,7 @@ form.append('file', buffer, {
  filename: fileName,
 });
 
-const response = await fetch('http://localhost:8000/general/v0/general', { 
+const response = await fetch('http://localhost:8000/general/v0/general', {
  method: 'POST',
  body: form,
  headers: {
@@ -95,7 +95,7 @@ Similarly, you could use [`llama.cpp` docker container](https://github.com/ggerg
 
 If you are working with an ML team that trained their own model or you want to host any model off [Huggingface](https://huggingface.co) and use the same Docker container approach, you can also check out [`cog` by Replicate](https://github.com/replicate/cog). It wraps Docker and is specifically designed for creating Docker containers for ML models.
 
-All of this works great if you have a relatively small surface area of tasks you want to perform and the composability is limited. 
+All of this works great if you have a relatively small surface area of tasks you want to perform and the composability is limited.
 
 ## JavaScript-native libraries
 
@@ -115,7 +115,7 @@ const { text } = await generateText({
 });
 ```
 
-However, since most of these ultimately wrap other tools and frameworks as integrations, you are still often left with more limited functionality than their Python counterparts. For example, the Python version of Langchain has 18 different document transformer integrations while the JavaScript one has 5. 
+However, since most of these ultimately wrap other tools and frameworks as integrations, you are still often left with more limited functionality than their Python counterparts. For example, the Python version of Langchain has 18 different document transformer integrations while the JavaScript one has 5.
 
 ## Native LLM APIs
 
@@ -135,7 +135,7 @@ If you want to give the `window.ai` API a shot, check out [Google's explainer re
 
 ## Pythonia
 
-One interesting approach to using Python tools in JavaScript is [`pythonia`](https://www.npmjs.com/package/pythonia). It's one half of the [`JSPyBridge` project](https://github.com/extremeheat/JSPyBridge) that creates an interface to call JavaScript from Python and Python from JavaScript by facilitating the interprocess communication so that you can write code in the language of your choice. 
+One interesting approach to using Python tools in JavaScript is [`pythonia`](https://www.npmjs.com/package/pythonia). It's one half of the [`JSPyBridge` project](https://github.com/extremeheat/JSPyBridge) that creates an interface to call JavaScript from Python and Python from JavaScript by facilitating the interprocess communication so that you can write code in the language of your choice.
 
 It uses inter-process communication (IPC) and [JavaScript Proxies](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) to enable you to almost use identical code when calling a Python library in JavaScript than in Python and then actually executing it in Python.
 
@@ -175,7 +175,7 @@ You might notice that this code is slightly longer and heavily uses `await`. Tha
 
 ### Performance of `pythoia`
 
-One concern for you might be performance and while it would be slower than entirely running in Python, the actual performance might surprise you. If you want to use a Python library, like [RAGatoille](https://github.com/bclavie/RAGatouille), but the rest of your system is written in JavaScript, really the only alternative to `pythonia` is exposing the library through an HTTP API and using `fetch` to bridge the systems. 
+One concern for you might be performance and while it would be slower than entirely running in Python, the actual performance might surprise you. If you want to use a Python library, like [RAGatoille](https://github.com/bclavie/RAGatouille), but the rest of your system is written in JavaScript, really the only alternative to `pythonia` is exposing the library through an HTTP API and using `fetch` to bridge the systems.
 
 If we run a benchmark where we use the `haystack-ai` code snippet from above and run it both using `pythonia` and expose it using [FastAPI](https://fastapi.tiangolo.com), both requests are slow because of their calls to OpenAI but `pythonia` actually slightly wins the race.
 

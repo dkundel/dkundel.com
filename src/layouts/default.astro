@@ -1,6 +1,7 @@
 ---
-import Footer from '../components/Footer.jsx';
-import Header from '../components/Header.jsx';
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
 import siteMetaData from '../../data/siteMetadata.json';
 
 const {title, fullTitle, canonical_url, image, description} = Astro.props;
@@ -49,14 +50,10 @@ const pageDescription = description || siteMetaData.description;
   </script>
 </head>
 <body>
-  <style is:global>
-    @import "../styles/global.css";
-    @tailwind base;
-	</style>
   <div class="bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]">
-    <Header name={siteMetaData.name} path={Astro.url.pathname} client:load />
+    <Header name={siteMetaData.name} path={Astro.url.pathname} />
     <div class="flex-1 max-w-[1000px] w-full p-[20px]" role="main"><slot/></div>
-    <Footer client:load />
+    <Footer />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
   </div>
 </body>

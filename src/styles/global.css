@@ -1,7 +1,7 @@
 /* src/styles/global.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.cjs";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   html {
@@ -86,7 +86,7 @@
   }
 
   .text-highlight-gradient {
-    @apply text-transparent bg-clip-text purple-gradient ;
+    @apply text-transparent bg-clip-text bg-gradient-to-tr from-[#DF3C83] to-purple-700 dark:to-purple-400;
   }
   
   .small-all-caps {
@@ -94,7 +94,7 @@
   }
 
   .medium-all-caps {
-    @apply small-all-caps text-base;
+    @apply text-gray-500 dark:text-gray-400 text-base m-0 tracking-wider uppercase;
   }
 
   .article-list-container {
@@ -141,7 +141,7 @@
   }
   
   .navigation-container {
-    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-4 md:gap-4 flex-grow md:flex-grow-0;
+    @apply flex flex-wrap mt-[10px] xs:mt-auto gap-4 md:gap-4 grow md:grow-0;
   }
   
   .navigation-container a {
@@ -169,11 +169,11 @@
   }
   
   .social-list li {
-    @apply w-auto flex-1 flex-shrink-0 text-sm mx-2 text-center;
+    @apply w-auto flex-1 shrink-0 text-sm mx-2 text-center;
   }
   
   .social-list li a {
-    @apply bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-800 dark:border-[0.5px] dark:border-slate-700 dark:hover:from-slate-700 dark:focus:from-slate-700 dark:focus-within:from-slate-700 dark:hover:to-slate-700 dark:focus:to-slate-700 dark:focus-within:to-slate-700 shadow px-2 py-2 text-center inline-block rounded hover:shadow-lg;
+    @apply bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-800 dark:border-[0.5px] dark:border-slate-700 dark:hover:from-slate-700 dark:focus:from-slate-700 dark:focus-within:from-slate-700 dark:hover:to-slate-700 dark:focus:to-slate-700 dark:focus-within:to-slate-700 shadow-sm px-2 py-2 text-center inline-block rounded-sm hover:shadow-lg;
     width: 210px;
   }
   
@@ -187,7 +187,7 @@
   
   .topic-list li {
     list-style: none;
-    @apply small-all-caps p-0 mb-2 mx-0 text-xs;
+    @apply text-gray-500 dark:text-gray-400 text-xs m-0 tracking-wider uppercase p-0 mb-2 mx-0;
   }
   
   .topic-list a {

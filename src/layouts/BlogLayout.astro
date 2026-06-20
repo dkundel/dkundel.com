@@ -1,19 +1,15 @@
 ---
 import { getFormattedDate } from "@utils/date";
-import { Image } from '@astrojs/image/components';
-import { log } from "astro/dist/core/logger/core";
 import Layout from "./default.astro";
+import "../styles/blog.css";
 
 const { frontmatter } = Astro.props;
 ---
 
 <Layout fullTitle={frontmatter.title} canonical_url={frontmatter?.canonical_url} image={frontmatter.image} description={frontmatter.excerpt}>
-  <style is:global>
-    @import "../styles/blog.css";
-  </style>
   <!-- <Container> -->
     <div class="mx-auto max-w-[735px] mt-14">
-      {typeof frontmatter.image === 'string' ? 
+      {typeof frontmatter.image === 'string' ?
         <img class="mb-4" src={frontmatter.image} alt={frontmatter.imageAlt || ''} width={frontmatter.imageWidth} height={frontmatter.imageHeight}/> : null}
       <span class="text-purple-300 uppercase tracking-wider text-sm font-medium">
         {frontmatter.category || 'Blog'}
@@ -47,7 +43,7 @@ const { frontmatter } = Astro.props;
     <div class="text-center mt-8">
       <a
         href="/blog"
-        class="bg-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:focus:bg-slate-700 dark:focus-within:bg-slate-700 text-sm shadow-sm hover:shadow-lg transition hover:scale-200 px-5 py-3 rounded-md"
+        class="bg-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:focus:bg-slate-700 dark:focus-within:bg-slate-700 text-sm shadow-xs hover:shadow-lg transition hover:scale-[1.02] px-5 py-3 rounded-md"
         >← Back to all articles</a
       >
     </div>

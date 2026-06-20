@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from 'react'; 
+import { useState, useEffect } from 'react';
 import Moon from '@heroicons/react/24/outline/MoonIcon';
 import Sun from '@heroicons/react/24/outline/SunIcon';
 
 const iconClasses = 'h-5 w-5 dark:text-gray-400 dark:hover:text-gray-100 hover:text-secondaryGreen-500'
 
-const DarkModeToggle = ({...props}) => {
+const DarkModeToggle = ({ ...props }) => {
   const [isDarkMode, setIsDarkMode] = useState(null);
-  
+
   useEffect(() => {
     setIsDarkMode(document.documentElement.classList.contains('dark'));
   }, [])

@@ -8,6 +8,8 @@ yarn-error.log
 /data/about/*.json
 /data/dkundel-md.json
 /dist
+.astro
+/public/blog-headers/external/*
 # Local Netlify folder
 .netlify
 .env.local

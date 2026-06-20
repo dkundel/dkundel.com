@@ -1,0 +1,9 @@
+---
+import img from '../images/panda-laptop.png';
+import { SiteFooter } from '../design-system/index.js';
+import DarkModeToggle from './DarkModeToggle.jsx';
+---
+
+<SiteFooter image={img}>
+  <DarkModeToggle className="sm:hidden" client:load />
+</SiteFooter>

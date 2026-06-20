@@ -1,14 +1,13 @@
-import { lightGray, secondaryGreenShades } from 'anker-colors';
-import React from 'react';
-
 const WritingIcon = props => {
+  const { className = '', ...svgProps } = props;
+
   return (
     <svg
-      className="writing-icon"
+      className={`writing-icon ${className}`}
       id="Duotone"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 112"
-      {...props}
+      {...svgProps}
     >
       <title>18- pseudo-code</title>
       <g id="Icons">
