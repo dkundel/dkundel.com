@@ -67,6 +67,62 @@ function isGenericXPreviewImage(rawUrl) {
   }
 }
 
+function getXArticleStatusUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    const match = url.pathname.match(/^\/([^/]+)\/article\/(\d+)\/?$/);
+
+    if (!match) {
+      return undefined;
+    }
+
+    const [, screenName, tweetId] = match;
+    return `https://x.com/${screenName}/status/${tweetId}`;
+  } catch (err) {
+    return undefined;
+  }
+}
+
+async function getXArticleStatusPreviewImage(rawUrl) {
+  const statusUrl = getXArticleStatusUrl(rawUrl);
+  if (!statusUrl) {
+    return undefined;
+  }
+
+  for (const userAgent of [
+    'Twitterbot/1.0',
+    'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)',
+  ]) {
+    let resp;
+    try {
+      resp = await got(statusUrl, {
+        headers: {
+          'user-agent': userAgent,
+        },
+        throwHttpErrors: false,
+      });
+    } catch (err) {
+      continue;
+    }
+
+    if (resp.statusCode >= 400) {
+      continue;
+    }
+
+    const image = getPreviewImage(cheerio.load(resp.body));
+    if (image && !isGenericXPreviewImage(image)) {
+      return new URL(image, statusUrl).toString();
+    }
+  }
+
+  return undefined;
+}
+
+function getImageFileExtension(imageUrl) {
+  const ext = extname(new URL(imageUrl).pathname);
+  return (ext ? ext.replace(/:.+$/, '') : '') || '.jpg';
+}
+
 function getEntryTitle(entry) {
   return cheerio.load(entry)('a').first().text().trim();
 }
@@ -176,7 +232,14 @@ async function run() {
       if (existingImageResults.length < 1) {
         const resp = await got(url);
         const $ = cheerio.load(resp.body);
-        const image = getPreviewImage($);
+        let image = getPreviewImage($);
+
+        if (
+          isXArticleUrl(url) &&
+          (!image || isGenericXPreviewImage(new URL(image, url).toString()))
+        ) {
+          image = await getXArticleStatusPreviewImage(url);
+        }
 
         if (!image) {
           if (isXArticleUrl(url)) {
@@ -187,14 +250,11 @@ async function run() {
 
         const imageUrl = new URL(image, url).toString();
         if (isGenericXPreviewImage(imageUrl)) {
-          if (isXArticleUrl(url)) {
-            out.image = await writeXArticlePreview(localImageId, entry);
-          }
           return out;
         }
 
         const localImageFile =
-          localImageId + (extname(new URL(imageUrl).pathname) || '.jpg');
+          localImageId + getImageFileExtension(imageUrl);
 
         const imageDownloadStream = got.stream(imageUrl);
         const imageWriteStream = createWriteStream(
