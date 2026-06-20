@@ -14,6 +14,7 @@ const classes = {
 
 const Talk = ({ info }) => {
   const { event, location, date, topic, other } = info;
+  const additionalMaterial = other || '';
   return (
     <section className={classes.container}>
       <h4 className={classes.event}>
@@ -26,10 +27,10 @@ const Talk = ({ info }) => {
         <p className={classes.date}>
           {date} @ {location}
         </p>
-        {other.trim().length > 0 && <p className={classes.info}>
+        {additionalMaterial.trim().length > 0 && <p className={classes.info}>
           Additional Material:{' '}
           <Html as="span">
-            {other
+            {additionalMaterial
               .replace(' Slides', '&nbsp;Slides')
               .replace(' Video', '&nbsp;Video')}
           </Html>
@@ -53,10 +54,20 @@ const TalkList = ({ talks, collapsed = false, className, ...props }) => {
 };
 
 function sortByEventDate(talkA, talkB) {
+  return getEventTime(talkB.date) - getEventTime(talkA.date);
+}
+
+function getEventTime(value) {
+  const rawValue = value || '';
   const format = 'MMMM d, yyyy';
-  const dateA = parse(talkA.date, format, new Date());
-  const dateB = parse(talkB.date, format, new Date());
-  return dateB.getTime() - dateA.getTime();
+  const date = parse(rawValue, format, new Date());
+  const time = date.getTime();
+  if (!Number.isNaN(time)) {
+    return time;
+  }
+
+  const year = rawValue.match(/\d{4}(?!.*\d{4})/)?.[0];
+  return year ? new Date(Number(year), 0, 1).getTime() : 0;
 }
 
 export default TalkList;

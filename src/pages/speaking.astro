@@ -14,7 +14,10 @@ import { FeaturedTalk } from '@components/speaking/FeaturedTalk';
 
 function groupPresentationsByYear(list) {
   return list.reduce((byYear, talk) => {
-    const [, year] = talk.date.match(/,\s*(\d{4})$/);
+    const year = (talk.date || '').match(/\d{4}(?!.*\d{4})/)?.[0];
+    if (!year) {
+      return byYear;
+    }
     if (byYear[year]) {
       byYear[year].push(talk);
     } else {

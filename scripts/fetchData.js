@@ -62,11 +62,19 @@ async function run() {
       if (existingImageResults.length < 1) {
         const resp = await got(url);
         const $ = cheerio.load(resp.body);
-        const image = $('meta[property="og:image"]').attr('content');
-        out.image = image;
-        const localImageFile = localImageId + (extname(image) || '.jpg');
+        const image =
+          $('meta[property="og:image"]').attr('content') ||
+          $('meta[name="twitter:image"]').attr('content');
 
-        const imageDownloadStream = got.stream(image);
+        if (!image) {
+          return out;
+        }
+
+        const imageUrl = new URL(image, url).toString();
+        const localImageFile =
+          localImageId + (extname(new URL(imageUrl).pathname) || '.jpg');
+
+        const imageDownloadStream = got.stream(imageUrl);
         const imageWriteStream = createWriteStream(
           OUTPUT_IMAGES + '/' + localImageFile
         );
