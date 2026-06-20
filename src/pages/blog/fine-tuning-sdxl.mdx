@@ -10,9 +10,9 @@ layout: '@layouts/BlogLayout.astro'
 tags: [javascript, generative-ai]
 ---
 
-Similar to a lot of other developers I've been experimenting in the last year a lot with different generative AI solutions. But I'm not a machine learning engineer, and I'm not even a Python developer. I'm a web developer who loves writing JavaScript & TypeScript from front-end over back-end to [coffee machines](https://dkundel.com/blog/how-we-hacked-our-coffee-machine-with-javascript/). 
+Similar to a lot of other developers I've been experimenting in the last year a lot with different generative AI solutions. But I'm not a machine learning engineer, and I'm not even a Python developer. I'm a web developer who loves writing JavaScript & TypeScript from front-end over back-end to [coffee machines](https://dkundel.com/blog/how-we-hacked-our-coffee-machine-with-javascript/).
 
-So even just using open-source models like [Stability AI's Stable Diffusion XL (SDXL)](https://github.com/Stability-AI/generative-models) has  been intimidating to me, let alone figuring out how to "fine-tune" such a model for my own needs. Just looking at the model's [Hugging Face page](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/) — you can think of Hugging Face like the GitHub of sharing machine learning models — brings up all sorts of questions. What's CUDA? What does `torch` do? And most importantly: 
+So even just using open-source models like [Stability AI's Stable Diffusion XL (SDXL)](https://github.com/Stability-AI/generative-models) has  been intimidating to me, let alone figuring out how to "fine-tune" such a model for my own needs. Just looking at the model's [Hugging Face page](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/) — you can think of Hugging Face like the GitHub of sharing machine learning models — brings up all sorts of questions. What's CUDA? What does `torch` do? And most importantly:
 
 > how do I make it generate images of my corgi?
 
@@ -20,7 +20,7 @@ In this blog post we'll explore how you can create your own image generation mod
 
 ## How to create your own image generation model
 
-Creating an image generation model is extremely hard and requires a lot of data and the results can be mixed. For that reason various companies are working on their proprietary models like [Adobe's Firefly](https://www.adobe.com/products/firefly.html) or [OpenAI's DALL·E 3](https://openai.com/dall-e-3). The problem with these models is that they are more of the "you get what you get" variety, meaning while you might be able to influence them with some example images they are largely static. 
+Creating an image generation model is extremely hard and requires a lot of data and the results can be mixed. For that reason various companies are working on their proprietary models like [Adobe's Firefly](https://www.adobe.com/products/firefly.html) or [OpenAI's DALL·E 3](https://openai.com/dall-e-3). The problem with these models is that they are more of the "you get what you get" variety, meaning while you might be able to influence them with some example images they are largely static.
 
 That's where open-source models come into play as base models for our project.
 
@@ -39,7 +39,7 @@ The other reason why we want to use SDXL is that it not only allows for fine-tun
 
 The core part of a model are its weights. The weights are essentially the brain of the model and so if we want to teach a model something new we need to update those weights. This updating of the weights is done through a process called fine-tuning.
 
-The problem is that the weights are a massive matrix though and updating all the relevant weights can be intensive work and therefore costly. That's where LoRA comes into place. LoRA stands for Low-Rank Adaptation. 
+The problem is that the weights are a massive matrix though and updating all the relevant weights can be intensive work and therefore costly. That's where LoRA comes into place. LoRA stands for Low-Rank Adaptation.
 
 With LoRA rather than changing the whole matrix of weights, an "adapter" gets created that is essentially a smaller matrix that sits on top of the original model and manipulates the relevant weights. The output of this process is also significantly smaller since it sits on top of the original weights rather than representing the whole set of weights. This means you could have more easily a multitude of fine-tuned models on top of the same base model without wasting storage.
 
@@ -110,7 +110,7 @@ Now that we were able to generate our first image using SDXL, it's time to creat
 
 ## Gathering your data
 
-Before we can start the process of fine-tuning we'll need some data, or rather some images, that we can train the model on using LoRA. 
+Before we can start the process of fine-tuning we'll need some data, or rather some images, that we can train the model on using LoRA.
 
 For my project I used 21 images of various sizes but with my subject being very clear in the picture and captured from different angles.
 
@@ -120,7 +120,7 @@ Once you have collected all the images of what you want to train the model on(20
 
 ## Starting your fine-tuning
 
-Now that you have your files together let's do the fine-tuning! With Replicate there are two ways we can do this. 
+Now that you have your files together let's do the fine-tuning! With Replicate there are two ways we can do this.
 
 ### Using the website
 
@@ -130,13 +130,13 @@ The first option and maybe the easiest to try things out is [using the website i
 
 ### Using the JavaScript
 
-The alternative way is using [Replicate's Trainings API](https://replicate.com/docs/reference/http#trainings.create) for example through the Node.js client library. 
+The alternative way is using [Replicate's Trainings API](https://replicate.com/docs/reference/http#trainings.create) for example through the Node.js client library.
 
 When using the API we first need to [create a new model](https://replicate.com/create) that will act as our target for our training model. You can create both private and public models. I'll be creating a private one. Take note of your username and model name.
 
 ![Screenshot of the Replicate website](/blog/fine-tuning-sdxl/replicate-create-model.png)
 
-In order to kick off a training using the API you'll need to host your ZIP file somewhere publicly like an S3 bucket or any static file hosting. 
+In order to kick off a training using the API you'll need to host your ZIP file somewhere publicly like an S3 bucket or any static file hosting.
 
 Once you have uploaded your ZIP file it's time to set up the code. Create a new file `fine-tune.js` and add the following code:
 
@@ -163,7 +163,7 @@ const training = await replicate.trainings.create(
 console.dir(training);
 ```
 
-Make sure you replace `<your-username>`, `<your-model-name>` and `<path-to-your-training-data>` according to your respective values. 
+Make sure you replace `<your-username>`, `<your-model-name>` and `<path-to-your-training-data>` according to your respective values.
 
 Since I'm fine-tuning the model for pictures of my dog, I added a parameter of `mask_target_prompts` that essentially tells the training process to focus in my input pictures on the `photo of a dog`. If you just train the model on a specific style of picture you can for example omit this parameter. There are a variety of parameters that you can pass into the training. [Check the model for documentation on what parameters are available](https://replicate.com/stability-ai/sdxl/train#training-inputs).
 
@@ -173,13 +173,13 @@ Once you are ready start your training by running:
 node fine-tuning.js
 ```
 
-The output will include a link to your training process or alternatively you can find the training run within the [Trainings section of your Replicate dashboard](https://replicate.com/trainings). 
+The output will include a link to your training process or alternatively you can find the training run within the [Trainings section of your Replicate dashboard](https://replicate.com/trainings).
 
 On this page you'll be able to watch the logs live as the training is going on.
 
 ## Testing your new model
 
-Once your training run is complete it's time to test our new model. Update your `index.js` file to point to your own model. 
+Once your training run is complete it's time to test our new model. Update your `index.js` file to point to your own model.
 
 You'll need both your username and model as well as the version of your model that you can find either on the training page or in the `Versions` tab of your model page.
 
@@ -220,7 +220,7 @@ When looking at the code you'll notice that the prompt says:
 But what is the `TOK`? It's basically a special "keyword" or token that represents the concept that you fine-tuned into the model. So when we say `A TOK dog` we are basically saying we want a dog that looks like the dog we trained the model on (in this case my corgi). The `dog` in this promopt is not stricly required and the prompt could also be:
 > A TOK sitting in a throne in the style of a renaissance painting
 
-But using `TOK dog` or even `TOK corgi` helps nudge the model into the right direction. 
+But using `TOK dog` or even `TOK corgi` helps nudge the model into the right direction.
 
 If you really don't like `TOK` you could pass during the training process the `token_string` parameter in with a different token but `TOK` seems to be the established way to do this.
 
@@ -240,11 +240,11 @@ And here we go! My corgi on a throne 🎉
 
 ## Getting ready for production
 
-As you start using your new model you might notice that it's taking a bit of time to execute and sometimes might even get queued for a while. That's because by default your model runs on shared infrastructure until you are ready to "Deploy" your model. 
+As you start using your new model you might notice that it's taking a bit of time to execute and sometimes might even get queued for a while. That's because by default your model runs on shared infrastructure until you are ready to "Deploy" your model.
 
-When you are ready and happy with your model and want to use it in production, head over to the version of your model that you want to deploy and press the "Deploy" button. 
+When you are ready and happy with your model and want to use it in production, head over to the version of your model that you want to deploy and press the "Deploy" button.
 
-From here you can pick how many instances and what infrastructure you'll want it to run on. Here you are primarily trading off cost, scale and execution time. 
+From here you can pick how many instances and what infrastructure you'll want it to run on. Here you are primarily trading off cost, scale and execution time.
 
 Once you deployed your model you have to update your code once more to point against your specific deployment by changing the call from `replicate.run` to:
 

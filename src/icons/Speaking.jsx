@@ -1,14 +1,13 @@
-import { lightGray, secondaryGreenShades } from 'anker-colors';
-import React from 'react';
-
 const SpeakingIcon = props => {
+  const { className = '', ...svgProps } = props;
+
   return (
     <svg
-      className="speaking-icon"
+      className={`speaking-icon ${className}`}
       id="Duotone"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 112"
-      {...props}
+      {...svgProps}
     >
       <defs />
       <title>67- web-html-programmer-male-caucasian</title>

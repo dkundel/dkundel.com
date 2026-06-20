@@ -1,0 +1,11 @@
+---
+import { SiteHeader } from '../design-system/index.js';
+import siteMetaData from '../../data/siteMetadata.json';
+import DarkModeToggle from './DarkModeToggle.jsx';
+
+const { name, path = '/' } = Astro.props;
+---
+
+<SiteHeader name={name} path={path} socials={siteMetaData.socials}>
+  <DarkModeToggle className="hidden sm:inline-block" client:load />
+</SiteHeader>

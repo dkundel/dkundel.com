@@ -1,25 +1,12 @@
 
 import { Resend } from 'resend';
 
-import fetch, {
-  Headers,
-  Request,
-  Response,
-} from 'node-fetch'
-
-if (!globalThis.fetch) {
-  globalThis.fetch = fetch
-  globalThis.Headers = Headers
-  globalThis.Request = Request
-  globalThis.Response = Response
-}
-
 export const handler = async function(event, context) {
   // Check if the request is coming from a browser
-  const isBrowser = event.headers['user-agent']?.includes('Mozilla') || 
-                    event.headers['user-agent']?.includes('Chrome') || 
+  const isBrowser = event.headers['user-agent']?.includes('Mozilla') ||
+                    event.headers['user-agent']?.includes('Chrome') ||
                     event.headers['user-agent']?.includes('Safari');
-  
+
   // If it's a browser request, redirect to Rick Roll
   if (isBrowser) {
     return {
@@ -29,7 +16,7 @@ export const handler = async function(event, context) {
       }
     };
   }
-  
+
   // For POST requests (like curl), check auth and handle email
   if (event.httpMethod === 'POST') {
     // Get credentials from environment variables
@@ -74,7 +61,7 @@ export const handler = async function(event, context) {
         // Parse the request body based on content type
         let params;
         const contentType = event.headers['content-type'] || '';
-        
+
         if (contentType.includes('application/json')) {
           params = JSON.parse(event.body);
         } else if (contentType.includes('application/x-www-form-urlencoded')) {
@@ -136,10 +123,10 @@ export const handler = async function(event, context) {
       body: 'Unauthorized'
     };
   }
-  
+
   // For any other request method
   return {
     statusCode: 405,
     body: 'Method Not Allowed'
   };
-}; 
+};

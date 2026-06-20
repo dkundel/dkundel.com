@@ -1,5 +1,4 @@
 const { shades } = require('anker-colors/dist/index');
-const defaultTheme = require('tailwindcss/defaultTheme');
 
 const disabledCss = {
   code: false,
@@ -13,7 +12,7 @@ module.exports = {
   darkMode: 'class',
   content: [
     './public/**/*.html',
-    './src/**/*.{astro,js,jsx,svelte,ts,tsx,vue}',
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
   ],
   plugins: [require('@tailwindcss/typography')],
   theme: {

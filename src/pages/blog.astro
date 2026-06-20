@@ -1,47 +1,55 @@
 ---
-import { Picture } from "@astrojs/image/components";
 import Layout from "@layouts/default.astro";
 import { getFormattedDate } from "@utils/date";
-import Heading from '../components/Heading.jsx';
-import SectionHeader from '../components/SectionHeader.jsx';
+import {
+  PageHeader,
+  PageHeadingGroup,
+  PageLead,
+  PageSubheading,
+  PageTitle,
+} from '../design-system/index.js';
 
-// Use Astro.glob() to fetch all posts, and then sort them by date.
-const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
+const postImports = import.meta.glob("./blog/*.{md,mdx}", { eager: true });
+const posts = Object.values(postImports).sort(
   (a, b) =>
     new Date(b.frontmatter.publishDate).valueOf() -
     new Date(a.frontmatter.publishDate).valueOf()
 );
+
+const myBlog = posts.filter(post => !post.frontmatter.canonical_url);
+const archive = posts.filter(post => !!post.frontmatter.canonical_url);
 ---
 
 <Layout title="Blog">
   <div>
-    <SectionHeader>
-      <Heading>
-      <Heading.h1>
-        Blog
-      </Heading.h1>
-      <Heading.p>
-        Below you can find articles written on my personal blog. Additionally to writing on my personal blog, I'm writing also on other platforms. For a full list of articles <a href="/writing">check out my writing page</a>.
-      </Heading.p>
-    </Heading>
-    </SectionHeader>
-    
+    <PageHeader>
+      <PageHeadingGroup>
+        <PageTitle>
+          Blog
+        </PageTitle>
+        <PageLead>
+          Below you can find articles written on my personal blog. Additionally to writing on my personal blog, I'm writing also on other platforms. For a full list of articles <a href="/writing">check out my writing page</a>.
+        </PageLead>
+      </PageHeadingGroup>
+    </PageHeader>
+
     <main class="mt-16">
       <ul class="grid gap-8 max-w-4xl mx-auto">
         {
-          posts.map((post, index) => (
+          myBlog.map((post, index) => (
             <li class="bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 shadow-md rounded-lg p-3 hover:shadow-xl focus:shadow-xl focus-within:shadow-xl hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform">
               <a href={post.url} class="">
                 <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
-                  <Picture
-                    src={post.frontmatter.image}
-                    widths={[200, 400, 800]}
-                    sizes="(max-width: 800px) 100vw, 800px"
-                    aspectRatio="2:1"
-                    alt="Thumbnail"
-                    loading={index === 0 ? "eager" : "lazy"}
-                    class="w-full rounded-md"
-                  />
+                  {post.frontmatter.image ? (
+                    <img
+                      src={post.frontmatter.image}
+                      alt={post.frontmatter.imageAlt || ""}
+                      width={post.frontmatter.imageWidth}
+                      height={post.frontmatter.imageHeight}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      class="w-full rounded-md"
+                    />
+                  ) : null}
                   <div>
                     <span class="text-purple-300 uppercase tracking-wider text-sm font-medium">
                       {post.frontmatter.category}
@@ -70,5 +78,24 @@ const posts = (await Astro.glob("./blog/*.{md,mdx}")).sort(
         }
       </ul>
     </main>
+    <section class="mt-10">
+      <PageHeader>
+        <PageHeadingGroup>
+          <PageSubheading>Archive</PageSubheading>
+          <PageLead>
+            Below you can find articles I have originally written on other platforms and that have been archived on my own blog.
+          </PageLead>
+        </PageHeadingGroup>
+      </PageHeader>
+      <ul class="topic-list">
+        {archive.map(post => (
+          <li>
+            <a href={post.url}>
+              <span class="font-bold">{post.frontmatter.title}</span> - <time datetime={post.frontmatter.publishDate}>{getFormattedDate(post.frontmatter.publishDate)}</time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
   </div>
 </Layout>

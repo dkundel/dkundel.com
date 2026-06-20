@@ -1,34 +1,38 @@
 ---
 import Layout from '../layouts/default.astro';
-import ArticleList from '../components/ArticleList.jsx';
-import SectionHeader from '../components/SectionHeader.jsx';
-import PageSubheading from '@components/common/PageSubheading';
-import Heading from '../components/Heading.jsx';
+import {
+  ArticleList,
+  PageHeader,
+  PageHeadingGroup,
+  PageLead,
+  PageSubheading,
+  PageTitle,
+} from '../design-system/index.js';
 import data from '../../data/about/dkundel.json';
 ---
 <!-- Below is your "component template." It's just HTML, but with
      some magic sprinkled in to help you build great templates. -->
-  <Layout title="Writing">
-  <SectionHeader>
-  <!-- <PageIcon Icon={Writing} /> -->
-  <Heading>
-    <Heading.h1>Writing</Heading.h1>
-    <Heading.p>
-      I love telling stories through code and explaining technical
-      concepts. As a result you'll find me regularly blogging on various
-      platforms such as{' '}
-      <a href="https://twilio.com/blog/author/dkundel">the Twilio Blog</a>
-      , <a href="https://dev.to/dkundel">dev.to</a>, or{' '}
-      <a href="/blog">my personal blog</a>.
-    </Heading.p>
-    <Heading.p>
-      Here's a list of some of my technical content published online and
-      in print.
-    </Heading.p>
-  </Heading>
-  </SectionHeader>
-  <PageSubheading.h2>Online Posts</PageSubheading.h2>
-  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} client:load />
-  <PageSubheading.h2>Printed Articles</PageSubheading.h2>
-  <ArticleList list={data.technicalWriting.print._list} client:load/>
-  </Layout>
+	  <Layout title="Writing">
+	  <PageHeader>
+	  <!-- <PageIcon Icon={Writing} /> -->
+	  <PageHeadingGroup>
+	    <PageTitle>Writing</PageTitle>
+	    <PageLead>
+	      I love telling stories through code and explaining technical
+	      concepts. As a result you'll find me regularly blogging on various
+	      platforms such as{' '}
+	      <a href="https://twilio.com/blog/author/dkundel">the Twilio Blog</a>
+	      , <a href="https://dev.to/dkundel">dev.to</a>, or{' '}
+	      <a href="/blog">my personal blog</a>.
+	    </PageLead>
+	    <PageLead>
+	      Here's a list of some of my technical content published online and
+	      in print.
+	    </PageLead>
+	  </PageHeadingGroup>
+	  </PageHeader>
+	  <PageSubheading>Online Posts</PageSubheading>
+	  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} />
+	  <PageSubheading>Printed Articles</PageSubheading>
+	  <ArticleList list={data.technicalWriting.print._list}/>
+	  </Layout>

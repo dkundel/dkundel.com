@@ -1,12 +1,16 @@
 import rss from '@astrojs/rss';
 
-const postImportResult = import.meta.glob('./blog/**/*.{md,mdx}', {
+const postImports = import.meta.glob('./blog/**/*.{md,mdx}', {
   eager: true,
 });
-const posts = Object.values(postImportResult);
+const posts = Object.values(postImports).sort(
+  (a, b) =>
+    new Date(b.frontmatter.publishDate).valueOf() -
+    new Date(a.frontmatter.publishDate).valueOf()
+);
 
-export const get = () =>
-  rss({
+export function GET(context) {
+  return rss({
     // `<title>` field in output xml
     title: `Dominik Kundel's Blog`,
     // `<description>` field in output xml
@@ -14,7 +18,7 @@ export const get = () =>
       'Articles about coding, product management, and more, written by Dominik Kundel',
     // base URL for RSS <item> links
     // SITE will use "site" from your project's astro.config.
-    site: import.meta.env.SITE,
+    site: context.site,
     // list of `<item>`s in output xml
     // simple example: generate items for every md file in /src/pages
     // see "Generating items" section for required frontmatter and advanced use cases
@@ -30,3 +34,4 @@ export const get = () =>
     // (optional) inject custom xml
     customData: `<language>en-us</language>`,
   });
+}
