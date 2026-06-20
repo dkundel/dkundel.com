@@ -30,6 +30,120 @@ function getLocalImageFileName(baseUrl) {
     .digest('hex');
 }
 
+function getPreviewImage($) {
+  return (
+    $('meta[property="og:image"]').attr('content') ||
+    $('meta[property="og:image:url"]').attr('content') ||
+    $('meta[property="og:image:secure_url"]').attr('content') ||
+    $('meta[name="twitter:image"]').attr('content') ||
+    $('meta[property="twitter:image"]').attr('content') ||
+    $('meta[name="twitter:image:src"]').attr('content')
+  );
+}
+
+function isXArticleUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    return (
+      ['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'].includes(
+        url.hostname
+      ) && /^\/(?:i\/article|[^/]+\/article)\/\d+\/?$/.test(url.pathname)
+    );
+  } catch (err) {
+    return false;
+  }
+}
+
+function isGenericXPreviewImage(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    return (
+      url.hostname === 'abs.twimg.com' &&
+      url.pathname.includes('/rweb/ssr/default/') &&
+      url.pathname.endsWith('/og/image.png')
+    );
+  } catch (err) {
+    return false;
+  }
+}
+
+function getEntryTitle(entry) {
+  return cheerio.load(entry)('a').first().text().trim();
+}
+
+function escapeXml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function wrapText(value, maxLineLength = 34, maxLines = 4) {
+  const words = value.replace(/\s+/g, ' ').trim().split(' ');
+  const lines = [];
+  let line = '';
+
+  words.forEach(word => {
+    const candidate = line ? `${line} ${word}` : word;
+    if (candidate.length > maxLineLength && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = candidate;
+    }
+  });
+
+  if (line) {
+    lines.push(line);
+  }
+
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    lines[maxLines - 1] = `${lines[maxLines - 1].replace(/[.。]+$/, '')}...`;
+  }
+
+  return lines;
+}
+
+function createXArticlePreviewSvg(title) {
+  const safeTitle = title || 'X Article';
+  const lines = wrapText(safeTitle)
+    .map(
+      (line, idx) =>
+        `<tspan x="96" dy="${idx === 0 ? 0 : 82}">${escapeXml(line)}</tspan>`
+    )
+    .join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="${escapeXml(
+    safeTitle
+  )}">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#101820"/>
+      <stop offset="0.55" stop-color="#172333"/>
+      <stop offset="1" stop-color="#111111"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M0 505C175 456 334 455 477 502c172 56 344 44 516-37 84-40 153-61 207-65v230H0Z" fill="#1d9bf0" opacity="0.18"/>
+  <text x="96" y="126" fill="#8ecdf8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" letter-spacing="4">X ARTICLE</text>
+  <text x="96" y="246" fill="#f7f9f9" font-family="Inter, Arial, sans-serif" font-size="66" font-weight="800">${lines}</text>
+  <text x="96" y="548" fill="#8b98a5" font-family="Inter, Arial, sans-serif" font-size="30">dkundel on X</text>
+  <text x="1040" y="548" fill="#f7f9f9" font-family="Arial, sans-serif" font-size="96" font-weight="800">X</text>
+</svg>`;
+}
+
+async function writeXArticlePreview(localImageId, entry) {
+  const localImageFile = `${localImageId}.svg`;
+  await writeFile(
+    resolve(OUTPUT_IMAGES, localImageFile),
+    createXArticlePreviewSvg(getEntryTitle(entry)),
+    'utf8'
+  );
+  return '/blog-headers/external/' + localImageFile;
+}
+
 async function run() {
   const resp = await got(DATA_URL);
   if (resp.statusCode !== 200) {
@@ -62,15 +176,23 @@ async function run() {
       if (existingImageResults.length < 1) {
         const resp = await got(url);
         const $ = cheerio.load(resp.body);
-        const image =
-          $('meta[property="og:image"]').attr('content') ||
-          $('meta[name="twitter:image"]').attr('content');
+        const image = getPreviewImage($);
 
         if (!image) {
+          if (isXArticleUrl(url)) {
+            out.image = await writeXArticlePreview(localImageId, entry);
+          }
           return out;
         }
 
         const imageUrl = new URL(image, url).toString();
+        if (isGenericXPreviewImage(imageUrl)) {
+          if (isXArticleUrl(url)) {
+            out.image = await writeXArticlePreview(localImageId, entry);
+          }
+          return out;
+        }
+
         const localImageFile =
           localImageId + (extname(new URL(imageUrl).pathname) || '.jpg');
 
