@@ -1,6 +1,6 @@
 {
-  "title": "Dominik Kundel | Programmer, Product Manager, Public Speaker",
-  "description": "Dominik Kundel is a Web Developer, Product Manager and Public Speaker.",
+  "title": "Dominik Kundel — Developer Experience, AI & Product",
+  "description": "Dominik Kundel is a developer, product leader, and speaker working on AI, developer experience, and tools that make complex technology feel approachable.",
   "name": "Dominik Kundel",
   "author": "@dkundel",
   "socials": {
@@ -9,6 +9,26 @@
     "linkedin": "https://linkedin.com/in/dkundel",
     "instagram": "https://instagram.com/cocktail.and.code"
   },
+  "selectedWork": [
+    {
+      "type": "Talk",
+      "event": "DevRelCon NYC",
+      "title": "Developer experience in the age of agents",
+      "href": "https://d-k.im/devrelcon"
+    },
+    {
+      "type": "Talk",
+      "event": "AI Engineer World's Fair",
+      "title": "Codex: the harness around the model",
+      "href": "https://d-k.im/aiewf-codex-harness"
+    },
+    {
+      "type": "Talk",
+      "event": "AI Engineer World's Fair",
+      "title": "Building with the Codex app server",
+      "href": "https://d-k.im/aiewf-codex-app-server"
+    }
+  ],
   "featuredTalks": [
     {
       "title": "XSS, CSRF, CSP, JWT, WTF? IDK ¯\\_(ツ)_/¯",

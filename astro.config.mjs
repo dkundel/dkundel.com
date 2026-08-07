@@ -9,6 +9,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 import mdx from '@astrojs/mdx';
+import rehypePerformanceImages from './scripts/rehype-performance-images.mjs';
 
 // https://astro.build/config
 export default defineConfig(
@@ -24,6 +25,7 @@ export default defineConfig(
       },
       processor: unified({
         remarkPlugins: [a11yEmoji],
+        rehypePlugins: [rehypePerformanceImages],
       }),
     },
     integrations: [

@@ -13,6 +13,27 @@ const DATA_URL = `${RAW_GITHUB}/master/README.md`;
 const OUTPUT = resolve(process.cwd(), 'data/about/dkundel.json');
 const OUTPUT_MD = resolve(process.cwd(), 'data/dkundel-md.json');
 const OUTPUT_IMAGES = resolve(process.cwd(), 'public/blog-headers/external/');
+const FEATURED_IMAGE_COUNT = 6;
+const REQUEST_TIMEOUT_MS = 12_000;
+
+async function fetchWithRetry(url, options = {}, attempts = 2) {
+  let lastResponse;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      lastResponse = response;
+      if (response.ok) return response;
+    } catch (error) {
+      if (attempt === attempts - 1) return undefined;
+    }
+  }
+
+  return lastResponse;
+}
 
 const sectionKeys = {
   '👨‍💻 Biography': 'biography',
@@ -98,16 +119,16 @@ async function getXArticleStatusPreviewImage(rawUrl) {
   ]) {
     let resp;
     try {
-      resp = await fetch(statusUrl, {
+      resp = await fetchWithRetry(statusUrl, {
         headers: {
           'user-agent': userAgent,
         },
-      });
+      }, 1);
     } catch (err) {
       continue;
     }
 
-    if (!resp.ok) {
+    if (!resp?.ok) {
       continue;
     }
 
@@ -204,8 +225,8 @@ async function writeXArticlePreview(localImageId, entry) {
 }
 
 async function run() {
-  const resp = await fetch(DATA_URL);
-  if (!resp.ok) {
+  const resp = await fetchWithRetry(DATA_URL);
+  if (!resp?.ok) {
     console.error('Could not fetch data');
     process.exit(1);
   }
@@ -214,13 +235,26 @@ async function run() {
   const data = parseReadme(readme, { asHtml: true });
   const mdData = parseReadme(readme, { asHtml: false });
 
+  const writingEntries = data.technicalWriting.online._list;
+  const imageStartIndex = Math.max(0, writingEntries.length - FEATURED_IMAGE_COUNT);
+
   data.technicalWriting.online._listExtended = await Promise.all(
-    data.technicalWriting.online._list.map(async entry => {
+    writingEntries.map(async (entry, index) => {
       const out = {
         html: entry,
       };
       const url = entry.match(/href="(.+?)"/)[1];
       out.url = url;
+
+      if (out.url.startsWith('https://moin.world')) {
+        out.url = '/blog/' + basename(out.url);
+        out.html = out.html.replace(/href="(.*?)"/, `href="${out.url}"`);
+      }
+
+      if (index < imageStartIndex) {
+        return out;
+      }
+
       const localImageId = getLocalImageFileName(url);
 
       const existingImageResults = await glob(
@@ -228,9 +262,12 @@ async function run() {
       );
 
       if (existingImageResults.length < 1) {
-        const resp = await fetch(url);
-        if (!resp.ok) {
-          throw new Error(`Unable to fetch ${url}: ${resp.status}`);
+        const resp = await fetchWithRetry(url, {
+          headers: { 'user-agent': 'dkundel.com link preview builder' },
+        });
+        if (!resp?.ok) {
+          console.warn(`Unable to fetch preview metadata for ${url}`);
+          return out;
         }
         const $ = cheerio.load(await resp.text());
         let image = getPreviewImage($);
@@ -257,8 +294,8 @@ async function run() {
         const localImageFile =
           localImageId + getImageFileExtension(imageUrl);
 
-        const imageResponse = await fetch(imageUrl);
-        if (!imageResponse.ok || !imageResponse.body) {
+        const imageResponse = await fetchWithRetry(imageUrl);
+        if (!imageResponse?.ok || !imageResponse.body) {
           return out;
         }
         await mkdir(OUTPUT_IMAGES, { recursive: true });
@@ -271,11 +308,6 @@ async function run() {
         out.image =
           '/blog-headers/external/' +
           relative(OUTPUT_IMAGES, existingImageResults[0]);
-      }
-
-      if (out.url.startsWith('https://moin.world')) {
-        out.url = '/blog/' + basename(out.url);
-        out.html = out.html.replace(/href="(.*?)"/, `href="${out.url}"`);
       }
 
       return out;

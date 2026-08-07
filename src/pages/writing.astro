@@ -1,38 +1,104 @@
 ---
 import Layout from '../layouts/default.astro';
+import { getFormattedDate } from '../utils/date.js';
 import {
   ArticleList,
   PageHeader,
   PageHeadingGroup,
   PageLead,
-  PageSubheading,
   PageTitle,
 } from '../design-system/index.js';
 import data from '../../data/about/dkundel.json';
+
+type PostModule = {
+  url: string;
+  frontmatter: {
+    title: string;
+    publishDate: string;
+    canonical_url?: string;
+    image?: string;
+    imageWidth?: number;
+    imageHeight?: number;
+  };
+};
+
+const postImports = import.meta.glob('./blog/*.{md,mdx}', { eager: true });
+const personalPosts = (Object.values(postImports) as PostModule[])
+  .filter(post => !post.frontmatter.canonical_url)
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.publishDate).valueOf() -
+      new Date(a.frontmatter.publishDate).valueOf()
+  )
+  .slice(0, 3);
 ---
-<!-- Below is your "component template." It's just HTML, but with
-     some magic sprinkled in to help you build great templates. -->
-	  <Layout title="Writing">
-	  <PageHeader>
-	  <!-- <PageIcon Icon={Writing} /> -->
-	  <PageHeadingGroup>
-	    <PageTitle>Writing</PageTitle>
-	    <PageLead>
-	      I love telling stories through code and explaining technical
-	      concepts. As a result you'll find me regularly blogging on various
-	      platforms such as{' '}
-	      <a href="https://twilio.com/blog/author/dkundel">the Twilio Blog</a>
-	      , <a href="https://dev.to/dkundel">dev.to</a>, or{' '}
-	      <a href="/blog">my personal blog</a>.
-	    </PageLead>
-	    <PageLead>
-	      Here's a list of some of my technical content published online and
-	      in print.
-	    </PageLead>
-	  </PageHeadingGroup>
-	  </PageHeader>
-	  <PageSubheading>Online Posts</PageSubheading>
-	  <ArticleList list={data.technicalWriting.online._listExtended} reverseOrder={true} />
-	  <PageSubheading>Printed Articles</PageSubheading>
-	  <ArticleList list={data.technicalWriting.print._list}/>
-	  </Layout>
+
+<Layout
+  title="Writing"
+  description="Writing by Dominik Kundel about AI, JavaScript, developer tools, product, and developer experience."
+>
+  <PageHeader>
+    <PageHeadingGroup>
+      <p class="eyebrow">Writing</p>
+      <PageTitle>Notes for people who build.</PageTitle>
+      <PageLead>
+        I write to make technical ideas easier to hold onto—from AI and developer
+        tools to JavaScript, product craft, and the occasional over-engineered coffee machine.
+      </PageLead>
+    </PageHeadingGroup>
+  </PageHeader>
+
+  <section class="writing-section" aria-labelledby="selected-writing-title">
+    <p class="section-kicker">Published elsewhere</p>
+    <h2 class="page-subheading" id="selected-writing-title">Selected technical writing</h2>
+    <ArticleList
+      list={data.technicalWriting.online._listExtended}
+      reverseOrder={true}
+      featuredCount={6}
+      archiveLabel="Browse all published articles"
+    />
+  </section>
+
+  <section class="writing-section" aria-labelledby="personal-writing-title">
+    <p class="section-kicker">Personal archive</p>
+    <h2 class="page-subheading" id="personal-writing-title">Longer notes and experiments</h2>
+    <ul class="blog-list">
+      {personalPosts.map(post => (
+        <li>
+          <a class="blog-list__link" href={post.url}>
+            {post.frontmatter.image ? (
+              <img
+                class="blog-list__image"
+                src={post.frontmatter.image}
+                alt=""
+                width={post.frontmatter.imageWidth || 1200}
+                height={post.frontmatter.imageHeight || 630}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : <span class="blog-list__image" aria-hidden="true" />}
+            <span>
+              <span class="blog-list__title">{post.frontmatter.title}</span>
+              <span class="article-meta">{getFormattedDate(post.frontmatter.publishDate)}</span>
+            </span>
+            <span class="feature-row__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="button-row">
+      <a class="button-link" href="/blog">Browse the personal blog</a>
+      <a class="button-link" href="/rss.xml">Subscribe via RSS</a>
+    </div>
+  </section>
+
+  <section class="writing-section" aria-labelledby="print-writing-title">
+    <p class="section-kicker">In print</p>
+    <h2 class="page-subheading" id="print-writing-title">Printed articles</h2>
+    <ArticleList
+      list={data.technicalWriting.print._list}
+      featuredCount={0}
+      archiveLabel="Browse printed articles"
+    />
+  </section>
+</Layout>

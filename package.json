@@ -12,7 +12,6 @@
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
     "@fec/remark-a11y-emoji": "^3.1.0",
-    "@heroicons/react": "^2.0.13",
     "@tailwindcss/vite": "^4.3.1",
     "anker-colors": "^1.4.0",
     "astro": "^6.4.8",
@@ -23,14 +22,17 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@astrojs/react": "^5.0.7",
     "@tailwindcss/typography": "^0.5.20",
     "cheerio": "^1.2.0",
     "glob": "^13.0.6",
-    "prettier": "^1.17.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3",
     "vite": "^7.3.5"
   },
   "keywords": [
@@ -44,8 +46,10 @@
     "postbuild": "node -e \"const { cpSync } = require('node:fs'); cpSync('data/about/dkundel.json', 'dist/dkundel.json'); cpSync('data/dkundel-md.json', 'dist/dkundel-md.json');\"",
     "dev": "astro dev",
     "preview": "astro preview",
-    "format": "prettier --write 'src/**/*.js'",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write 'src/**/*.{astro,js,jsx,css,md,mdx}' 'scripts/**/*.{js,mjs}' '*.{js,mjs,json,md}' '.github/**/*.yml'",
+    "check": "astro check",
+    "check:dist": "node scripts/checkBuild.mjs",
+    "test": "npm run build && npm run check && npm run check:dist",
     "fetch:data": "node scripts/fetchData.js"
   },
   "repository": {

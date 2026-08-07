@@ -1,49 +1,95 @@
 import { InteractiveCard } from '../ui/card.jsx';
 
-export function ArticleList({ list = [], reverseOrder = false }) {
+/**
+ * @param {{
+ *   list?: Array<string | { html: string, url?: string, image?: string }>,
+ *   reverseOrder?: boolean,
+ *   featuredCount?: number,
+ *   archiveLabel?: string
+ * }} props
+ */
+export function ArticleList({
+  list = [],
+  reverseOrder = false,
+  featuredCount = 6,
+  archiveLabel = 'Browse the full archive',
+}) {
   const entries = list.map(parseListEntry).filter(Boolean);
-  if (reverseOrder) {
-    entries.reverse();
-  }
+  if (reverseOrder) entries.reverse();
+
+  const featured = entries.slice(0, featuredCount);
+  const archive = entries.slice(featuredCount);
 
   return (
-    <div className="grid article-list-container justify-items-center justify-around lg:justify-start">
-      {entries.map(article => (
-        <ArticleCard article={article} key={article.url} />
-      ))}
-    </div>
+    <>
+      {featured.length > 0 ? (
+        <ul className="article-feature-list">
+          {featured.map((article, index) => (
+            <li key={article.url}>
+              <ArticleCard article={article} eager={index === 0} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {archive.length > 0 ? (
+        <details className="archive-disclosure">
+          <summary className="archive-summary">
+            <span>{archiveLabel}</span>
+            <span className="small-all-caps">{archive.length} more</span>
+          </summary>
+          <ol className="archive-list">
+            {archive.map(article => (
+              <li className="archive-row" key={article.url}>
+                <a
+                  href={article.url}
+                  target={article.isExternal ? '_blank' : undefined}
+                  rel={article.isExternal ? 'noopener noreferrer' : undefined}
+                >
+                  <span className="archive-row__title">{article.title}</span>
+                  <span className="archive-row__meta">
+                    {article.date} · {article.onWebsite}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      ) : null}
+    </>
   );
 }
 
-function ArticleCard({ article }) {
-  const { language, title, date, url, onWebsite, image } = article;
-  const isExternal = !url.startsWith('/');
-  const imageClasses = image ? 'min-h-[14rem] max-w-full' : 'min-h-0';
+function ArticleCard({ article, eager }) {
+  const { language, title, date, url, onWebsite, image, isExternal } = article;
 
   return (
     <InteractiveCard
-      className={`w-[300px] mx-2 max-w-xs mb-6 p-0 flex justify-between flex-col cursor-pointer hover:no-underline ${imageClasses}`}
+      className="article-card"
       href={url}
       target={isExternal ? '_blank' : undefined}
       rel={isExternal ? 'noopener noreferrer' : undefined}
     >
       {image ? (
-        <div className="mb-1">
-          <img
-            className="max-h-[150px] object-cover bg-white dark:bg-slate-800 w-full"
-            src={image}
-            alt="decorative header image of blog post"
-          />
-        </div>
-      ) : null}
-      <div className="flex flex-col flex-1 px-3 py-2 justify-between min-h-[100px] max-h-[120px]">
-        <h3 className="text-base font-bold pb-4 mb-0 text-purple-300 dark:text-gray-300 dark:hover:text-white">
-          {title}
-        </h3>
-        <p className="normal-case text-gray-500 dark:text-gray-300 text-xs m-0 tracking-wider uppercase">
-          <span>{language}</span>{' '}
-          <span className="uppercase">{date}</span> on{' '}
-          <span className="text-purple-300 dark:text-pink-400">{onWebsite}</span>
+        <img
+          className="article-card__image"
+          src={image}
+          width="600"
+          height="315"
+          alt=""
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ) : (
+        <div className="article-card__image" aria-hidden="true" />
+      )}
+      <div className="article-card__body">
+        <h3 className="article-card__title">{title}</h3>
+        <p className="article-meta">
+          {language ? <span>{language}</span> : null}
+          {language && date ? <span aria-hidden="true">·</span> : null}
+          {date ? <span>{date}</span> : null}
+          <span aria-hidden="true">·</span>
+          <span className="article-meta__source">{onWebsite}</span>
         </p>
       </div>
     </InteractiveCard>
@@ -52,36 +98,24 @@ function ArticleCard({ article }) {
 
 function parseListEntry(entry) {
   let info = entry;
-  if (typeof info !== 'string') {
-    info = entry.html;
-  }
+  if (typeof info !== 'string') info = entry.html;
+  if (typeof info !== 'string') return null;
 
   const parsedInfo = info.match(/(.*?)\s+(.*)\s+\|\s+(.*?)$/);
-  if (!parsedInfo) {
-    return null;
-  }
-
-  const [, language, link, date] = parsedInfo;
+  const link = parsedInfo?.[2] || info;
   const result = {
-    language,
-    title: stripHtml(link),
-    date,
-    image: entry.image || undefined,
-    url: entry.url,
+    language: parsedInfo?.[1]?.trim() || '',
+    title: stripHtml(link).trim(),
+    date: parsedInfo?.[3]?.trim() || '',
+    image: typeof entry === 'object' ? entry.image : undefined,
+    url: typeof entry === 'object' ? entry.url : undefined,
   };
 
-  if (!result.url) {
-    result.url = link.match(/href="(.*?)"/)?.[1];
-  }
+  if (!result.url) result.url = link.match(/href="(.*?)"/)?.[1];
+  if (!result.url || !result.title) return null;
 
-  if (!result.url) {
-    return null;
-  }
-
-  result.onWebsite = result.url.startsWith('/')
-    ? 'dkundel.com'
-    : getHostname(result.url);
-
+  result.isExternal = !result.url.startsWith('/');
+  result.onWebsite = result.isExternal ? getHostname(result.url) : 'dkundel.com';
   return result;
 }
 

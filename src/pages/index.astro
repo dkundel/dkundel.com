@@ -1,24 +1,61 @@
 ---
 import Layout from '../layouts/default.astro';
-import {
-  HomeIntro,
-  Paragraphs,
-  SocialList,
-  SubsectionHeading,
-  TopicList,
-} from '../design-system/index.js';
-import data from '../../data/about/dkundel.json';
-
+import { HomeIntro } from '../design-system/index.js';
+import siteMetadata from '../../data/siteMetadata.json';
 ---
-<!-- Below is your "component template." It's just HTML, but with
-     some magic sprinkled in to help you build great templates. -->
-  <Layout title="About Me">
+
+<Layout
+  fullTitle={siteMetadata.title}
+  description="Developer, product leader, and speaker working at the intersection of AI, developer tools, and the people who build with them."
+>
   <HomeIntro />
-  <SubsectionHeading>Biography</SubsectionHeading>
-  <Paragraphs list={data.biography._paragraphs} />
-  <SubsectionHeading>Examples of previous talks</SubsectionHeading>
-  <Paragraphs list={data.biography.examplesOfPreviousTalks._paragraphs}/>
-  <TopicList talks={data.biography.examplesOfPreviousTalks._list} />
-  <SubsectionHeading>Reach me on:</SubsectionHeading>
-  <SocialList channels={data.socialChannels._list} />
-  </Layout>
+
+  <section class="section-block" id="selected-work" aria-labelledby="selected-work-title">
+    <div class="section-header">
+      <div>
+        <p class="section-kicker">Selected work</p>
+        <h2 class="section-title" id="selected-work-title">Ideas made practical.</h2>
+      </div>
+      <p class="section-header__copy">
+        Recent talks about building with agents, shaping better developer experiences,
+        and turning frontier capabilities into tools people can trust.
+      </p>
+    </div>
+    <ul class="feature-list">
+      {siteMetadata.selectedWork.map(item => (
+        <li class="feature-row">
+          <a class="feature-row__link" href={item.href} target="_blank" rel="noopener noreferrer">
+            <span class="feature-row__event">{item.event}</span>
+            <span class="feature-row__title">{item.title}</span>
+            <span class="feature-row__arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section-block about-grid" aria-labelledby="about-title">
+    <div>
+      <p class="section-kicker">About</p>
+      <h2 class="section-title" id="about-title">Technology is only useful when people can use it.</h2>
+    </div>
+    <div class="about-copy">
+      <p>
+        I’m Dominik Kundel. At OpenAI, I work on developer experience around Codex.
+        My work sits between engineering, product, and storytelling: understanding
+        what new technology makes possible, then helping developers put it to work.
+      </p>
+      <p>
+        Before OpenAI, I spent nine years at Twilio across developer relations,
+        serverless, product, and emerging technology. I still write code, speak at
+        conferences, and occasionally connect JavaScript to things that should never
+        have had an API.
+      </p>
+      <div class="button-row">
+        <a class="button-link" href="/speaking">Speaking</a>
+        <a class="button-link" href="/writing">Writing</a>
+        <a class="button-link" href="mailto:hi@dkundel.com">hi@dkundel.com</a>
+      </div>
+    </div>
+  </section>
+</Layout>

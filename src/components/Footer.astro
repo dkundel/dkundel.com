@@ -1,9 +1,7 @@
 ---
 import img from '../images/panda-laptop.png';
 import { SiteFooter } from '../design-system/index.js';
-import DarkModeToggle from './DarkModeToggle.jsx';
+import siteMetaData from '../../data/siteMetadata.json';
 ---
 
-<SiteFooter image={img}>
-  <DarkModeToggle className="sm:hidden" client:load />
-</SiteFooter>
+<SiteFooter image={img} socials={siteMetaData.socials} />

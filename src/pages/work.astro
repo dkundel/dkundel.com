@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/default.astro';
+import {
+  PageHeader,
+  PageHeadingGroup,
+  PageLead,
+  PageTitle,
+} from '../design-system/index.js';
+import siteMetadata from '../../data/siteMetadata.json';
+---
+
+<Layout
+  title="Work"
+  description="Dominik Kundel's work across AI, developer experience, product, and technical storytelling."
+>
+  <PageHeader>
+    <PageHeadingGroup>
+      <p class="eyebrow">Work</p>
+      <PageTitle>Making ambitious technology usable.</PageTitle>
+      <PageLead>
+        I work where engineering, product, and communication overlap—finding the
+        shape of a new capability and making the path into it feel clear.
+      </PageLead>
+    </PageHeadingGroup>
+  </PageHeader>
+
+  <section class="section-block work-grid" aria-labelledby="current-focus">
+    <div class="work-card">
+      <p class="section-kicker">Now</p>
+      <h2 id="current-focus">Developer experience at OpenAI</h2>
+      <div class="work-card__copy">
+        <p>
+          I work on the developer experience around Codex: helping translate frontier
+          capabilities into tools, workflows, and stories developers can use in real work.
+        </p>
+      </div>
+    </div>
+    <div class="work-card">
+      <p class="section-kicker">Before</p>
+      <h2>Nine years of building with developers at Twilio</h2>
+      <div class="work-card__copy">
+        <p>
+          Across developer relations, serverless, product management, and emerging
+          technology, I helped developers understand new platforms and helped product
+          teams understand their developers.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" aria-labelledby="work-selected-title">
+    <div class="section-header">
+      <div>
+        <p class="section-kicker">In practice</p>
+        <h2 class="section-title" id="work-selected-title">Recent ideas and tools.</h2>
+      </div>
+      <p class="section-header__copy">
+        A selection of the work I’ve been sharing publicly around Codex, agents,
+        and the next generation of developer experience.
+      </p>
+    </div>
+    <ul class="feature-list">
+      {siteMetadata.selectedWork.map(item => (
+        <li class="feature-row">
+          <a class="feature-row__link" href={item.href} target="_blank" rel="noopener noreferrer">
+            <span class="feature-row__event">{item.event}</span>
+            <span class="feature-row__title">{item.title}</span>
+            <span class="feature-row__arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section-block about-grid" aria-labelledby="collaborate-title">
+    <div>
+      <p class="section-kicker">Connect</p>
+      <h2 class="section-title" id="collaborate-title">Let’s compare notes.</h2>
+    </div>
+    <div class="about-copy">
+      <p>
+        I’m always interested in thoughtful conversations about developer tools,
+        product craft, and how AI changes the way software gets made.
+      </p>
+      <div class="button-row">
+        <a class="button-link button-link--primary" href="mailto:hi@dkundel.com">Get in touch</a>
+        <a class="button-link" href="/speaking">See speaking work</a>
+      </div>
+    </div>
+  </section>
+</Layout>

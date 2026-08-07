@@ -1,16 +1,29 @@
 ---
-import Layout from "@layouts/default.astro";
-import { getFormattedDate } from "@utils/date";
+import Layout from '../layouts/default.astro';
+import { getFormattedDate } from '../utils/date.js';
 import {
   PageHeader,
   PageHeadingGroup,
   PageLead,
-  PageSubheading,
   PageTitle,
 } from '../design-system/index.js';
 
-const postImports = import.meta.glob("./blog/*.{md,mdx}", { eager: true });
-const posts = Object.values(postImports).sort(
+type PostModule = {
+  url: string;
+  frontmatter: {
+    title: string;
+    publishDate: string;
+    canonical_url?: string;
+    image?: string;
+    imageAlt?: string;
+    imageWidth?: number;
+    imageHeight?: number;
+    excerpt?: string;
+  };
+};
+
+const postImports = import.meta.glob('./blog/*.{md,mdx}', { eager: true });
+const posts = (Object.values(postImports) as PostModule[]).sort(
   (a, b) =>
     new Date(b.frontmatter.publishDate).valueOf() -
     new Date(a.frontmatter.publishDate).valueOf()
@@ -18,84 +31,96 @@ const posts = Object.values(postImports).sort(
 
 const myBlog = posts.filter(post => !post.frontmatter.canonical_url);
 const archive = posts.filter(post => !!post.frontmatter.canonical_url);
+const [featured, ...remainingPosts] = myBlog;
 ---
 
-<Layout title="Blog">
-  <div>
-    <PageHeader>
-      <PageHeadingGroup>
-        <PageTitle>
-          Blog
-        </PageTitle>
-        <PageLead>
-          Below you can find articles written on my personal blog. Additionally to writing on my personal blog, I'm writing also on other platforms. For a full list of articles <a href="/writing">check out my writing page</a>.
-        </PageLead>
-      </PageHeadingGroup>
-    </PageHeader>
+<Layout
+  title="Blog"
+  description="Longer notes and experiments from Dominik Kundel about AI, JavaScript, developer tools, and things with questionable APIs."
+>
+  <PageHeader>
+    <PageHeadingGroup>
+      <p class="eyebrow">Personal archive</p>
+      <PageTitle>Notes and experiments.</PageTitle>
+      <PageLead>
+        Longer pieces written here—usually where software, AI, product, and
+        curiosity collide. For everything published elsewhere, visit <a href="/writing">Writing</a>.
+      </PageLead>
+    </PageHeadingGroup>
+  </PageHeader>
 
-    <main class="mt-16">
-      <ul class="grid gap-8 max-w-4xl mx-auto">
-        {
-          myBlog.map((post, index) => (
-            <li class="bg-white dark:bg-slate-800 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-[0.5px] dark:border-slate-700 shadow-md rounded-lg p-3 hover:shadow-xl focus:shadow-xl focus-within:shadow-xl hover:scale-[1.02] focus:scale-[1.02] focus-within:scale-[1.02] transition-transform">
-              <a href={post.url} class="">
-                <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
-                  {post.frontmatter.image ? (
-                    <img
-                      src={post.frontmatter.image}
-                      alt={post.frontmatter.imageAlt || ""}
-                      width={post.frontmatter.imageWidth}
-                      height={post.frontmatter.imageHeight}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      class="w-full rounded-md"
-                    />
-                  ) : null}
-                  <div>
-                    <span class="text-purple-300 uppercase tracking-wider text-sm font-medium">
-                      {post.frontmatter.category}
-                    </span>
+  {featured ? (
+    <article>
+      <a class="blog-feature card interactive-card" href={featured.url}>
+        {featured.frontmatter.image ? (
+          <img
+            class="blog-feature__image"
+            src={featured.frontmatter.image}
+            alt={featured.frontmatter.imageAlt || ''}
+            width={featured.frontmatter.imageWidth || 1200}
+            height={featured.frontmatter.imageHeight || 630}
+            decoding="async"
+            fetchpriority="high"
+          />
+        ) : null}
+        <div class="blog-feature__copy">
+          <p class="section-kicker">Latest · {getFormattedDate(featured.frontmatter.publishDate)}</p>
+          <h2 class="blog-feature__title">{featured.frontmatter.title}</h2>
+          {featured.frontmatter.excerpt ? (
+            <p class="blog-feature__excerpt">{featured.frontmatter.excerpt}</p>
+          ) : null}
+        </div>
+      </a>
+    </article>
+  ) : null}
 
-                    <h2 class="text-2xl font-semibold leading-snug tracking-tight mt-1  mb-2 text-transparent bg-clip-text bg-gradient-to-tr from-[#DF3C83] to-purple-700 dark:to-purple-400">
-                      {post.frontmatter.title}
-                    </h2>
-
-                    <div class="flex gap-2 mt-3 small-all-caps">
-                      <span class="text-gray-400">
-                        {post.frontmatter.author || 'Dominik Kundel'}
-                      </span>
-                      <span class="text-gray-400">• </span>
-                      <time
-                        class="text-gray-400"
-                        datetime={post.frontmatter.publishDate}>
-                        {getFormattedDate(post.frontmatter.publishDate)}
-                      </time>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </main>
-    <section class="mt-10">
-      <PageHeader>
-        <PageHeadingGroup>
-          <PageSubheading>Archive</PageSubheading>
-          <PageLead>
-            Below you can find articles I have originally written on other platforms and that have been archived on my own blog.
-          </PageLead>
-        </PageHeadingGroup>
-      </PageHeader>
-      <ul class="topic-list">
-        {archive.map(post => (
+  {remainingPosts.length > 0 ? (
+    <section class="writing-section" aria-labelledby="more-posts-title">
+      <p class="section-kicker">More from the archive</p>
+      <h2 class="page-subheading" id="more-posts-title">Personal posts</h2>
+      <ul class="blog-list">
+        {remainingPosts.map(post => (
           <li>
-            <a href={post.url}>
-              <span class="font-bold">{post.frontmatter.title}</span> - <time datetime={post.frontmatter.publishDate}>{getFormattedDate(post.frontmatter.publishDate)}</time>
+            <a class="blog-list__link" href={post.url}>
+              {post.frontmatter.image ? (
+                <img
+                  class="blog-list__image"
+                  src={post.frontmatter.image}
+                  alt=""
+                  width={post.frontmatter.imageWidth || 1200}
+                  height={post.frontmatter.imageHeight || 630}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : <span class="blog-list__image" aria-hidden="true" />}
+              <span>
+                <span class="blog-list__title">{post.frontmatter.title}</span>
+                <span class="article-meta">{getFormattedDate(post.frontmatter.publishDate)}</span>
+              </span>
+              <span class="feature-row__arrow" aria-hidden="true">→</span>
             </a>
           </li>
         ))}
       </ul>
     </section>
-  </div>
+  ) : null}
+
+  {archive.length > 0 ? (
+    <section class="writing-section" aria-labelledby="republished-title">
+      <p class="section-kicker">Republished</p>
+      <h2 class="page-subheading" id="republished-title">Archived from elsewhere</h2>
+      <ul class="archive-list">
+        {archive.map(post => (
+          <li class="archive-row">
+            <a href={post.url}>
+              <span class="archive-row__title">{post.frontmatter.title}</span>
+              <time class="archive-row__meta" datetime={post.frontmatter.publishDate}>
+                {getFormattedDate(post.frontmatter.publishDate)}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ) : null}
 </Layout>

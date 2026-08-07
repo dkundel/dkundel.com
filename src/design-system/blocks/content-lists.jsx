@@ -3,16 +3,23 @@ import { SafeHtml } from '../ui/safe-html.jsx';
 
 export function Paragraphs({ list = [] }) {
   return (
-    <div className="text-base mb-2 styled-paragraphs">
+    <div className="about-copy">
       {list.map(content => <SafeHtml as="p" html={content} key={content.slice(0, 40)} />)}
     </div>
   );
 }
 
+/** @param {{ talks?: string[], className?: string }} props */
 export function TopicList({ talks = [], className = '' }) {
   return (
     <ul className={cn('topic-list', className)}>
-      {talks.map(talk => <SafeHtml as="li" html={talk} key={talk.slice(0, 40)} />)}
+      {talks.map(talk => (
+        <SafeHtml
+          as="li"
+          html={talk.replace(/<br\s*\/?\s*>/gi, ' · ')}
+          key={talk.slice(0, 40)}
+        />
+      ))}
     </ul>
   );
 }
