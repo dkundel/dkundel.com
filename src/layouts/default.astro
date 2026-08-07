@@ -4,7 +4,7 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import siteMetaData from '../../data/siteMetadata.json';
 
-const {title, fullTitle, canonical_url, image, description} = Astro.props;
+const {title, fullTitle, canonical_url, image, description, type = 'website'} = Astro.props;
 const siteTitle = fullTitle ? fullTitle : title ? `${title} | ${siteMetaData.title}` : siteMetaData.title;
 let canonicalURL = new URL(Astro.url.pathname, Astro.site);
 if (canonical_url) {
@@ -20,13 +20,13 @@ const pageDescription = description || siteMetaData.description;
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Montserrat:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
   <meta name="description" content={pageDescription}>
+  <meta name="theme-color" content="#f7f4ee" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151216" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
   <meta property="og:title" content={siteTitle}>
   <meta property="og:description" content={pageDescription}>
-  <meta property="og:type" content="website">
+  <meta property="og:type" content={type}>
   <meta property="og:image" content={pageImage}>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:creator" content={siteMetaData.author}>
@@ -40,19 +40,26 @@ const pageDescription = description || siteMetaData.description;
   <link rel="icon" href="/favicon-180.png" sizes="180x180">
   <link rel="icon" href="/favicon-192.png" sizes="192x192">
   <link rel="canonical" href={canonicalURL} />
+  <link rel="alternate" type="application/rss+xml" title={`${siteMetaData.name} RSS feed`} href="/rss.xml" />
   <title>{siteTitle}</title>
-  <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+  <script is:inline>
+    (() => {
+      let theme;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch {
+        theme = null;
+      }
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', theme === 'dark' || (!theme && prefersDark));
+    })();
   </script>
 </head>
 <body>
-  <div class="bg-gray-50 dark:bg-slate-900 flex w-full h-full flex-col items-center min-h-[100vh]">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="site-shell">
     <Header name={siteMetaData.name} path={Astro.url.pathname} />
-    <div class="flex-1 max-w-[1000px] w-full p-[20px]" role="main"><slot/></div>
+    <main id="main-content" class="page-frame"><slot/></main>
     <Footer />
     <a rel="me" style="display:none;" href="https://mastodon.social/@dkundel">Mastodon</a>
   </div>

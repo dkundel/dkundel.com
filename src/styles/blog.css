@@ -1,25 +1,7 @@
-h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.75rem;
-  margin-bottom: 0.5rem;
-}
-
 .astro-code {
-  padding: 0.75rem;
+  padding: 1rem;
 }
 
-.inline-code-prose *:not(pre) code {
-  background-color: rgb(233 213 255 / 40%);
-  border-radius: 0.375rem;
-  color: #6d28d9;
-  font-size: 0.70em;
-  padding: 0.25rem;
-  /* @apply before:content-none;
-  @apply after:content-none; */
-}
-
-.dark .inline-code-prose *:not(pre) code {
-  background-color: rgb(151 60 105 / 60%);
-  color: #faf5ff;
+.editorial-prose .twitter-tweet {
+  margin-inline: auto;
 }

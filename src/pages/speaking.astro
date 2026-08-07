@@ -5,7 +5,6 @@ import {
   PageHeader,
   PageHeadingGroup,
   PageLead,
-  PageSubheading,
   PageTitle,
   TalksByYear,
   TopicList,
@@ -14,63 +13,101 @@ import data from '../../data/about/dkundel.json';
 import siteMetadata from '../../data/siteMetadata.json';
 import speakingImage from '../images/me-speaking.png';
 
-function groupPresentationsByYear(list) {
-  return list.reduce((byYear, talk) => {
+type Talk = {
+  event: string;
+  location: string;
+  date: string;
+  topic: string;
+  other?: string;
+};
+
+function groupPresentationsByYear(list: Talk[]) {
+  return list.reduce<Record<string, Talk[]>>((byYear, talk) => {
     const year = (talk.date || '').match(/\d{4}(?!.*\d{4})/)?.[0];
-    if (!year) {
-      return byYear;
-    }
-    if (byYear[year]) {
-      byYear[year].push(talk);
-    } else {
-      byYear[year] = [talk];
-    }
+    if (!year) return byYear;
+    byYear[year] ||= [];
+    byYear[year].push(talk);
     return byYear;
   }, {});
 }
 
 const talksByYears = groupPresentationsByYear(data.pastPresentations._entries);
 const years = Object.keys(talksByYears).sort((a, b) => +b - +a);
-
 ---
-<!-- Below is your "component template." It's just HTML, but with
-     some magic sprinkled in to help you build great templates. -->
-  <Layout title="Speaking">
-	    <div class="flex flex-col md:flex-row-reverse">
-	      <div class="w-[230px] sm:w-[300px] md:w-[800px] mx-auto mb-7 mt-3">
-	        <img src={speakingImage.src} width={speakingImage.width} height={speakingImage.height} alt="Dominik on stage speaking."/>
-	      </div>
-	    <PageHeader>
-	      <!-- <PageIcon Icon={Speaking} /> -->
-	      <PageHeadingGroup>
-	        <PageTitle>Speaking</PageTitle>
-	        <PageLead>
-	          During my time as a developer, I learned a lot from my peers and
-	          as a result I try to give back whenever possible. One way for me
-	          to do this is by giving presentations about a variety of topics.
-	        </PageLead>
-	        <PageLead className="m-0 mb-2">
-	          Among others these topics include:
-	        </PageLead>
-	        <TopicList talks={data.currentTalkTopics._list.map(x => x.replace('|', '<br>'))} />
-	        <PageLead className="m-0 mb-8">
-	          You can find a comprehensive{' '}
-	          <a href="https://github.com/dkundel/about-me/tree/master/abstracts">
-	            list on my GitHub
-	          </a>
-	          .
-	        </PageLead>
-	      </PageHeadingGroup>
-	    </PageHeader>
-	    </div>
-	    <PageSubheading>Featured Past Talks</PageSubheading>
-	    <div class="flex gap-4 justify-center flex-wrap mb-8">
-	      {siteMetadata.featuredTalks.map(talk => {
-	        return <FeaturedTalk {...talk}/>
-	      })}
-	    </div>
-	    <PageSubheading>Past Speaking Engagements</PageSubheading>
-    {years.map((year, idx) => {
-      return <TalksByYear list={talksByYears[year]} year={year} showDefault={idx!==0} />
-    })}
-  </Layout>
+
+<Layout
+  title="Speaking"
+  description="Talks by Dominik Kundel about AI, Codex, developer experience, JavaScript, and building better tools."
+>
+  <section class="speaking-hero">
+    <PageHeader>
+      <PageHeadingGroup>
+        <p class="eyebrow">Speaking</p>
+        <PageTitle>Make the complicated memorable.</PageTitle>
+        <PageLead>
+          I speak about AI, developer experience, product craft, and the surprising
+          things that happen when people meet powerful tools.
+        </PageLead>
+        <TopicList talks={data.currentTalkTopics._list.map((topic: string) => topic.replace('|', ' · '))} />
+        <div class="button-row">
+          <a class="button-link button-link--primary" href="mailto:hi@dkundel.com?subject=Speaking%20inquiry">
+            Invite me to speak
+          </a>
+          <a class="button-link" href="https://github.com/dkundel/about-me/tree/master/abstracts" target="_blank" rel="noopener noreferrer">
+            Browse abstracts
+          </a>
+        </div>
+      </PageHeadingGroup>
+    </PageHeader>
+    <div class="speaking-portrait">
+      <img
+        src={speakingImage.src}
+        width={speakingImage.width}
+        height={speakingImage.height}
+        alt="Dominik Kundel speaking on stage"
+        decoding="async"
+        fetchpriority="high"
+      />
+    </div>
+  </section>
+
+  <section class="section-block" aria-labelledby="recent-talks-title">
+    <div class="section-header">
+      <div>
+        <p class="section-kicker">Recent</p>
+        <h2 class="section-title" id="recent-talks-title">What I’m talking about now.</h2>
+      </div>
+      <p class="section-header__copy">
+        Current thinking on agents, Codex, and the product decisions that turn a
+        capable model into a useful development environment.
+      </p>
+    </div>
+    <ul class="feature-list">
+      {siteMetadata.selectedWork.map(item => (
+        <li class="feature-row">
+          <a class="feature-row__link" href={item.href} target="_blank" rel="noopener noreferrer">
+            <span class="feature-row__event">{item.event}</span>
+            <span class="feature-row__title">{item.title}</span>
+            <span class="feature-row__arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section-block" aria-labelledby="recordings-title">
+    <p class="section-kicker">Watch</p>
+    <h2 class="page-subheading" id="recordings-title">Selected recordings</h2>
+    <div class="featured-talks">
+      {siteMetadata.featuredTalks.map(talk => <FeaturedTalk {...talk} />)}
+    </div>
+  </section>
+
+  <section class="section-block" aria-labelledby="speaking-archive-title">
+    <p class="section-kicker">Archive</p>
+    <h2 class="page-subheading" id="speaking-archive-title">Past speaking engagements</h2>
+    {years.map((year, index) => (
+      <TalksByYear list={talksByYears[year]} year={year} showDefault={index !== 0} />
+    ))}
+  </section>
+</Layout>

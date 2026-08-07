@@ -1,7 +1,20 @@
 ---
 import Layout from '../layouts/default.astro';
-
 ---
-  <Layout title="Oh no page not found.">
-    😢 Page not found
-  </Layout>
+
+<Layout title="Page not found" description="The page you were looking for could not be found.">
+  <section class="not-found" aria-labelledby="not-found-title">
+    <div>
+      <p class="not-found__code" aria-hidden="true">404</p>
+      <h1 id="not-found-title">This page wandered off.</h1>
+      <p>
+        The address may have changed, or the page may never have existed. There are
+        still plenty of useful things nearby.
+      </p>
+      <div class="button-row" style="justify-content: center">
+        <a class="button-link button-link--primary" href="/">Go home</a>
+        <a class="button-link" href="/writing">Browse writing</a>
+      </div>
+    </div>
+  </section>
+</Layout>
